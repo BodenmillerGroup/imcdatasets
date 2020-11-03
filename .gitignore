@@ -1,0 +1,15 @@
+.DS_Store
+._.DS_Store
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.zip
+*.rds
+*.html
+*.Rapp.history
+*._.DS_Store
+imcdatasets.Rproj
+
+# Temporary data files
+data/*

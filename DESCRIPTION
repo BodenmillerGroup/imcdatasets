@@ -1,0 +1,41 @@
+Package: imcdatasets
+Version: 0.1.0
+Date: 2020-11-02
+Title: Collection of publicly available imaging mass cytometry (IMC) datasets.
+Description:
+    The IMCdata package provides access to publicly available IMC datasets in
+    the form of SingleCellExperiment and CytoImageList objects.
+Authors@R:
+    c(person("Nils", "Eling", role = c("aut", "cre"),
+      email = "nils.eling@dqbm.uzh.ch",
+      comment = c(ORCID = "0000-0002-4711-1176")),
+      person("Nicolas", "Damond", role = c("aut"),
+      email = "nicolas.damond@dqbm.uzh.ch",
+      comment = c(ORCID = "0000-0003-3027-8989")),
+      person("Tobias", "Hoch", role = c("ctb")))
+License: GPL (>= 2)
+NeedsCompilation: no
+Depends:
+    R (>= 4.0),
+    SingleCellExperiment,
+    cytomapper,
+    methods
+Imports:
+    S4Vectors
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    testthat
+biocViews:
+   ExperimentHub,
+   ExperimentData,
+   SingleCell,
+   SingleCellData,
+   ImmunoOncology,
+   Tissue
+VignetteBuilder: knitr
+URL: https://github.com/BodenmillerGroup/IMCdata
+BugReports: https://github.com/BodenmillerGroup/IMCdata/issues
+RoxygenNote: 7.1.1
+Encoding: UTF-8

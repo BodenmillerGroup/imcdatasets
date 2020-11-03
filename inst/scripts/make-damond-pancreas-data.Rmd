@@ -1,0 +1,394 @@
+---
+title: "Load single-cell data"
+author: "Nicolas Damond and Nils Eling"
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+bibliography: ../ref.bib
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+# Loading required R packages
+
+```{r load-packages}
+library(S4Vectors)
+library(SingleCellExperiment)
+library(cytomapper)
+```
+
+This script downloads 100 example images, as well as the associated single-cell data and cell masks from the pancreas Imaging mass cytometry (IMC) dataset available [here](http://dx.doi.org/10.17632/cydmwsfztj.2). The dataset is associated to the following publication:
+
+[Damond et al. A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry. Cell Metabolism. 2019 Mar 5;29(3):755-768](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6821395)
+
+The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.
+
+
+# **Single-cell data**
+
+## Obtain and read-in data
+
+Here, a subset of single-cell data corresponding to 100 images from @damond2019pancreas is downloaded.
+
+### Read in single-cell data
+
+We read in the single-cell meta- and expression data and order them based on the image and cell number.
+
+```{r download-cell-data, message=FALSE}
+# Download the zipped folder image and unzip it
+url.cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
+download.file(url.cells, destfile = "data/damond-pancreas/CellSubset.zip")
+unzip("data/damond-pancreas/CellSubset.zip", exdir = "data/damond-pancreas")
+file.remove("data/damond-pancreas/CellSubset.zip")
+
+# Read-in the data
+cells <- read.csv("data/damond-pancreas/CellSubset.csv",
+                  stringsAsFactors = FALSE)
+
+# Order the dataset by ImageNumber and ObjectNumber
+cells <- cells[order(cells$ImageNumber, cells$ObjectNumber), ]
+```
+
+### Read in image metadata
+
+Next, we will read in the image-specific metadata.
+
+```{r download-image-metadata}
+# Download the zipped folder image and unzip it
+url.image <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/0b236273-d21b-4566-84a2-f1c56324a900/file_downloaded")
+download.file(url.image, destfile = "data/damond-pancreas/Image.zip")
+unzip("data/damond-pancreas/Image.zip", exdir = "data/damond-pancreas")
+file.remove("data/damond-pancreas/Image.zip")
+
+# Read-in the data
+image <- read.csv("data/damond-pancreas/All_Image.csv",
+                  stringsAsFactors = FALSE)
+```
+
+### Read in cell-type information
+
+In the original publication, cells were phenotyped based on informative marker expression.
+These phenotype labels are supplied in the online repository.
+
+```{r download-celltypes}
+# Download the zipped folder image and unzip it
+url.celltypes <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/59e8da72-5bfe-4289-b95b-28348a6e1222/file_downloaded")
+download.file(url.celltypes, destfile = "data/damond-pancreas/CellTypes.zip")
+unzip("data/damond-pancreas/CellTypes.zip", exdir = "data/damond-pancreas")
+file.remove("data/damond-pancreas/CellTypes.zip")
+
+# Read-in the data
+celltypes <- read.csv("data/damond-pancreas/CellTypes.csv",
+                      stringsAsFactors = FALSE)
+```
+
+### Read-in donor information
+
+We will furthermore read in the metadata per donor.
+
+```{r download-donor-info}
+# Download the zipped folder image and unzip it
+url.donors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/9074990e-1b93-4c79-8c49-1db01a66398b/file_downloaded")
+download.file(url.donors, destfile = "data/damond-pancreas/Donors.zip")
+unzip("data/damond-pancreas/Donors.zip", exdir = "data/damond-pancreas")
+file.remove("data/damond-pancreas/Donors.zip")
+
+# Read-in the data
+donors <- read.csv("data/damond-pancreas/Donors.csv",
+                   stringsAsFactors = FALSE)
+```
+
+## Prepare metadata
+
+In this part of the workflow, we will select cell-specific metadata and collect them in a single `DataFrame`.
+This will be the `colData` entry of the final `SingleCellExperiment` object.
+
+### Generate cell-specific metadata
+
+The cell-specific metadata can be obtained from the `cells` object.
+
+```{r cell-metadata}
+cell.metadata <- DataFrame(ImageNumber = cells$ImageNumber,
+                           CellNumber = cells$ObjectNumber,
+                           Pos_X = cells$Location_Center_X,
+                           Pos_Y = cells$Location_Center_Y,
+                           ParentIslet = cells$Parent_Islets,
+                           ClosestIslet = cells$Parent_ExpandedIslets,
+                           Area = cells$AreaShape_Area,
+                           NbNeighbours = cells$Neighbors_NumberOfNeighbors_3)
+```
+
+Specific image metadata can be obtained from column-entries of the `image` object.
+
+```{r image-metadata}
+image.metadata <- DataFrame(ImageNumber = image$ImageNumber,
+                            ImageFullName = image$FileName_CleanStack,
+                            slide = image$Metadata_Slide,
+                            width = image$Width_CleanStack,
+                            height = image$Height_CleanStack)
+```
+
+We will next merge the cell- and image-specific metadata.
+
+```{r merge-metadata}
+cell.metadata <- merge(cell.metadata, image.metadata, by="ImageNumber")
+```
+
+We will also add the `ImageName` entry to the metadata object.
+This information is used by `cytomapper` to match single-cell data with images and masks.
+
+```{r add-image-names}
+cell.metadata$ImageName <- sub("_a0_full_clean.tiff", "",
+                               cell.metadata$ImageFullName)
+```
+
+We will now add the cell-type information to the metadata object.
+
+```{r import-cell-types}
+# Add cell ids to cell metadata (format: "ImageName_CellNumber")
+cell.metadata$id <- paste(cell.metadata$ImageName, cell.metadata$CellNumber,
+                          sep="_")
+
+# Merge cell metadata and cell type information
+cell.metadata <- merge(cell.metadata,
+                       celltypes[, c("id", "CellCat", "CellType")],
+                       by="id")
+```
+
+We will add the donor information to the metadata object.
+
+```{r import-donors-info}
+cell.metadata <- merge(cell.metadata, donors, by="slide")
+```
+
+Finally, we order the cell-metadata object based on `ImageNumber` and `CellNumber` and add rownames.
+
+```{r cell-rownames}
+# Rows are ordered by ImageNumber and CellNumber
+cell.metadata <- cell.metadata[order(cell.metadata$ImageNumber,
+                                     cell.metadata$CellNumber), ]
+
+# Cell ids are used as row names
+rownames(cell.metadata) <- cell.metadata$id
+```
+
+### Generate marker-specific metadata
+
+Here, we will download the panel information, which contains antibody-related metadata.
+However, for some datasets, the channel-order and the panel order do not match.
+For this, the channel-mass file is used to match panel information and image stack slices.
+
+```{r load-panel}
+# Import panel
+url.panel <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/2f9fecfc-b98f-4937-bc38-ae1b959bd74d/file_downloaded")
+download.file(url.panel, destfile = "data/damond-pancreas/panel.csv")
+panel <- read.csv("data/damond-pancreas/panel.csv")
+
+# Import channel-mass file
+url.channelmass <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/704312eb-377c-42e2-8227-44bb9aca0fb3/file_downloaded")
+download.file(url.channelmass,
+              destfile = "data/damond-pancreas/ChannelMass.csv")
+channel.mass <- read.csv("data/damond-pancreas/ChannelMass.csv", header = FALSE)
+```
+
+First, we will select the relevant channels used for analysis and order the pannel based on channel mass.
+
+```{r arrange-panel}
+# Match panel and stack slice information
+panel <- panel[panel$full == 1,]
+panel <- panel[match(channel.mass[,1], panel$MetalTag),]
+
+# Add short protein names as panel rownames
+rownames(panel) <- panel$shortname
+```
+
+## Select relevant expression features
+
+CellProfiler measures a number of different statistics per marker and cell.
+We will select the mean intensity per channel and per cell to obtain single-cell expression counts.
+
+```{r select-counts}
+cur_counts <- cells[, grepl("Intensity_MeanIntensity_CleanStack",
+                            colnames(cells))]
+```
+
+Next, we will reorder the channels based on channel number.
+
+```{r reorder-counts}
+channelNumber <- as.numeric(sub("^.*_c", "", colnames(cur_counts)))
+cur_counts <- cur_counts[, order(channelNumber, decreasing = FALSE)]
+```
+
+## Create the SingleCellExperiment object
+
+We have now obtained all metadata and feature data to create the `SingleCellExperiment` object.
+We will first create is based on the raw expression counts.
+
+```{r create-SCE}
+sce <- SingleCellExperiment(assays = list(counts = t(as.matrix(cur_counts))))
+```
+
+Furthermore, we will store the arcsinh-transformed (using a co-factor of 1) counts in the `exprs` assay slot.
+
+```{r transform-counts}
+assay(sce, "exprs") <- asinh(counts(sce)/1)
+```
+
+Now, we will set the dimnames of the object.
+
+```{r dimnames-SCE}
+rownames(sce) <- rownames(panel)
+colnames(sce) <- rownames(cell.metadata)
+```
+
+Finally, we will store the marker- and cell-specific metadata in the `SingleCellExperiment` object.
+Here, columns are cells and rows are markers.
+
+```{r store-metadata}
+colData(sce) <- cell.metadata
+rowData(sce) <- panel
+sce
+```
+
+## Save the SCE object
+
+For further analysis, we will save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-SCE}
+saveRDS(sce, "data/damond-pancreas/sce.rds")
+```
+
+## Clean up
+
+Finally, we remove the downloaded objects to save storage space.
+
+```{r clean-up, message = FALSE}
+file.remove("data/damond-pancreas/All_Image.csv",
+            "data/damond-pancreas/CellSubset.csv",
+            "data/damond-pancreas/CellTypes.csv",
+            "data/damond-pancreas/Donors.csv")
+```
+
+
+# Images and cell masks
+
+## Download and read-in images
+
+Here, a subset of 100 images from @damond2019pancreas is downloaded.
+We use the `loadImages` function of the `cytomapper` package to read them into a `CytoImageList` object.
+
+```{r load-images, message=FALSE}
+# Download the zipped folder image and unzip it
+url.images <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/b37054d2-d5d0-4c48-a001-81ff77136f41/file_downloaded")
+download.file(url.images, destfile = "data/damond-pancreas/ImageSubset.zip")
+unzip("data/damond-pancreas/ImageSubset.zip", exdir = "data/damond-pancreas/")
+file.remove("data/damond-pancreas/ImageSubset.zip")
+
+# Load the images as a CytoImageList object
+images <- loadImages("data/damond-pancreas/", pattern="_full_clean.tiff")
+images
+```
+
+We also download the associated segemntation masks and read them into a `CytoImageList` object.
+
+```{r load-masks}
+# Download the zipped folder masks and unzip it
+url.masks <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/13679a61-e9b4-4820-9f09-a5bbc697647c/file_downloaded")
+download.file(url.masks, destfile = "data/damond-pancreas/Masks.zip")
+unzip("data/damond-pancreas/Masks.zip", exdir = "data/damond-pancreas/")
+file.remove("data/damond-pancreas/Masks.zip")
+
+# Load the images as a CytoImageList object
+masks <- loadImages("data/damond-pancreas/", pattern="_full_mask.tiff")
+masks
+```
+
+Here, we remove the downloaded images again.
+
+```{r clean-up-2, message = FALSE}
+# Remove image stacks
+images.del <- list.files("data/damond-pancreas/", pattern="_full_clean.tiff",
+                         full.names = TRUE)
+file.remove(images.del)
+
+# Remove masks
+masks.del <- list.files("data/damond-pancreas/", pattern="_full_mask.tiff",
+                        full.names = TRUE)
+file.remove(masks.del)
+```
+
+## Process images and masks
+
+We will now have to process the images to make them compatible with `cytomapper`.
+The masks are 16-bit images and need to be re-scaled in order to obtain integer cell IDs.
+
+```{r scale-masks}
+# Before scaling
+masks[[1]]
+
+masks <- scaleImages(masks, value = (2 ^ 16) - 1)
+
+# After scaling
+masks[[1]]
+```
+
+Next, we will add the `ImageName` to the images and masks objects.
+This information is stored in the metadata columns of the `CytoImageList` objects
+and is used by `cytomapper` to match single cell data, images and mask
+
+```{r add-image-names2}
+mcols(images)$ImageName <- gsub("_a0_full_clean", "", names(images))
+mcols(masks)$ImageName <- gsub("_a0_full_mask", "", names(masks))
+```
+
+We downloaded the full set of segmentation masks.
+To match the segmentation masks to the corresponding images, we will subset them.
+As a safty check, we will make sure that the `ImageName`s of the masks are identical to those of the images.
+
+```{r subset-masks}
+masks <- masks[mcols(masks)$ImageName %in% mcols(images)$ImageName]
+identical(mcols(masks)$ImageName, mcols(images)$ImageName)
+```
+
+Finally, we will use the protein short name as `channelNames`.
+Again, we need to make sure that the names match the correct order of the channels.
+
+```{r add-channel-names}
+# Match panel and stack slice information
+panel <- panel[panel$full == 1,]
+panel <- panel[match(channel.mass[,1], panel$MetalTag),]
+
+# Add channel names to the  image stacks CytoImageList object
+channelNames(images) <- panel$shortname
+```
+
+## Save the CytoImageList objects
+
+Here, we will save the generated `CytoImageList` objects for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-cytoimagelists}
+saveRDS(images, "data/damond-pancreas/images.rds")
+saveRDS(masks, "data/damond-pancreas/masks.rds")
+```
+
+## Clean up
+
+We will delete all unecessary files.
+
+```{r clean-up-panel, message = FALSE}
+file.remove("data/damond-pancreas/panel.csv",
+            "data/damond-pancreas/ChannelMass.csv")
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
