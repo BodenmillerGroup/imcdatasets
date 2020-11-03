@@ -31,18 +31,20 @@
 #' masks <- DamondPancreasData(data.type = "masks")
 #'
 #' @import cytomapper
-#' @import utils
-#' @importFrom ExperimentHub ExperimentHub
+#' @importFrom utils download.file
+#' @importFrom utils read.csv
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @export
 DamondPancreasData <- function(data.type = "sce") {
 
+    # will have to re-add  @importFrom ExperimentHub ExperimentHub
+
     if(!(data.type %in% c("sce", "images", "masks"))) {
         stop('The data.type argument should be "sce", "images" or "masks".')
     }
 
-    # Code for when the data will be on Bioconductor S3
+    # Code for when the data will be on Bioconductor AWS S3
     # host <- file.path("imcdatasets", "damond-pancreas")
     # hub <- ExperimentHub()
     #
@@ -60,7 +62,6 @@ DamondPancreasData <- function(data.type = "sce") {
     # Temporary code for downloading files from switchdrive
     if(data.type == "sce") {
         if(!file.exists("../data/damond-pancreas/sce.rds")) {
-            print("?")
             url.file <- "https://drive.switch.ch/index.php/s/CAbnHjwJOwRnOS4/download"
             download.file(url.file, destfile = "data/damond-pancreas/sce.rds")
         }

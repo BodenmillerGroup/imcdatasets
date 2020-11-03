@@ -16,15 +16,22 @@ output:
     BiocStyle::html_document:
         toc: true
 bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
-vignette: |
+vignette: >
     %\VignetteIndexEntry{User's Guide}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r style, echo=FALSE}
 knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r library, echo=FALSE}
+library(cytomapper)
+library(SingleCellExperiment)
+# library(imcdatasets)
+source("../R/DamondPancreasData.R")
+source("../R/listDatasets.R")
 ```
 
 # Introduction
@@ -41,10 +48,6 @@ Please refer to the `r Biocpkg("SingleCellExperiment")` and `r Biocpkg("cytomapp
 Users can import the datasets by calling a single function. For example:  
 
 ```{r import-dataset}
-# library(imcdatasets)
-library(SingleCellExperiment)
-
-# Import single cell data
 sce <- DamondPancreasData(data.type = "sce")
 sce
 ```
@@ -52,8 +55,6 @@ sce
 Import multichannel images
 
 ```{r import-images}
-library(cytomapper)
-
 images <- DamondPancreasData(data.type = "images")
 images
 ```
