@@ -29,10 +29,8 @@ Suggests:
     rmarkdown
 biocViews:
    ExperimentHub,
-   ExperimentData,
-   SingleCell,
    SingleCellData,
-   ImmunoOncology,
+   TechnologyData,
    Tissue
 VignetteBuilder: knitr
 URL: https://github.com/BodenmillerGroup/imcdatasets
