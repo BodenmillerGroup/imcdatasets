@@ -31,6 +31,7 @@
 #' masks <- DamondPancreasData(data.type = "masks")
 #'
 #' @import cytomapper
+#' @import utils
 #' @importFrom ExperimentHub ExperimentHub
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
