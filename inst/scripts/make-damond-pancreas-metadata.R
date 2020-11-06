@@ -1,7 +1,10 @@
 meta <- data.frame(
-    Title = sprintf("Damond Pancreas %s", c("single cell data", "multichannel images", "cell masks")),
-    Description = sprintf("%s for the Damond pancreas imaging mass cytometry dataset",
-                          c("Single cell data", "Multichannel images", "Cell masks")),
+    Title = sprintf(
+        "Damond Pancreas 2019 %s",
+        c("single cell data", "multichannel images", "cell masks")),
+    Description = sprintf(
+        "%s for the Damond pancreas 2019 imaging mass cytometry dataset",
+        c("Single cell data", "Multichannel images", "Cell masks")),
     BiocVersion = rep("3.13", 3),
     Genome = NA,
     SourceType = rep("Zip", 3),
@@ -14,12 +17,13 @@ meta <- data.frame(
     Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
     RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)) ,
     DispatchClass = rep("Rds", 3),
-    # RDataPath = c(paste0("imcdatasets/damond-pancreas", c("sce.rds", "images.rds", "masks.rds"))),
-    Location_Prefix = "https://drive.switch.ch/index.php/",
-    RDataPath = c(paste0("s/", c("CAbnHjwJOwRnOS4", "iJxY21xV3X0XyDZ", "LvRRTtCtnUWvfBS"))),
-    Data_Type = c("sce", "images", "masks"),
+    RDataPath = file.path("imcdatasets", "damond-pancreas-2019",
+                          c("sce.rds", "images.rds", "masks.rds")),
+    DataType = c("sce", "images", "masks"),
     Tags = "",
-    Notes = c("","","")
+    Notes = c("","",""),
+    stringsAsFactors = FALSE
 )
 
-write.csv(meta, file="inst/extdata/metadata-damond-pancreas.csv", row.names=FALSE)
+write.csv(meta, file="inst/extdata/metadata-damond-pancreas-2019.csv",
+          row.names=FALSE)
