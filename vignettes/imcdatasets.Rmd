@@ -29,9 +29,7 @@ knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
 ```{r library, echo=FALSE}
 library(cytomapper)
 library(SingleCellExperiment)
-# library(imcdatasets)
-source("../R/DamondPancreasData.R")
-source("../R/listDatasets.R")
+library(imcdatasets)
 ```
 
 # Introduction
@@ -39,30 +37,30 @@ source("../R/listDatasets.R")
 The `r Biocpkg("imcdatasets")` package provides access to publicly available imaging mass cytometry (IMC) datasets.  
 
 Each dataset is composed of :
-* Single-cell data in the form of a `SingleCellExperiment` object.  
-* Multichannel images in the form of a `CytoImageList` object.
-* Cell masks in the form of a `CytoImageList` object.
+* Single-cell data in the form of a `SingleCellExperiment` object (named `sce.rds`).
+* Multichannel images in the form of a `CytoImageList` object (named `images.rds`).
+* Cell masks in the form of a `CytoImageList` object (named `masks.rds`).
 
 Please refer to the `r Biocpkg("SingleCellExperiment")` and `r Biocpkg("cytomapper")` documentation for further information on how to work with `SingleCellExperiment` objects and with the `cytomapper`package.
 
 Users can import the datasets by calling a single function. For example:  
 
 ```{r import-dataset}
-sce <- DamondPancreasData(data.type = "sce")
+sce <- DamondPancreas2019Data(data.type = "sce")
 sce
 ```
 
 Import multichannel images
 
 ```{r import-images}
-images <- DamondPancreasData(data.type = "images")
+images <- DamondPancreas2019Data(data.type = "images")
 images
 ```
 
 Import cell masks
 
 ```{r import-masks}
-masks <- DamondPancreasData(data.type = "masks")
+masks <- DamondPancreas2019Data(data.type = "masks")
 masks
 ```
 
