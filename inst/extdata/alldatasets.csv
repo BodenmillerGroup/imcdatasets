@@ -1,2 +1,2 @@
 Reference,Species,Tissue,NumberOfCells,NumberOfImages,NumberOfChannels,FunctionCall
-@damond2019pancreas,Human,Pancreas,252059,100,38,DamondPancreasData()
+@damond2019pancreas,Human,Pancreas,252059,100,38,DamondPancreas2019Data()

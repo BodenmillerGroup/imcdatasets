@@ -36,7 +36,7 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @export
-DamondPancreasData <- function(data.type = "sce") {
+DamondPancreas2019Data <- function(data.type = "sce") {
 
     # will have to re-add  @importFrom ExperimentHub ExperimentHub
 
