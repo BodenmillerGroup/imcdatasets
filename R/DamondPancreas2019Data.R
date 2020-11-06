@@ -26,58 +26,34 @@
 #' \emph{Cell Metab} 29(3), 755-768.
 #'
 #' @examples
-#' sce <- DamondPancreasData()
-#' images <- DamondPancreasData(data.type = "images")
-#' masks <- DamondPancreasData(data.type = "masks")
+#' sce <- DamondPancreas2019Data()
+#' images <- DamondPancreas2019Data(data.type = "images")
+#' masks <- DamondPancreas2019Data(data.type = "masks")
 #'
 #' @import cytomapper
 #' @importFrom utils download.file
 #' @importFrom utils read.csv
+#' @importFrom ExperimentHub ExperimentHub
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @export
 DamondPancreas2019Data <- function(data.type = "sce") {
-
-    # will have to re-add  @importFrom ExperimentHub ExperimentHub
-
     if(!(data.type %in% c("sce", "images", "masks"))) {
         stop('The data.type argument should be "sce", "images" or "masks".')
     }
 
-    # Code for when the data will be on Bioconductor AWS S3
-    # host <- file.path("imcdatasets", "damond-pancreas")
-    # hub <- ExperimentHub()
-    #
-    # if(data.type == "sce") {
-    #     cur.dat <- hub[hub$rdatapath == file.path(
-    #         host, paste0("sce", ".rds"))]
-    # } else if(data.type == "images") {
-    #     cur.dat <- hub[hub$rdatapath == file.path(
-    #         host, paste0("images", ".rds"))]
-    # } else if(data.type == "masks") {
-    #     cur.dat <- hub[hub$rdatapath == file.path(
-    #         host, paste0("masks", ".rds"))]
-    # }
+    host <- file.path("imcdatasets", "damond-pancreas-2019")
+    hub <- ExperimentHub()
 
-    # Temporary code for downloading files from switchdrive
     if(data.type == "sce") {
-        if(!file.exists("../data/damond-pancreas/sce.rds")) {
-            url.file <- "https://drive.switch.ch/index.php/s/CAbnHjwJOwRnOS4/download"
-            download.file(url.file, destfile = "data/damond-pancreas/sce.rds")
-        }
-        cur.dat <- readRDS("../data/damond-pancreas/sce.rds")
+        cur.dat <- hub[hub$rdatapath == file.path(
+            host, paste0("sce", ".rds"))]
     } else if(data.type == "images") {
-        if(!file.exists("../data/damond-pancreas/images.rds")) {
-            url.file <- "https://drive.switch.ch/index.php/s/iJxY21xV3X0XyDZ/download"
-            download.file(url.file, destfile = "data/damond-pancreas/images.rds")
-        }
-        cur.dat <- readRDS("../data/damond-pancreas/images.rds")
+        cur.dat <- hub[hub$rdatapath == file.path(
+            host, paste0("images", ".rds"))]
     } else if(data.type == "masks") {
-        if(!file.exists("../data/damond-pancreas/masks.rds")) {
-            url.file <- "https://drive.switch.ch/index.php/s/LvRRTtCtnUWvfBS/download"
-            download.file(url.file, destfile = "data/damond-pancreas/masks.rds")
-        }
-        cur.dat <- readRDS("../data/damond-pancreas/masks.rds")
+        cur.dat <- hub[hub$rdatapath == file.path(
+            host, paste0("masks", ".rds"))]
     }
 
     cur.dat

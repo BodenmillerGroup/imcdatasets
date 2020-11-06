@@ -24,7 +24,6 @@
 #' @importFrom S4Vectors DataFrame
 #' @importFrom utils read.csv
 listDatasets <- function() {
-    # path <- system.file("extdata", "alldatasets.csv", package="imcdatasets")
-    path <- file.path("../inst/extdata/alldatasets.csv")
+    path <- system.file("extdata", "alldatasets.csv", package="imcdatasets")
     DataFrame(read.csv(path, stringsAsFactors=FALSE))
 }
