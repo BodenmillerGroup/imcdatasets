@@ -28,8 +28,19 @@ This script downloads 100 example images, as well as the associated single-cell 
 
 [Damond et al. A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry. Cell Metabolism. 2019 Mar 5;29(3):755-768](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6821395)
 
-The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.
+The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.  
 
+
+Setting the working and output directories
+
+```{r directories}
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+outdir <- file.path("inst", "extdata", "damond-pancreas-2019")
+if(!(dir.exists(outdir)))
+    dir.create(outdir)
+```
 
 # **Single-cell data**
 
@@ -44,13 +55,12 @@ We read in the single-cell meta- and expression data and order them based on the
 ```{r download-cell-data, message=FALSE}
 # Download the zipped folder image and unzip it
 url.cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
-download.file(url.cells, destfile = "data/damond-pancreas/CellSubset.zip")
-unzip("data/damond-pancreas/CellSubset.zip", exdir = "data/damond-pancreas")
-file.remove("data/damond-pancreas/CellSubset.zip")
+download.file(url.cells, destfile = file.path(workdir, "CellSubset.zip"))
+unzip(file.path(workdir, "CellSubset.zip"), exdir = workdir)
+file.remove(file.path(workdir, "CellSubset.zip"))
 
 # Read-in the data
-cells <- read.csv("data/damond-pancreas/CellSubset.csv",
-                  stringsAsFactors = FALSE)
+cells <- read.csv(file.path(workdir, "CellSubset.csv"), stringsAsFactors = FALSE)
 
 # Order the dataset by ImageNumber and ObjectNumber
 cells <- cells[order(cells$ImageNumber, cells$ObjectNumber), ]
@@ -63,13 +73,12 @@ Next, we will read in the image-specific metadata.
 ```{r download-image-metadata}
 # Download the zipped folder image and unzip it
 url.image <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/0b236273-d21b-4566-84a2-f1c56324a900/file_downloaded")
-download.file(url.image, destfile = "data/damond-pancreas/Image.zip")
-unzip("data/damond-pancreas/Image.zip", exdir = "data/damond-pancreas")
-file.remove("data/damond-pancreas/Image.zip")
+download.file(url.image, destfile = file.path(workdir, "Image.zip"))
+unzip(file.path(workdir, "Image.zip"), exdir = workdir)
+file.remove(file.path(workdir, "Image.zip"))
 
 # Read-in the data
-image <- read.csv("data/damond-pancreas/All_Image.csv",
-                  stringsAsFactors = FALSE)
+image <- read.csv(file.path(workdir, "All_Image.csv"), stringsAsFactors = FALSE)
 ```
 
 ### Read in cell-type information
@@ -80,13 +89,12 @@ These phenotype labels are supplied in the online repository.
 ```{r download-celltypes}
 # Download the zipped folder image and unzip it
 url.celltypes <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/59e8da72-5bfe-4289-b95b-28348a6e1222/file_downloaded")
-download.file(url.celltypes, destfile = "data/damond-pancreas/CellTypes.zip")
-unzip("data/damond-pancreas/CellTypes.zip", exdir = "data/damond-pancreas")
-file.remove("data/damond-pancreas/CellTypes.zip")
+download.file(url.celltypes, destfile = file.path(workdir, "CellTypes.zip"))
+unzip(file.path(workdir, "CellTypes.zip"), exdir = workdir)
+file.remove(file.path(workdir, "CellTypes.zip"))
 
 # Read-in the data
-celltypes <- read.csv("data/damond-pancreas/CellTypes.csv",
-                      stringsAsFactors = FALSE)
+celltypes <- read.csv(file.path(workdir, "CellTypes.csv"), stringsAsFactors = FALSE)
 ```
 
 ### Read-in donor information
@@ -96,13 +104,12 @@ We will furthermore read in the metadata per donor.
 ```{r download-donor-info}
 # Download the zipped folder image and unzip it
 url.donors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/9074990e-1b93-4c79-8c49-1db01a66398b/file_downloaded")
-download.file(url.donors, destfile = "data/damond-pancreas/Donors.zip")
-unzip("data/damond-pancreas/Donors.zip", exdir = "data/damond-pancreas")
-file.remove("data/damond-pancreas/Donors.zip")
+download.file(url.donors, destfile = file.path(workdir, "Donors.zip"))
+unzip(file.path(workdir, "Donors.zip"), exdir = workdir)
+file.remove(file.path(workdir, "Donors.zip"))
 
 # Read-in the data
-donors <- read.csv("data/damond-pancreas/Donors.csv",
-                   stringsAsFactors = FALSE)
+donors <- read.csv(file.path(workdir, "Donors.csv"), stringsAsFactors = FALSE)
 ```
 
 ## Prepare metadata
@@ -188,14 +195,13 @@ For this, the channel-mass file is used to match panel information and image sta
 ```{r load-panel}
 # Import panel
 url.panel <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/2f9fecfc-b98f-4937-bc38-ae1b959bd74d/file_downloaded")
-download.file(url.panel, destfile = "data/damond-pancreas/panel.csv")
-panel <- read.csv("data/damond-pancreas/panel.csv")
+download.file(url.panel, destfile = file.path(workdir, "panel.csv"))
+panel <- read.csv(file.path(workdir, "panel.csv"))
 
 # Import channel-mass file
 url.channelmass <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/704312eb-377c-42e2-8227-44bb9aca0fb3/file_downloaded")
-download.file(url.channelmass,
-              destfile = "data/damond-pancreas/ChannelMass.csv")
-channel.mass <- read.csv("data/damond-pancreas/ChannelMass.csv", header = FALSE)
+download.file(url.channelmass, destfile = file.path(workdir, "ChannelMass.csv"))
+channel.mass <- read.csv(file.path(workdir, "ChannelMass.csv"), header = FALSE)
 ```
 
 First, we will select the relevant channels used for analysis and order the pannel based on channel mass.
@@ -262,7 +268,7 @@ sce
 For further analysis, we will save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-SCE}
-saveRDS(sce, "data/damond-pancreas/sce.rds")
+saveRDS(sce, file.path(outdir, "sce.rds"))
 ```
 
 ## Clean up
@@ -270,10 +276,12 @@ saveRDS(sce, "data/damond-pancreas/sce.rds")
 Finally, we remove the downloaded objects to save storage space.
 
 ```{r clean-up, message = FALSE}
-file.remove("data/damond-pancreas/All_Image.csv",
-            "data/damond-pancreas/CellSubset.csv",
-            "data/damond-pancreas/CellTypes.csv",
-            "data/damond-pancreas/Donors.csv")
+file.remove(
+    file.path(workdir, "All_Image.csv"),
+    file.path(workdir, "CellSubset.csv"),
+    file.path(workdir, "CellTypes.csv"),
+    file.path(workdir, "Donors.csv")
+)
 ```
 
 
@@ -287,12 +295,12 @@ We use the `loadImages` function of the `cytomapper` package to read them into a
 ```{r load-images, message=FALSE}
 # Download the zipped folder image and unzip it
 url.images <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/b37054d2-d5d0-4c48-a001-81ff77136f41/file_downloaded")
-download.file(url.images, destfile = "data/damond-pancreas/ImageSubset.zip")
-unzip("data/damond-pancreas/ImageSubset.zip", exdir = "data/damond-pancreas/")
-file.remove("data/damond-pancreas/ImageSubset.zip")
+download.file(url.images, destfile = file.path(workdir, "ImageSubset.zip"))
+unzip(file.path(workdir, "ImageSubset.zip"), exdir = workdir)
+file.remove(file.path(workdir, "ImageSubset.zip"))
 
 # Load the images as a CytoImageList object
-images <- loadImages("data/damond-pancreas/", pattern="_full_clean.tiff")
+images <- loadImages(workdir, pattern = "_full_clean.tiff")
 images
 ```
 
@@ -301,12 +309,12 @@ We also download the associated segemntation masks and read them into a `CytoIma
 ```{r load-masks}
 # Download the zipped folder masks and unzip it
 url.masks <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/13679a61-e9b4-4820-9f09-a5bbc697647c/file_downloaded")
-download.file(url.masks, destfile = "data/damond-pancreas/Masks.zip")
-unzip("data/damond-pancreas/Masks.zip", exdir = "data/damond-pancreas/")
-file.remove("data/damond-pancreas/Masks.zip")
+download.file(url.masks, destfile = file.path(workdir, "Masks.zip"))
+unzip(file.path(workdir, "Masks.zip"), exdir = workdir)
+file.remove(file.path(workdir, "Masks.zip"))
 
 # Load the images as a CytoImageList object
-masks <- loadImages("data/damond-pancreas/", pattern="_full_mask.tiff")
+masks <- loadImages(workdir, pattern = "_full_mask.tiff")
 masks
 ```
 
@@ -314,13 +322,11 @@ Here, we remove the downloaded images again.
 
 ```{r clean-up-2, message = FALSE}
 # Remove image stacks
-images.del <- list.files("data/damond-pancreas/", pattern="_full_clean.tiff",
-                         full.names = TRUE)
+images.del <- list.files(workdir, pattern="_full_clean.tiff", full.names = TRUE)
 file.remove(images.del)
 
 # Remove masks
-masks.del <- list.files("data/damond-pancreas/", pattern="_full_mask.tiff",
-                        full.names = TRUE)
+masks.del <- list.files(workdir, pattern="_full_mask.tiff", full.names = TRUE)
 file.remove(masks.del)
 ```
 
@@ -357,6 +363,20 @@ masks <- masks[mcols(masks)$ImageName %in% mcols(images)$ImageName]
 identical(mcols(masks)$ImageName, mcols(images)$ImageName)
 ```
 
+We will also add the `ImageNumber` to the images and masks objects.
+This information is stored in the metadata columns of the `CytoImageList` objects
+and can be used by `cytomapper` to match single cell data, images and mask
+
+```{r add-image-numbers}
+mcols(images) <- merge(mcols(images),
+                       unique(colData(sce)[, c("ImageName", "ImageNumber")]),
+                       by = "ImageName")
+mcols(masks) <- merge(mcols(masks),
+                       unique(colData(sce)[, c("ImageName", "ImageNumber")]),
+                       by = "ImageName")
+identical(mcols(masks)$ImageNumber, mcols(images)$ImageNumber)
+```
+
 Finally, we will use the protein short name as `channelNames`.
 Again, we need to make sure that the names match the correct order of the channels.
 
@@ -374,8 +394,8 @@ channelNames(images) <- panel$shortname
 Here, we will save the generated `CytoImageList` objects for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-cytoimagelists}
-saveRDS(images, "data/damond-pancreas/images.rds")
-saveRDS(masks, "data/damond-pancreas/masks.rds")
+saveRDS(images, file.path(outdir, "images.rds"))
+saveRDS(masks, file.path(outdir, "masks.rds"))
 ```
 
 ## Clean up
@@ -383,8 +403,8 @@ saveRDS(masks, "data/damond-pancreas/masks.rds")
 We will delete all unecessary files.
 
 ```{r clean-up-panel, message = FALSE}
-file.remove("data/damond-pancreas/panel.csv",
-            "data/damond-pancreas/ChannelMass.csv")
+file.remove(file.path(workdir, "panel.csv"),
+            file.path(workdir, "ChannelMass.csv"))
 ```
 
 # Session information
