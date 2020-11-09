@@ -43,18 +43,18 @@ DamondPancreas2019Data <- function(data.type = "sce") {
     }
 
     host <- file.path("imcdatasets", "damond-pancreas-2019")
-    hub <- ExperimentHub()
+    eh <- ExperimentHub()
 
     if(data.type == "sce") {
-        cur.dat <- hub[hub$rdatapath == file.path(
-            host, paste0("sce", ".rds"))]
+        object_id <- eh[eh$title == "DamondPancreas2019_sce"]$ah_id
+        cur_dat <- eh[[object_id]]
     } else if(data.type == "images") {
-        cur.dat <- hub[hub$rdatapath == file.path(
-            host, paste0("images", ".rds"))]
+        object_id <- eh[eh$title == "DamondPancreas2019_images"]$ah_id
+        cur_dat <- eh[[object_id]]
     } else if(data.type == "masks") {
-        cur.dat <- hub[hub$rdatapath == file.path(
-            host, paste0("masks", ".rds"))]
+        object_id <- eh[eh$title == "DamondPancreas2019_masks"]$ah_id
+        cur_dat <- eh[[object_id]]
     }
 
-    cur.dat
+    cur_dat
 }
