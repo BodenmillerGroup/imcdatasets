@@ -30,7 +30,6 @@ df_DamondPancreas2019 <- cbind(
     RDataPath = file.path("imcdatasets", "damond-pancreas-2019",
                           c("sce.rds", "images.rds", "masks.rds")),
     DataType = c("sce", "images", "masks"),
-    Tags = "",
     Notes = c("","","")
 )
 
