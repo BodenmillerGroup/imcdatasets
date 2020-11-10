@@ -31,6 +31,7 @@
 #' masks <- DamondPancreas2019Data(data.type = "masks")
 #'
 #' @import cytomapper
+#' @import methods
 #' @importFrom utils download.file
 #' @importFrom utils read.csv
 #' @importFrom ExperimentHub ExperimentHub
@@ -46,15 +47,17 @@ DamondPancreas2019Data <- function(data.type = "sce") {
     eh <- ExperimentHub()
 
     if(data.type == "sce") {
-        object_id <- eh[eh$title == "DamondPancreas2019_sce"]$ah_id
+        object_name <- "DamondPancreas2019_sce"
+        object_id <- eh[eh$title == object_name]$ah_id
         cur_dat <- eh[[object_id]]
     } else if(data.type == "images") {
-        object_id <- eh[eh$title == "DamondPancreas2019_images"]$ah_id
+        object_name <- "DamondPancreas2019_images"
+        object_id <- eh[eh$title == object_name]$ah_id
         cur_dat <- eh[[object_id]]
     } else if(data.type == "masks") {
-        object_id <- eh[eh$title == "DamondPancreas2019_masks"]$ah_id
+        object_name <- "DamondPancreas2019_masks"
+        object_id <- eh[eh$title == object_name]$ah_id
         cur_dat <- eh[[object_id]]
     }
-
     cur_dat
 }

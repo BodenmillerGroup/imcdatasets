@@ -3,6 +3,7 @@
 export(DamondPancreas2019Data)
 export(listDatasets)
 import(cytomapper)
+import(methods)
 importFrom(ExperimentHub,ExperimentHub)
 importFrom(S4Vectors,DataFrame)
 importFrom(SingleCellExperiment,SingleCellExperiment)

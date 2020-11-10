@@ -7,22 +7,27 @@
 listDatasets()
 }
 \value{
-A \linkS4class{DataFrame} where each row corresponds to a dataset, containing the fields:
+A \linkS4class{DataFrame} where each row corresponds to a dataset, containing
+the fields:
 \itemize{
-\item \code{Reference}, a Markdown-formatted citation to \code{scripts/ref.bib} in the \pkg{imcdatasets} installation directory.
-\item \code{Species}, species of origin.
-\item \code{Tissue}, the tissue that was imaged.
-\item \code{NumberOfCells}, the total number of cells in the dataset.
-\item \code{NumberOfImages}, the total number of images in the dataset.
-\item \code{NumberOfChannels}, the number of channels per image.
-\item \code{FunctionCall}, the R function call required to construct the dataset.
+    \item \code{Reference}, a Markdown-formatted citation to 
+    \code{scripts/ref.bib} in the \pkg{imcdatasets} installation directory.
+    \item \code{Species}, species of origin.
+    \item \code{Tissue}, the tissue that was imaged.
+    \item \code{NumberOfCells}, the total number of cells in the dataset.
+    \item \code{NumberOfImages}, the total number of images in the dataset.
+    \item \code{NumberOfChannels}, the number of channels per image.
+    \item \code{FunctionCall}, the R function call required to construct the
+    dataset.
 }
 }
 \description{
-Summary information for all available datasets in the \pkg{imcdatasets} package.
+Summary information for all available datasets in the \pkg{imcdatasets}
+package.
 }
 \details{
-One dataset should contain single-cell data, multichannel images and cell masks.
+One dataset should contain single-cell data, multichannel images and cell 
+masks.
 }
 \examples{
 listDatasets()

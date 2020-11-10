@@ -1,27 +1,32 @@
 Package: imcdatasets
 Version: 0.1.0
 Date: 2020-11-02
-Title: Collection of publicly available imaging mass cytometry (IMC) datasets.
+Title: Collection of publicly available imaging mass cytometry (IMC) datasets
 Description:
-    The IMCdata package provides access to publicly available IMC datasets in
-    the form of SingleCellExperiment and CytoImageList objects.
+    The imcdatasets package provides access to publicly available IMC datasets.
+    IMC is a technology that enables measurement of > 40 proteins from tissue
+    sections. The generated images can be segmented to extract single cell data.
+    Datasets typically consists of three elements: a SingleCellExperiment object
+    containing single cell data, a CytoImageList object containing multichannel
+    images and a CytoImageList object containing cell masks.
 Authors@R:
-    c(person("Nils", "Eling", role = c("aut", "cre"),
-      email = "nils.eling@dqbm.uzh.ch",
-      comment = c(ORCID = "0000-0002-4711-1176")),
-      person("Nicolas", "Damond", role = c("aut"),
-      email = "nicolas.damond@dqbm.uzh.ch",
-      comment = c(ORCID = "0000-0003-3027-8989")),
+    c(person("Nicolas", "Damond", role = c("aut", "cre"),
+        email = "nicolas.damond@dqbm.uzh.ch",
+        comment = c(ORCID = "0000-0003-3027-8989")),
+      person("Nils", "Eling", role = c("aut"),
+        email = "nils.eling@dqbm.uzh.ch",
+        comment = c(ORCID = "0000-0002-4711-1176")),
       person("Tobias", "Hoch", role = c("ctb")))
 License: GPL (>= 2)
 NeedsCompilation: no
 Depends:
-    R (>= 4.0),
+    R (>= 4.1),
     SingleCellExperiment,
     cytomapper,
 Imports:
     methods,
     utils,
+    ExperimentHub,
     S4Vectors
 Suggests:
     BiocStyle,
@@ -31,6 +36,7 @@ biocViews:
    ExperimentHub,
    SingleCellData,
    TechnologyData,
+   PackageTypeData,
    Tissue
 VignetteBuilder: knitr
 URL: https://github.com/BodenmillerGroup/imcdatasets

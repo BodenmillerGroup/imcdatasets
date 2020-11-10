@@ -54,13 +54,15 @@ We read in the single-cell meta- and expression data and order them based on the
 
 ```{r download-cell-data, message=FALSE}
 # Download the zipped folder image and unzip it
-url.cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
+url.cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+              files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
 download.file(url.cells, destfile = file.path(workdir, "CellSubset.zip"))
 unzip(file.path(workdir, "CellSubset.zip"), exdir = workdir)
 file.remove(file.path(workdir, "CellSubset.zip"))
 
 # Read-in the data
-cells <- read.csv(file.path(workdir, "CellSubset.csv"), stringsAsFactors = FALSE)
+cells <- read.csv(file.path(workdir, "CellSubset.csv"),
+                  stringsAsFactors = FALSE)
 
 # Order the dataset by ImageNumber and ObjectNumber
 cells <- cells[order(cells$ImageNumber, cells$ObjectNumber), ]
@@ -72,13 +74,15 @@ Next, we will read in the image-specific metadata.
 
 ```{r download-image-metadata}
 # Download the zipped folder image and unzip it
-url.image <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/0b236273-d21b-4566-84a2-f1c56324a900/file_downloaded")
+url.image <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+              files/0b236273-d21b-4566-84a2-f1c56324a900/file_downloaded")
 download.file(url.image, destfile = file.path(workdir, "Image.zip"))
 unzip(file.path(workdir, "Image.zip"), exdir = workdir)
 file.remove(file.path(workdir, "Image.zip"))
 
 # Read-in the data
-image <- read.csv(file.path(workdir, "All_Image.csv"), stringsAsFactors = FALSE)
+image <- read.csv(file.path(workdir, "All_Image.csv"),
+                  stringsAsFactors = FALSE)
 ```
 
 ### Read in cell-type information
@@ -88,13 +92,15 @@ These phenotype labels are supplied in the online repository.
 
 ```{r download-celltypes}
 # Download the zipped folder image and unzip it
-url.celltypes <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/59e8da72-5bfe-4289-b95b-28348a6e1222/file_downloaded")
+url.celltypes <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+                  files/59e8da72-5bfe-4289-b95b-28348a6e1222/file_downloaded")
 download.file(url.celltypes, destfile = file.path(workdir, "CellTypes.zip"))
 unzip(file.path(workdir, "CellTypes.zip"), exdir = workdir)
 file.remove(file.path(workdir, "CellTypes.zip"))
 
 # Read-in the data
-celltypes <- read.csv(file.path(workdir, "CellTypes.csv"), stringsAsFactors = FALSE)
+celltypes <- read.csv(file.path(workdir, "CellTypes.csv"),
+                      stringsAsFactors = FALSE)
 ```
 
 ### Read-in donor information
@@ -103,7 +109,8 @@ We will furthermore read in the metadata per donor.
 
 ```{r download-donor-info}
 # Download the zipped folder image and unzip it
-url.donors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/9074990e-1b93-4c79-8c49-1db01a66398b/file_downloaded")
+url.donors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+               files/9074990e-1b93-4c79-8c49-1db01a66398b/file_downloaded")
 download.file(url.donors, destfile = file.path(workdir, "Donors.zip"))
 unzip(file.path(workdir, "Donors.zip"), exdir = workdir)
 file.remove(file.path(workdir, "Donors.zip"))
@@ -194,13 +201,17 @@ For this, the channel-mass file is used to match panel information and image sta
 
 ```{r load-panel}
 # Import panel
-url.panel <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/2f9fecfc-b98f-4937-bc38-ae1b959bd74d/file_downloaded")
+url.panel <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+              files/2f9fecfc-b98f-4937-bc38-ae1b959bd74d/file_downloaded")
 download.file(url.panel, destfile = file.path(workdir, "panel.csv"))
 panel <- read.csv(file.path(workdir, "panel.csv"))
 
 # Import channel-mass file
-url.channelmass <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/704312eb-377c-42e2-8227-44bb9aca0fb3/file_downloaded")
-download.file(url.channelmass, destfile = file.path(workdir, "ChannelMass.csv"))
+url.channelmass <- ("https://data.mendeley.com/public-files/datasets/
+                    cydmwsfztj/files/704312eb-377c-42e2-8227-44bb9aca0fb3/
+                    file_downloaded")
+download.file(url.channelmass, destfile = file.path(workdir, 
+                                                    "ChannelMass.csv"))
 channel.mass <- read.csv(file.path(workdir, "ChannelMass.csv"), header = FALSE)
 ```
 
@@ -276,12 +287,10 @@ saveRDS(sce, file.path(outdir, "sce.rds"))
 Finally, we remove the downloaded objects to save storage space.
 
 ```{r clean-up, message = FALSE}
-file.remove(
-    file.path(workdir, "All_Image.csv"),
-    file.path(workdir, "CellSubset.csv"),
-    file.path(workdir, "CellTypes.csv"),
-    file.path(workdir, "Donors.csv")
-)
+file.remove(file.path(workdir, "All_Image.csv"),
+            file.path(workdir, "CellSubset.csv"),
+            file.path(workdir, "CellTypes.csv"),
+            file.path(workdir, "Donors.csv"))
 ```
 
 
@@ -294,7 +303,8 @@ We use the `loadImages` function of the `cytomapper` package to read them into a
 
 ```{r load-images, message=FALSE}
 # Download the zipped folder image and unzip it
-url.images <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/b37054d2-d5d0-4c48-a001-81ff77136f41/file_downloaded")
+url.images <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+               files/b37054d2-d5d0-4c48-a001-81ff77136f41/file_downloaded")
 download.file(url.images, destfile = file.path(workdir, "ImageSubset.zip"))
 unzip(file.path(workdir, "ImageSubset.zip"), exdir = workdir)
 file.remove(file.path(workdir, "ImageSubset.zip"))
@@ -308,7 +318,8 @@ We also download the associated segemntation masks and read them into a `CytoIma
 
 ```{r load-masks}
 # Download the zipped folder masks and unzip it
-url.masks <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/13679a61-e9b4-4820-9f09-a5bbc697647c/file_downloaded")
+url.masks <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/
+              files/13679a61-e9b4-4820-9f09-a5bbc697647c/file_downloaded")
 download.file(url.masks, destfile = file.path(workdir, "Masks.zip"))
 unzip(file.path(workdir, "Masks.zip"), exdir = workdir)
 file.remove(file.path(workdir, "Masks.zip"))
@@ -322,11 +333,13 @@ Here, we remove the downloaded images again.
 
 ```{r clean-up-2, message = FALSE}
 # Remove image stacks
-images.del <- list.files(workdir, pattern="_full_clean.tiff", full.names = TRUE)
+images.del <- list.files(workdir, pattern="_full_clean.tiff",
+                         full.names = TRUE)
 file.remove(images.del)
 
 # Remove masks
-masks.del <- list.files(workdir, pattern="_full_mask.tiff", full.names = TRUE)
+masks.del <- list.files(workdir, pattern="_full_mask.tiff",
+                        full.names = TRUE)
 file.remove(masks.del)
 ```
 
