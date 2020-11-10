@@ -1,14 +1,14 @@
 ---
-title: "Load single-cell data"
+title: "Loading single-cell data"
 author: "Nicolas Damond and Nils Eling"
-date: "`r Sys.Date()`"
+date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
 output:
   BiocStyle::html_document:
     titlecaps: false
     toc_float: true
 editor_options:
   chunk_output_type: console
-bibliography: ../ref.bib
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
 ---
 
 ```{r style, echo=FALSE, results='hide', message=FALSE}

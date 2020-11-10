@@ -4,10 +4,10 @@
 \alias{DamondPancreas2019Data}
 \title{Obtain the damond-pancreas-2019 data}
 \usage{
-DamondPancreas2019Data(data.type = "sce")
+DamondPancreas2019Data(data_type)
 }
 \arguments{
-\item{data.type}{type of data to load, should be `sce` for single cell data
+\item{data_type}{type of data to load, should be `sce` for single cell data
 (default), `images` for multichannel images or `masks` for cell masks.}
 }
 \value{
@@ -22,15 +22,22 @@ et al. (2019).
 \details{
 The dataset contains three types of data: single cell data in form of a
 `SingleCellExperiment` object, multichannel images formatted into a
-`CytoImageList` object and cell masks formatted into a `CytoImageList`
-object. The type of data to retrieve is defined by the `data.type` parameter.
+`CytoImageList` object and cell masks formatted into a `CytoImageList` 
+object.
+
+The value of \code{data_type} will retrieve different data sets.
+\itemize{
+\item \code{"sce"}, single cell data
+\item \code{"images"}, 38-channel images.
+\item \code{"masks"}, cell masks.
+}
 
 All data are downloaded from ExperimentHub and cached for local re-use.
 }
 \examples{
-sce <- DamondPancreas2019Data()
-images <- DamondPancreas2019Data(data.type = "images")
-masks <- DamondPancreas2019Data(data.type = "masks")
+sce <- DamondPancreas2019Data(data_type = "sce")
+images <- DamondPancreas2019Data(data_type = "images")
+masks <- DamondPancreas2019Data(data_type = "masks")
 
 }
 \references{

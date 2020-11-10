@@ -48,21 +48,21 @@ with `SingleCellExperiment` and `CytoImageList` objects.
 Users can import the datasets by calling a single function. For example:  
 
 ```{r import-dataset}
-sce <- DamondPancreas2019Data(data.type = "sce")
+sce <- DamondPancreas2019Data(data_type = "sce")
 sce
 ```
 
 Import multichannel images
 
 ```{r import-images}
-images <- DamondPancreas2019Data(data.type = "images")
+images <- DamondPancreas2019Data(data_type = "images")
 images
 ```
 
 Import cell masks
 
 ```{r import-masks}
-masks <- DamondPancreas2019Data(data.type = "masks")
+masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 

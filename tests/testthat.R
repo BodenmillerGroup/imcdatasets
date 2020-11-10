@@ -1,0 +1,5 @@
+library(testthat)
+library(imcdatasets)
+library(cytomapper)
+library(SingleCellExperiment)
+test_check("imcdatasets")
