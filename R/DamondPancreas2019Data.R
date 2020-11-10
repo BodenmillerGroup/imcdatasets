@@ -1,25 +1,30 @@
-#' Obtain the damond-pancreas-2019 data
+#' Obtain the damond-pancreas-2019 dataset
 #'
-#' Obtain the human pancreas from donors with type 1 diabetes data from Damond
-#' et al. (2019).
+#' Obtain the damond-pancreas-2019 dataset, which consists of three data 
+#' objects: single cell data, multichannel images and cell masks. The data was
+#' obtained by imaging mass cytometry of human pancreas sections from donors 
+#' with type 1 diabetes.
 #'
-#' @param data_type type of data to load, should be `sce` for single cell data
-#' (default), `images` for multichannel images or `masks` for cell masks.
+#' @param data_type type of data to load, should be `sce` for single cell data, 
+#' `images` for multichannel images or `masks` for cell masks.
 #'
 #' @details
-#' The dataset contains three types of data: single cell data in form of a
-#' `SingleCellExperiment` object, multichannel images formatted into a
-#' `CytoImageList` object and cell masks formatted into a `CytoImageList` 
-#' object.
-#'
-#' The value of \code{data_type} will retrieve different data sets.
+#' The dataset contains three data objects. The desired object can be selected 
+#' using the \code{data_type} argument:
 #' \itemize{
-#' \item \code{"sce"}, single cell data
-#' \item \code{"images"}, 38-channel images.
-#' \item \code{"masks"}, cell masks.
+#' \item \code{`sce`}, single cell data in form of 
+#' a \linkS4class{SingleCellExperiment} object.
+#' \item \code{`images`}, 38-channel images formatted into 
+#' a \linkS4class{CytoImageList} object. 
+#' \item \code{`masks`}, cell masks formatted into 
+#' a \linkS4class{CytoImageList} object.
 #' }
-#' 
-#' All data are downloaded from ExperimentHub and cached for local re-use.
+#'
+#' All data are downloaded from ExperimentHub and cached for local re-use. 
+#' Specific resources can be retrieved by searching for
+#' \code{imcdatasets/DamondPancreas2019_sce}, 
+#' \code{imcdatasets/DamondPancreas2019_images}, or 
+#' \code{imcdatasets/DamondPancreas2019_masks}.
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
 #' \linkS4class{CytoImageList} object containing multichannel images, or a

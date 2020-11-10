@@ -4,11 +4,11 @@ date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('imcdatasets')`"
 author:
 - name: Nicolas Damond
-  affiliation: Department for Quantitative Biomedicine, University of Zurich
-  email: nicolas.damond@dqbm.uzh.ch
+    affiliation: Department for Quantitative Biomedicine, University of Zurich
+    email: nicolas.damond@dqbm.uzh.ch
 - name: Nils Eling
-  affiliation: Department for Quantitative Biomedicine, University of Zurich
-  email: nils.eling@dqbm.uzh.ch
+    affiliation: Department for Quantitative Biomedicine, University of Zurich
+    email: nils.eling@dqbm.uzh.ch
 output:
     BiocStyle::html_document:
     toc: true

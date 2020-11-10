@@ -1,5 +1,5 @@
 ---
-title: "Loading single-cell data"
+title: "Loading single cell data, images and masks"
 author: "Nicolas Damond and Nils Eling"
 date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
 output:
