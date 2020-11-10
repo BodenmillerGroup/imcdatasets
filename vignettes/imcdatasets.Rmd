@@ -21,6 +21,7 @@ vignette: >
 
 ```{r style, echo=FALSE}
 knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
+library(BiocStyle)
 ```
 
 ```{r library, echo=FALSE}
