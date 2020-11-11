@@ -4,8 +4,8 @@
 #' package.
 #'
 #' @details
-#' One dataset should contain single-cell data, multichannel images and cell 
-#' masks.
+#' Each dataset contains single-cell data, multichannel images and cell 
+#' segmentation masks.
 #'
 #' @return
 #' A \linkS4class{DataFrame} where each row corresponds to a dataset, containing
