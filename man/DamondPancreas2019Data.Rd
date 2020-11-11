@@ -22,14 +22,16 @@ obtained by imaging mass cytometry of human pancreas sections from donors
 with type 1 diabetes.
 }
 \details{
-The dataset contains three data objects. The desired object can be selected 
+The dataset contains three data objects corresponding to 100 multichannel 
+images, the associated cell masks and single cell data 
+. The desired object can be selected 
 using the \code{data_type} argument:
 \itemize{
 \item \code{`sce`}, single cell data in form of 
-a \linkS4class{SingleCellExperiment} object.
-\item \code{`images`}, 38-channel images formatted into 
+a \linkS4class{SingleCellExperiment} object of dimension 38 x 252059.
+\item \code{`images`}, 100 images, each with 38 channels formatted into 
 a \linkS4class{CytoImageList} object. 
-\item \code{`masks`}, cell masks formatted into 
+\item \code{`masks`}, 100 cell masks formatted into 
 a \linkS4class{CytoImageList} object.
 }
 
