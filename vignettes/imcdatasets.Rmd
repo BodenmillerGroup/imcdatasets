@@ -33,46 +33,50 @@ library(imcdatasets)
 # Introduction
 
 The `r Biocpkg("imcdatasets")` package provides access to publicly available
-imaging mass cytometry (IMC) @giesen2014imc datasets.  
+imaging mass cytometry (IMC) datasets.
 
-Each dataset is composed of :
-* Single-cell data in the form of a `SingleCellExperiment` object (named 
-`sce.rds`).
-* Multichannel images in the form of a `CytoImageList` object (named 
-`images.rds`).
-* Cell masks in the form of a `CytoImageList` object (named `masks.rds`).
+IMC is a technology that enables measurement of up to 50 markers from tissue 
+sections at a resolution of 1 $\mu m$ @giesen2014imc. In classical processing 
+pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline)
+, the multichannel images are segmented to generate cells masks. These masks are
+then used to extract single cell features from the multichannel images.  
 
-Please refer to the `r Biocpkg("SingleCellExperiment")` and 
-`r Biocpkg("cytomapper")` documentation for further information on how to work
-with `SingleCellExperiment` and `CytoImageList` objects.
+Each dataset in `imcdatasets` is composed of three elements that can be 
+retrieved separately:  
+1. Single-cell data in the form of a `SingleCellExperiment` class object.  
+2. Multichannel images in the form of a `CytoImageList` class object.  
+3. Cell masks in the form of a `CytoImageList` class object.  
 
-Users can import the datasets by calling a single function. For example:  
+# Retrieving data
+
+Users can import the datasets by calling a single function and specifying the 
+type of data to retrieve.  
+
+**Importing single cell data**
 
 ```{r import-dataset}
 sce <- DamondPancreas2019Data(data_type = "sce")
 sce
 ```
 
-Import multichannel images
+**Importing multichannel images**
 
 ```{r import-images}
 images <- DamondPancreas2019Data(data_type = "images")
 images
 ```
 
-Import cell masks
+**Importing cell masks**
 
 ```{r import-masks}
 masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 
-
 # Available datasets
 
-The `listDatasets()` function returns all available datasets in 
-`imcdatasets`, along with associated information and the R function
-call to load them.
+The `listDatasets()` function returns all available datasets in `imcdatasets`, 
+along with associated information and the R function call to load them.
 
 ```{r list-datasets}
 datasets <- listDatasets()
@@ -81,10 +85,76 @@ datasets$FunctionCall <- sprintf("`%s`", datasets$FunctionCall)
 knitr::kable(datasets)
 ```
 
+# Usage
+
+The `SingleCellExperiment` class objects can be used for data analysis. For more
+information, please refer to the `r Biocpkg("SingleCellExperiment")` package 
+and to the [Orchestrating Single-Cell Analysis with Bioconductor](http://bioconductor.org/books/release/OSCA/)
+workflow.  
+
+The `CytoImageList` class objects can be used for plotting cell and pixel 
+information. Some typical use cases are given below. For more information, 
+please see the `r Biocpkg("cytomapper")` package and the
+[associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html)
+.  
+
+**Subsetting the images and masks**
+
+```{r usage-subset}
+cur_images <- images[1:5]
+cur_masks <- masks[1:5]
+```
+
+**Plotting pixel information**  
+
+The `images` objects can be used to display pixel-level data.
+
+```{r usage-pixel}
+plotPixels(
+    cur_images,
+    colour_by = c("CDH", "CD99", "H3"),
+    bcg = list(
+        CD99 = c(0,2,1),
+        CDH = c(0,8,1),
+        H3 = c(0,5,1)
+    )
+)
+```
+
+**Plotting cell information**  
+
+The `masks` and `sce` objects can be combined to display cell-level data.
+
+```{r usage-cell}
+plotCells(
+    cur_masks, object = sce,
+    img_id = "ImageNumber", cell_id = "CellNumber",
+    colour_by = c("CD8a", "PIN"),
+    exprs_values = "exprs"
+)
+```
+
+**Outlining cells on images**  
+
+Cell information can be displayed on top of images by combining the `images`, 
+`masks` and `sce` objects.
+
+```{r usage-outline}
+plotPixels(
+    cur_images, mask = cur_masks, object = sce,
+    img_id = "ImageNumber", cell_id = "CellNumber",
+    outline_by = "CellType",
+    colour_by = c("H3", "CD99", "CDH"),
+    bcg = list(
+        CD99 = c(0,2,1),
+        CDH = c(0,8,1),
+        H3 = c(0,5,1)
+    )
+)
+```
 
 ```{r session-info}
 sessionInfo()
 ```
-
 
 # References
