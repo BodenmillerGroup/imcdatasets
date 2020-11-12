@@ -1,8 +1,0 @@
-language: R
-cache: packages
-
-r: bioc-devel
-bioc_check: true
-
-after_success:
-  - Rscript -e 'covr::codecov()'

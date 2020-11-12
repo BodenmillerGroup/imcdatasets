@@ -6,9 +6,10 @@ Description:
     The imcdatasets package provides access to publicly available IMC datasets.
     IMC is a technology that enables measurement of > 40 proteins from tissue
     sections. The generated images can be segmented to extract single cell data.
-    Datasets typically consists of three elements: a SingleCellExperiment object
+    Datasets typically consist of three elements: a SingleCellExperiment object
     containing single cell data, a CytoImageList object containing multichannel
-    images and a CytoImageList object containing cell masks.
+    images and a CytoImageList object containing the cell masks that were used
+    to extract the single cell data from the images.
 Authors@R:
     c(person("Nicolas", "Damond", role = c("aut", "cre"),
         email = "nicolas.damond@dqbm.uzh.ch",
@@ -41,5 +42,6 @@ biocViews:
 VignetteBuilder: knitr
 URL: https://github.com/BodenmillerGroup/imcdatasets
 BugReports: https://github.com/BodenmillerGroup/imcdatasets/issues
+BiocType: ExperimentData
 RoxygenNote: 7.1.1
 Encoding: UTF-8

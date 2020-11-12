@@ -2,4 +2,4 @@ Changes in version 0.1.0 (2020-11-02):
 
 + Initial commit
 + Creation of the imcdatasets package
-+ Added the damond-pancreas dataset
++ Added the damond-pancreas-2019 dataset
