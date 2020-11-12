@@ -22,10 +22,20 @@ check_intersect <- function(sce, img, msk) {
 }
 
 test_that("DamondPancreas2019Data works", {
-  check_sce(DamondPancreas2019Data(data_type = "sce"))
-  check_images(DamondPancreas2019Data(data_type = "images"))
-  check_masks(DamondPancreas2019Data(data_type = "masks"))
-  check_intersect(DamondPancreas2019Data(data_type = "sce"),
-                  DamondPancreas2019Data(data_type = "images"),
-                  DamondPancreas2019Data(data_type = "masks"))
+  sce <- DamondPancreas2019Data(data_type = "sce")
+  images <- DamondPancreas2019Data(data_type = "images")
+  masks <- DamondPancreas2019Data(data_type = "masks")
+    
+  check_sce(sce)
+  check_images(images)
+  check_masks(masks)
+  check_intersect(sce,
+                  images,
+                  masks)
+  
+  # Fail
+  expect_error(DamondPancreas2019Data(data_type = "test"), 
+               regexp = 'The data_type argument should be "sce", "images" or "masks".')
+  expect_error(DamondPancreas2019Data(data_type = c("sce", "images")), 
+               regexp = 'The data_type argument should be of length 1.')
 })

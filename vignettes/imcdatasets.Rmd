@@ -4,17 +4,17 @@ date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('imcdatasets')`"
 author:
 - name: Nicolas Damond
-    affiliation: Department for Quantitative Biomedicine, University of Zurich
-    email: nicolas.damond@dqbm.uzh.ch
+  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  email: nicolas.damond@dqbm.uzh.ch
 - name: Nils Eling
-    affiliation: Department for Quantitative Biomedicine, University of Zurich
-    email: nils.eling@dqbm.uzh.ch
+  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  email: nils.eling@dqbm.uzh.ch
 output:
     BiocStyle::html_document:
-    toc: true
+        toc_float: yes
 bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
 vignette: >
-    %\VignetteIndexEntry{User's Guide}
+    %\VignetteIndexEntry{"Accessing IMC datasets"}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ library(imcdatasets)
 # Introduction
 
 The `r Biocpkg("imcdatasets")` package provides access to publicly available
-imaging mass cytometry (IMC) datasets.
+datasets generated using imaging mass cytometry (IMC) [@giesen2014imc].
 
 IMC is a technology that enables measurement of up to 50 markers from tissue 
 sections at a resolution of 1 $\mu m$ @giesen2014imc. In classical processing 
@@ -43,16 +43,23 @@ then used to extract single cell features from the multichannel images.
 
 Each dataset in `imcdatasets` is composed of three elements that can be 
 retrieved separately:  
-1. Single-cell data in the form of a `SingleCellExperiment` class object.  
-2. Multichannel images in the form of a `CytoImageList` class object.  
-3. Cell masks in the form of a `CytoImageList` class object.  
+1. Single-cell data in the form of a `SingleCellExperiment` class object (named 
+`XYZ_sce.rds`).  
+2. Multichannel images in the form of a `CytoImageList` class object (named 
+`XYZ_images.rds`).  
+3. Cell segmentation masks in the form of a `CytoImageList` class object (named
+`XYZ_masks.rds`).  
+Here, `XYZ` refers to the name of the dataset.
+
 
 # Retrieving data
 
 Users can import the datasets by calling a single function and specifying the 
-type of data to retrieve.  
+type of data to retrieve. The following examples highlight accessing the dataset
+provided by _Damond, N. et al., A Map of Human Type 1 Diabetes Progression by 
+Imaging Mass Cytometry_[@damond2019pancreas].
 
-**Importing single cell data**
+Importing single-cell expression data and metadata:
 
 ```{r import-dataset}
 sce <- DamondPancreas2019Data(data_type = "sce")
@@ -66,11 +73,22 @@ images <- DamondPancreas2019Data(data_type = "images")
 images
 ```
 
-**Importing cell masks**
+**Importing cell segmentation masks**
 
 ```{r import-masks}
 masks <- DamondPancreas2019Data(data_type = "masks")
 masks
+```
+
+**Accessing the metadata**
+
+Data files can also be individually accessed by name. The associated metadata can 
+be displayed as follows:
+
+```{r access-metadata}
+DamondPancreas2019_sce(metadata = TRUE)
+DamondPancreas2019_images(metadata = TRUE)
+DamondPancreas2019_masks(metadata = TRUE)
 ```
 
 # Available datasets
@@ -153,8 +171,9 @@ plotPixels(
 )
 ```
 
-```{r session-info}
+# Session info {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
-
 # References

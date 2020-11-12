@@ -1,5 +1,5 @@
 ---
-title: "Loading single cell data, images and masks"
+title: "Loading single cell data, images and masks of the Damond et al dataset"
 author: "Nicolas Damond and Nils Eling"
 date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
 output:
@@ -24,12 +24,11 @@ library(SingleCellExperiment)
 library(cytomapper)
 ```
 
-This script downloads 100 example images, as well as the associated single-cell data and cell masks from the pancreas Imaging mass cytometry (IMC) dataset available [here](http://dx.doi.org/10.17632/cydmwsfztj.2). The dataset is associated to the following publication:
+This script downloads 100 example images, as well as the associated single-cell data and cell segmentation masks from the pancreas Imaging Mass Cytometry (IMC) dataset available [here](http://dx.doi.org/10.17632/cydmwsfztj.2). The dataset is associated to the following publication:
 
 [Damond et al. A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry. Cell Metabolism. 2019 Mar 5;29(3):755-768](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6821395)
 
 The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.  
-
 
 Setting the working and output directories
 
@@ -46,7 +45,7 @@ if(!(dir.exists(outdir)))
 
 ## Obtain and read-in data
 
-Here, a subset of single-cell data corresponding to 100 images from @damond2019pancreas is downloaded.
+Here, a subset of single-cell data corresponding to 100 images from [@damond2019pancreas] is downloaded.
 
 ### Read in single-cell data
 
@@ -293,12 +292,11 @@ file.remove(file.path(workdir, "All_Image.csv"),
             file.path(workdir, "Donors.csv"))
 ```
 
-
 # Images and cell masks
 
 ## Download and read-in images
 
-Here, a subset of 100 images from @damond2019pancreas is downloaded.
+Here, a subset of 100 images from [@damond2019pancreas] is downloaded.
 We use the `loadImages` function of the `cytomapper` package to read them into a `CytoImageList` object.
 
 ```{r load-images, message=FALSE}
@@ -314,7 +312,7 @@ images <- loadImages(workdir, pattern = "_full_clean.tiff")
 images
 ```
 
-We also download the associated segemntation masks and read them into a `CytoImageList` object.
+We also download the associated segmentation masks and read them into a `CytoImageList` object.
 
 ```{r load-masks}
 # Download the zipped folder masks and unzip it
@@ -369,7 +367,7 @@ mcols(masks)$ImageName <- gsub("_a0_full_mask", "", names(masks))
 
 We downloaded the full set of segmentation masks.
 To match the segmentation masks to the corresponding images, we will subset them.
-As a safty check, we will make sure that the `ImageName`s of the masks are identical to those of the images.
+As a sanity check, we will make sure that the `ImageName`s of the masks are identical to those of the images.
 
 ```{r subset-masks}
 masks <- masks[mcols(masks)$ImageName %in% mcols(images)$ImageName]
@@ -413,7 +411,7 @@ saveRDS(masks, file.path(outdir, "masks.rds"))
 
 ## Clean up
 
-We will delete all unecessary files.
+We will delete all unnecessary files.
 
 ```{r clean-up-panel, message = FALSE}
 file.remove(file.path(workdir, "panel.csv"),
