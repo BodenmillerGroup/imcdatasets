@@ -26,8 +26,8 @@ Summary information for all available datasets in the \pkg{imcdatasets}
 package.
 }
 \details{
-One dataset should contain single-cell data, multichannel images and cell 
-masks.
+Each dataset contains single-cell data, multichannel images and cell 
+segmentation masks.
 }
 \examples{
 listDatasets()

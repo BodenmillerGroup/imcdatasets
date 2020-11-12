@@ -66,24 +66,24 @@ sce <- DamondPancreas2019Data(data_type = "sce")
 sce
 ```
 
-**Importing multichannel images**
+__Importing multichannel images__
 
 ```{r import-images}
 images <- DamondPancreas2019Data(data_type = "images")
 images
 ```
 
-**Importing cell segmentation masks**
+__Importing cell segmentation masks__
 
 ```{r import-masks}
 masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 
-**Accessing the metadata**
+__Accessing the metadata__
 
-Data files can also be individually accessed by name. The associated metadata can 
-be displayed as follows:
+Data files can also be individually accessed by name. The associated metadata 
+can be displayed as follows:
 
 ```{r access-metadata}
 DamondPancreas2019_sce(metadata = TRUE)
@@ -116,14 +116,14 @@ please see the `r Biocpkg("cytomapper")` package and the
 [associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html)
 .  
 
-**Subsetting the images and masks**
+__Subsetting the images and masks__
 
 ```{r usage-subset}
 cur_images <- images[1:5]
 cur_masks <- masks[1:5]
 ```
 
-**Plotting pixel information**  
+__Plotting pixel information__  
 
 The `images` objects can be used to display pixel-level data.
 
@@ -139,7 +139,7 @@ plotPixels(
 )
 ```
 
-**Plotting cell information**  
+__Plotting cell information__  
 
 The `masks` and `sce` objects can be combined to display cell-level data.
 
@@ -152,7 +152,7 @@ plotCells(
 )
 ```
 
-**Outlining cells on images**  
+__Outlining cells on images__  
 
 Cell information can be displayed on top of images by combining the `images`, 
 `masks` and `sce` objects.
@@ -176,4 +176,5 @@ plotPixels(
 ```{r sessionInfo, echo=FALSE}
 sessionInfo()
 ```
+
 # References

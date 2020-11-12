@@ -34,8 +34,12 @@ test_that("DamondPancreas2019Data works", {
                   masks)
   
   # Fail
-  expect_error(DamondPancreas2019Data(data_type = "test"), 
-               regexp = 'The data_type argument should be "sce", "images" or "masks".')
-  expect_error(DamondPancreas2019Data(data_type = c("sce", "images")), 
-               regexp = 'The data_type argument should be of length 1.')
+  expect_error(
+    DamondPancreas2019Data(data_type = "test"), 
+    regexp = 'The data_type argument should be "sce", "images" or "masks".'
+  )
+  expect_error(
+    DamondPancreas2019Data(data_type = c("sce", "images")), 
+    regexp = 'The data_type argument should be of length 1.'
+  )
 })
