@@ -33,7 +33,7 @@ library(imcdatasets)
 # Introduction
 
 The `r Biocpkg("imcdatasets")` package provides access to publicly available
-datasets generated using imaging mass cytometry (IMC) @giesen2014imc.
+datasets generated using imaging mass cytometry (IMC) [@giesen2014imc].
 
 Each dataset is composed of:
 * Single-cell data in the form of a `SingleCellExperiment` object (named 
@@ -50,7 +50,7 @@ Biocpkg("cytomapper")` documentation for further information on how to work with
 Users can import the datasets by calling a single function. The following
 examples highlight accessing the dataset provided by _Damond, N. et al., A Map
 of Human Type 1 Diabetes Progression by Imaging Mass Cytometry_
-@damond2019pancreas
+[@damond2019pancreas].
 
 Import single-cell expression and metadata:
 
