@@ -50,7 +50,7 @@ dataset ideal for benchmarking spatial and neighborhood analysis algorithms.
 The \code{assay} slot of the \linkS4class{SingleCellExperiment} object 
 contains two assays:
 \itemize{
-    \item \code{counts} contains raw IMC counts.
+    \item \code{counts} contains mean ion counts per cell.
     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
 }
 
@@ -87,9 +87,12 @@ The three donors present the following characteristics:
 
 File sizes:
 \itemize{
-    \item \code{`DamondPancreas2019_images`}: 7.4 Gb.
-    \item \code{`DamondPancreas2019_masks`}: 200.0 Mb.
-    \item \code{`DamondPancreas2019_sce`}: 248.6 Mb.
+    \item \code{`DamondPancreas2019_images`}: size in memory = 7.4 Gb, size 
+    on disk = 1780 Mb.
+    \item \code{`DamondPancreas2019_masks`}: size in memory = 200.0 Mb, size 
+    on disk = 8.6 Mb.
+    \item \code{`DamondPancreas2019_sce`}: size in memory = 248.6 Mb, size on
+    disk = 145 Mb.
 }
 
 Original source: Damond et al. (2019): 
