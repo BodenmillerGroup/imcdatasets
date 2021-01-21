@@ -1,5 +1,5 @@
 Package: imcdatasets
-Version: 0.99.3
+Version: 0.99.4
 Date: 2020-12-03
 Title: Collection of publicly available imaging mass cytometry (IMC) datasets
 Description:
@@ -17,7 +17,7 @@ Authors@R:
       person("Nils", "Eling", role = c("aut"),
         email = "nils.eling@dqbm.uzh.ch",
         comment = c(ORCID = "0000-0002-4711-1176")))
-License: GPL 3
+License: GPL-3
 NeedsCompilation: no
 Depends:
     R (>= 4.1),
