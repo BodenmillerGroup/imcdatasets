@@ -1,0 +1,453 @@
+---
+title: "Prepare single-cell data, images and masks from the Jackson and Fischer dataset"
+author: "Jana Fischer and Nicolas Damond"
+date: "Created: Mar 15, 2021; Compiled: `r BiocStyle::doc_date()`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+This script loads an example dataset including single-cell data, single-cell masks and IMC tiffs of 100 images (1 image per patient) from the Jackson and Fischer 2020 breast cancer dataset:  
+
+[Jackson, H.W., Fischer, J.R. et al. The single-cell pathology landscape of breast cancer. Nature 578, 615–620 (2020)](https://doi.org/10.1038/s41586-019-1876-x).  
+
+The data is obtained from [zenodo](https://doi.org/10.5281/zenodo.3518284) and processed to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. The [cytomapper package](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) is used to read in the images and masks and create `CytoImageList` objects.  
+
+
+Loading required R packages
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(SingleCellExperiment)
+library(stringr)
+library(cytomapper)
+library(plyr)
+```
+
+Setting the working and output directories
+
+```{r directories}
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+outdir <- file.path("inst", "extdata", "JacksonFischer2020")
+if(!(dir.exists(outdir)))
+    dir.create(outdir)
+```
+
+#Single-cell and sample/patient metadata
+
+##Download and unzip single-cell, sample and patient metadata
+
+The data is downloaded from [zenodo](https://doi.org/10.5281/zenodo.3518284).
+The first zip folder contains the main single-cell, sample and patient metadata. The single-cell locations and cluster labels are downloaded as separate zip folders because they were uploaded to zenodo separately at a later time point.
+
+###Single cell data and metadata
+
+```{r download single-cell and metadata, message=FALSE}
+timeout <- getOption('timeout')
+options(timeout=1000)
+
+#Download the zipped folder with single-cell and metadata
+url.cells <- ("https://zenodo.org/record/4607374/files/SingleCell_and_Metadata.zip?download=1")
+download.file(url.cells, destfile = file.path(
+  workdir, "SingleCell_and_Metadata.zip"))
+
+#Unzip file in same directory
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "SingleCell_and_Metadata.zip"), "-d", workdir),
+  stdout = TRUE)
+
+#Remove zip file
+file.remove(file.path(workdir, "SingleCell_and_Metadata.zip"))
+```
+
+###Single cell cluster labels
+
+```{r download single-cell cluster labels, message=FALSE}
+#Download the zipped folder with single-cell cluster labels
+url.cluster <- ("https://zenodo.org/record/4607374/files/singlecell_cluster_labels.zip?download=1")
+download.file(url.cluster, destfile = file.path(
+  workdir, "singlecell_cluster_labels.zip"))
+
+#Unzip file in same directory
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "singlecell_cluster_labels.zip"), "-d", workdir),
+  stdout = TRUE)
+
+#Remove zip file
+file.remove(file.path(workdir, "singlecell_cluster_labels.zip"))
+```
+
+###Single cell locations
+
+```{r download single-cell locations, message=FALSE}
+#Download the zipped folder with single-cell locations
+url.clocations <- ("https://zenodo.org/record/4607374/files/singlecell_locations.zip?download=1")
+download.file(url.clocations, destfile = file.path(
+  workdir, "singlecell_locations.zip"))
+
+#Unzip file in same directory
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "singlecell_locations.zip"), "-d", workdir), stdout = TRUE)
+
+#Remove zip file
+file.remove(file.path(workdir, "singlecell_locations.zip"))
+```
+
+##Read single-cell, sample and patient metadata
+
+Basel dataset
+
+```{r read single-cell and metadata}
+#Single cell expressions and spatial features
+cells <- fread(
+  file.path(workdir, "Data_publication/BaselTMA/SC_dat.csv"))
+
+#Sample and patient metadata
+meta <- fread(
+  file.path(workdir, "Data_publication/BaselTMA/Basel_PatientMetadata.csv"))
+
+#Panel info
+panel <- fread(
+  file.path(workdir, "Data_publication/Basel_Zuri_StainingPanel.csv"))
+
+#Cluster labels (combine PhenoGraph cluster labels and metacluster labels)
+PG_clusters <- fread(
+  file.path(workdir, "Cluster_labels/PG_basel.csv"), header = T)
+Meta_clusters <- fread(
+  file.path(workdir, "Cluster_labels/Basel_metaclusters.csv"), header = T)
+clusters <- merge(PG_clusters, Meta_clusters, by = "id", all.x = T)
+PG_clusters <- NULL
+Meta_clusters <- NULL
+
+#Single-cell locations
+locations <- fread(file.path(workdir, "Basel_SC_locations.csv"), header = T)
+```
+
+##Select a set of 100 patients as an example dataset
+
+One primary tumor core per patient
+
+```{r select patients}
+#Exclude healthy tissue samples and controls
+meta <- meta[diseasestatus == "tumor",]
+
+#Exclude patients for which the tumor core was split across 2 images (machine failure)
+meta[, ncores := .N,by = "PID"]
+meta <- meta[ncores == 1,]
+
+#Randomly sample 100 patients
+set.seed(2)
+meta <- meta[PID %in% sample(meta$PID, 100, replace = F),]
+```
+
+##Subset single-cell data to cores of selected patients
+
+```{r subset single-cell data}
+cells <- cells[core %in% meta$core,]
+locations <- locations[core %in% meta$core,]
+clusters <- clusters[core %in% meta$core,]
+```
+
+##Convert cells to single-cell experiment
+
+```{r convert to SCE}
+spatial_channels <- c("Area","Eccentricity","Solidity","Extent","EulerNumber",
+                      "Perimeter","MajorAxisLength","MinorAxisLength",
+                      "Orientation","Percent_Touching","Number_Neighbors")
+
+#Spatial channels go into colData
+spatial <- cells[channel %in% spatial_channels,]
+
+#Marker expression channels go into counts
+cells <- cells[!channel %in% spatial_channels,]
+
+#Normalize marker counts between 0 and 1 with the 99th percentile
+cells[, quant := quantile(mc_counts, 0.99), by = "channel"]
+cells[, quant_norm := mc_counts/quant, by = "channel"]
+cells[quant_norm > 1, quant_norm := 1]
+cells[quant_norm < 0, quant_norm := 0]
+
+#Arcsinh transform marker counts
+cells[,arcsinh := asinh(mc_counts), by = "channel"]
+
+#Raw counts to SCE format
+cells_raw <- dcast.data.table(cells, "core + CellId + id ~channel",
+                              value.var = "mc_counts")
+rnames <- cells_raw$id
+cells_raw <- as.matrix(cells_raw[, -c("id", "CellId", "core")])
+rownames(cells_raw) <- rnames
+cells_raw <- t(cells_raw)
+
+#Normalized counts to SCE format
+cells_quant <- dcast.data.table(cells, "core + CellId + id ~channel",
+                                value.var = "quant_norm")
+rnames <- cells_quant$id
+cells_quant <- as.matrix(cells_quant[, -c("id", "CellId", "core")])
+rownames(cells_quant) <- rnames
+cells_quant <- t(cells_quant)
+
+#Asinh counts to SCE format
+cells_asinh <- dcast.data.table(cells, "core + CellId + id ~channel",
+                                value.var = "arcsinh")
+rnames <- cells_asinh$id
+cells_asinh <- as.matrix(cells_asinh[, -c("id", "CellId", "core")])
+rownames(cells_asinh) <- rnames
+cells_asinh <- t(cells_asinh)
+
+#Make sce
+sce <- SingleCellExperiment(
+  assays = list(counts = cells_raw,
+                exprs = cells_asinh,
+                quant_norm = cells_quant)
+)
+cells_asinh <- NULL
+cells_quant <- NULL
+cells_raw <- NULL
+cells <- NULL
+```
+
+##Add spatial single-cell features, clusters and metadata to colData
+
+```{r colData}
+#Wide format spatial single-cell info
+singlecell_meta <- dcast.data.table(
+  spatial, "core + CellId + id ~channel", value.var = "mc_counts")
+
+#Add single-cell locations
+singlecell_meta <- merge(
+  singlecell_meta, locations[, c("Location_Center_X","Location_Center_Y","id")],
+  by = "id")
+
+#Add clusters
+singlecell_meta <- merge(
+  singlecell_meta, clusters[,c("PhenoGraphBasel","cluster","id")],
+  by = "id")
+setnames(singlecell_meta, "cluster", "metacluster")
+
+#Add sample and patient metadata
+meta <- meta[,ImageNb := 1:.N]
+singlecell_meta <- merge(
+  singlecell_meta,
+  meta[,-c("treatment", "DiseaseStage", "AllSamplesSVSp4.Array", "ncores")],
+  by = "core", all.x = T)
+
+#Set ImageName, ImageNb and CellNb for cytomapper package
+# to map to CytoImageList objects
+setnames(singlecell_meta, "FileName_FullStack", "ImageName")
+setnames(singlecell_meta, "CellId", "CellNb")
+
+#Make sure order matches id order of sce
+singlecell_meta <- singlecell_meta[order(match(id, colnames(sce))),]
+
+#Add colData to sce
+rown <- singlecell_meta$id
+singlecell_meta <- DataFrame(singlecell_meta)
+rownames(singlecell_meta) <- rown
+colData(sce) <- singlecell_meta
+```
+
+##Clean marker names and add row metadata
+
+```{r rowData}
+#Exclude gas channels
+sce <- sce[rownames(sce)[!str_detect(rownames(sce),"Hg") & !str_detect(rownames(sce),"In115") & !str_detect(rownames(sce),"I127") & !str_detect(rownames(sce),"Pb") & !str_detect(rownames(sce),"Xe") & !str_detect(rownames(sce),"Ar")]]
+
+#Add row metadata
+rows <- data.table(original = rownames(sce))
+rows[,marker := sub(".*Di ", "",original)]
+rows[,metal := sub("Di .*", "",original)]
+rows[,weight := sub(".*[A-Za-z ]", "",metal)]
+rows[,metal := gsub("[0-9]+","",metal)]
+rows[,`Metal Tag` := paste0(metal,weight)]
+
+#Add metal weight to non-unique names
+rows[marker == "Rutheni", marker := paste0("Rutheni_", weight)]
+rows[marker == "Iridium", marker := paste0("Iridium_", weight)]
+
+#Clarify unclear names
+rows[marker == "cleaved", marker := "CC3/cPARP"]
+rows[marker == "cerbB", marker := "HER2"]
+rows[`Metal Tag` == "Nd143", marker := "CK19"]
+rows[`Metal Tag` == "Sm147", marker := "CK14"]
+rows[`Metal Tag` == "Pr141", marker := "CK5"]
+rows[`Metal Tag` == "La139", marker := "H3K27me3"]
+rows[marker == "Carboni" ,marker := "CAIX"]
+rows[`Metal Tag` == "Nd144", marker := "CK8/18"]
+rows[`Metal Tag` == "Yb174", marker := "CK7"]
+
+#Add missing metal info
+rows[marker == "phospho Histone", `Metal Tag` := "Eu153"]
+rows[marker == "phospho S6", `Metal Tag` := "Er170"]
+rows[marker == "phospho mTOR", `Metal Tag` := "Yb173"]
+
+#Add channel number from panel
+rows <- merge(rows, unique(panel[, c("Metal Tag", "FullStack")]),
+              by = "Metal Tag", all.x = T)
+
+#Add rowData to sce
+rows <- rows[order(match(original, rownames(sce)))]
+rownames(sce) <- rows$marker
+rowd <- DataFrame(rows[, -"marker"])
+rownames(rowd) <- rows$marker
+rowData(sce) <- rowd
+```
+
+##Save out sce object
+
+Save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save sce}
+saveRDS(sce, file.path(outdir, "sce.rds"))
+```
+
+## Clean up
+
+Remove the downloaded objects to save storage space.
+
+```{r clean-up1, message = FALSE}
+file.remove(file.path(workdir, "Basel_SC_locations.csv"),
+            file.path(workdir, "Zurich_SC_locations.csv"))
+unlink(file.path(workdir, "Data_publication"), recursive = TRUE)
+unlink(file.path(workdir, "Cluster_labels"), recursive = TRUE)
+```
+
+#Image tiffs and masks
+
+##Download and unzip tiffs and masks
+
+```{r download images and masks, message=FALSE}
+#Download the zipped folder with tiffs and masks
+url.imgs <- ("https://zenodo.org/record/4607374/files/OMEandSingleCellMasks.zip?download=1")
+download.file(url.imgs, destfile = file.path(
+  workdir, "OMEandSingleCellMasks.zip"))
+
+#Unzip main folder
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "OMEandSingleCellMasks.zip"),"-d", workdir),
+  stdout = TRUE)
+
+#Remove zip file
+file.remove(file.path(workdir, "OMEandSingleCellMasks.zip"))
+
+#Unzip subfolder with masks
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "OMEnMasks", "Basel_Zuri_masks.zip"),"-d", workdir),
+  stdout = TRUE)
+
+#Unzip subfolder with tiffs
+system2("unzip", args = c(
+  "-o", # include override flag
+  file.path(workdir, "OMEnMasks", "ome.zip"), "-d", workdir),
+  stdout = TRUE)
+
+#Remove zip files
+file.remove(file.path(workdir, "OMEnMasks/Basel_Zuri_masks.zip"))
+file.remove(file.path(workdir, "OMEnMasks/ome.zip"))
+```
+
+##Load and process masks and images into cytomapper image list
+
+The masks are 16-bit images and need to be re-scaled in order to obtain integer cell IDs. Also, occasionally a single-cell ID is skipped in the masks but in the single-cell data the CellNbs were renamed sequentially. Therefore, the single-cell IDs in the masks also have to renamed sequentially in order to correspond to the CellNbs from the single-cell data.
+
+```{r load and process masks}
+#Load the masks as a CytoImageList object
+masks <- loadImages(file.path(workdir, "Basel_Zuri_masks/"),
+                    pattern = "_full_maks.tiff")
+
+#Metadata names according to full filename in sce
+mcols(masks)$ImageName <- gsub("_full_maks", "_full.tiff", names(masks))
+
+#Subset to selected 100 images corresponding to sce
+masks <- masks[mcols(masks)$ImageName %in% unique(sce$ImageName)]
+
+#Scale masks
+masks <- scaleImages(masks, value = (2 ^ 16) - 1)
+
+#Rename single-cell IDs sequentially in each mask
+for (n in names(masks)){
+  imageData(masks[[n]]) = mapvalues(
+    imageData(masks[[n]]),
+    sort(unique(as.integer(imageData(masks[[n]])))),
+    0:(length(unique(as.integer(imageData(masks[[n]]))))-1)
+  )
+}
+
+#Add ImageNb to metadata
+mcols(masks) <- merge(mcols(masks),
+                       unique(colData(sce)[, c("ImageName", "ImageNb")]),
+                       by = "ImageName")
+
+#Save masks as CytoImageList object
+saveRDS(masks, file.path(outdir, "masks.rds"))
+```
+
+Loading all tiffs would need too much memory -> only keep tiffs that we want to load in folder and delete rest
+
+```{r load and process tiffs}
+#Delete tiff stacks of images we don't want to read from folder
+infold = list.files(file.path(workdir, "ome/"))
+file.remove(file.path(workdir, "ome/",
+                      infold[!infold %in% unique(sce$ImageName)]))
+
+#Load the tiffs as a CytoImageList object
+images <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
+
+#Metadata names according to full filename in sce
+mcols(images)$ImageName <- paste0(names(images), ".tiff")
+
+#Double check that the images correspond to filenames in the sce
+images <- images[mcols(images)$ImageName %in% sce$ImageName]
+
+#Add ImageNb to metadata
+mcols(images) <- merge(mcols(images),
+                       unique(colData(sce)[, c("ImageName", "ImageNb")]),
+                       by = "ImageName")
+
+#Exclude channels that weren't used in sce
+d <- as.data.table(rowData(sce))
+d$rown <- rownames(sce)
+d <- d[order(FullStack),]
+images <- getChannels(images,d$FullStack)
+
+#Add channel names to CytoImageList object
+channelNames(images) <- d$rown
+
+#Check if names of masks and tiffs are equal
+identical(mcols(masks)$ImageName, mcols(images)$ImageName)
+
+#Save tiff images as CytoImageList object
+saveRDS(images, file.path(outdir, "images.rds"))
+```
+
+## Clean up
+
+Remove the downloaded objects to save storage space.
+
+```{r clean-up2, message = FALSE}
+unlink(file.path(workdir, "OMEnMasks"), recursive = TRUE)
+unlink(file.path(workdir, "Basel_Zuri_masks"), recursive = TRUE)
+unlink(file.path(workdir, "ome"), recursive = TRUE)
+options(timeout=timeout)
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```

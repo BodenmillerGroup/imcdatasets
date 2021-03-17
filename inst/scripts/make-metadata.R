@@ -33,6 +33,30 @@ df_DamondPancreas2019 <- cbind(
     Notes = c("","","")
 )
 
+# ------------
+# JacksonFischer2020
+# ------------
+df_JacksonFischer2020 <- cbind(
+    df_base,
+    Title = sprintf("JacksonFischer2020_%s", c("sce", "images", "masks")),
+    Description = sprintf(
+        "%s for the JacksonFischer2020 imaging mass cytometry dataset",
+        c("Single cell data", "Multichannel images", "Cell masks")),
+    BiocVersion = rep("3.13", 3),
+    SourceType = rep("Zip", 3),
+    SourceUrl = rep("https://doi.org/10.5281/zenodo.3518284", 3),
+    SourceVersion = "Nov 04 2019",
+    Species = "Homo sapiens",
+    TaxonomyId = 9606,
+    Coordinate_1_based = NA,
+    DataProvider = "University of Zurich",
+    Maintainer = "Jana Fischer <jana.fischer@dqbm.uzh.ch>",
+    RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
+    RDataPath = file.path("imcdatasets", "jackson-fischer-2020",
+                          c("sce.rds", "images.rds", "masks.rds")),
+    DataType = c("sce", "images", "masks"),
+    Notes = c("","","")
+)
 
 # ---------------------------------
 # Combine for all datasets and save
@@ -40,7 +64,7 @@ df_DamondPancreas2019 <- cbind(
 
 # Combine all datasets
 df_all <- rbind(
-    df_DamondPancreas2019
+    df_DamondPancreas2019, df_JacksonFischer2020
 )
 
 # Save as .csv file
