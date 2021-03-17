@@ -45,7 +45,7 @@
 #' cancer (one image per patient).
 #' 
 #' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object 
-#' contains two assays:
+#' contains three assays:
 #' \itemize{
 #'     \item \code{counts} contains mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.

@@ -44,12 +44,6 @@ if(!(dir.exists(outdir)))
     dir.create(outdir)
 ```
 
-```{r}
-outdir <- file.path("/home/ubuntu/bbvolume/Git/imcdatasets", "inst", "extdata", "JacksonFischer2020")
-workdir <- file.path("/home/ubuntu/Data2")
-```
-
-
 #Single-cell and sample/patient metadata
 
 ##Download and unzip single-cell, sample and patient metadata
@@ -252,7 +246,7 @@ singlecell_meta <- merge(
   by = "core", all.x = T)
 
 #Set ImageName, ImageNb and CellNb for cytomapper package
-#to map to CytoImageList objects
+# to map to CytoImageList objects
 setnames(singlecell_meta, "FileName_FullStack", "ImageName")
 setnames(singlecell_meta, "CellId", "CellNb")
 
@@ -324,7 +318,7 @@ saveRDS(sce, file.path(outdir, "sce.rds"))
 
 Remove the downloaded objects to save storage space.
 
-```{r clean-up, message = FALSE}
+```{r clean-up1, message = FALSE}
 file.remove(file.path(workdir, "Basel_SC_locations.csv"),
             file.path(workdir, "Zurich_SC_locations.csv"))
 unlink(file.path(workdir, "Data_publication"), recursive = TRUE)
@@ -353,7 +347,7 @@ file.remove(file.path(workdir, "OMEandSingleCellMasks.zip"))
 #Unzip subfolder with masks
 system2("unzip", args = c(
   "-o", # include override flag
-  file.path(workdir,"OMEnMasks", "Basel_Zuri_masks.zip"),"-d", workdir),
+  file.path(workdir, "OMEnMasks", "Basel_Zuri_masks.zip"),"-d", workdir),
   stdout = TRUE)
 
 #Unzip subfolder with tiffs
@@ -445,7 +439,7 @@ saveRDS(images, file.path(outdir, "images.rds"))
 
 Remove the downloaded objects to save storage space.
 
-```{r clean-up, message = FALSE}
+```{r clean-up2, message = FALSE}
 unlink(file.path(workdir, "OMEnMasks"), recursive = TRUE)
 unlink(file.path(workdir, "Basel_Zuri_masks"), recursive = TRUE)
 unlink(file.path(workdir, "ome"), recursive = TRUE)

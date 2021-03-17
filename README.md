@@ -20,7 +20,7 @@ For details on the datasets, please refer to the help files for each dataset ava
 
 ## Availability and installation
 
-The `imcdatasets` package is freely available from [Bioconductor](https://www.bioconductor.org/packages/devel/bioc/html/imcdatasets.html), and can be installed by following standard Bioconductor package installation procedures:
+The `imcdatasets` package is freely available from [Bioconductor](https://www.bioconductor.org/packages/release/bioc/html/imcdatasets.html), and can be installed by following standard Bioconductor package installation procedures:
 
 ```{r}
 ## Install imcdatasets

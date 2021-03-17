@@ -43,3 +43,26 @@ test_that("DamondPancreas2019Data works", {
     regexp = 'The data_type argument should be of length 1.'
   )
 })
+
+test_that("JacksonFischer2020Data works", {
+  sce <- JacksonFischer2020Data(data_type = "sce")
+  images <- JacksonFischer2020Data(data_type = "images")
+  masks <- JacksonFischer2020Data(data_type = "masks")
+  
+  check_sce(sce)
+  check_images(images)
+  check_masks(masks)
+  check_intersect(sce,
+                  images,
+                  masks)
+  
+  # Fail
+  expect_error(
+    JacksonFischer2020Data(data_type = "test"), 
+    regexp = 'The data_type argument should be "sce", "images" or "masks".'
+  )
+  expect_error(
+    JacksonFischer2020Data(data_type = c("sce", "images")), 
+    regexp = 'The data_type argument should be of length 1.'
+  )
+})
