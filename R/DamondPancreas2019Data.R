@@ -5,101 +5,101 @@
 #' The data was obtained by imaging mass cytometry of human pancreas sections
 #' from donors with type 1 diabetes.
 #'
-#' @param data_type type of data to load, should be `sce` for single cell data, 
+#' @param data_type type of data to load, should be `sce` for single cell data,
 #' `images` for multichannel images or `masks` for cell segmentation masks.
 #'
 #' @details
-#' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019), 
+#' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 #' consisting of three data objects:
 #' \itemize{
 #'     \item \code{DamondPancreas2019_images} contains a hundred 38-channel
 #'     images in the form of a \linkS4class{CytoImageList} class object.
-#'     \item \code{DamondPancreas2019_masks} contains the cell segmentation 
-#'     masks associated with the images, in the form of a 
+#'     \item \code{DamondPancreas2019_masks} contains the cell segmentation
+#'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{DamondPancreas2019_sce} contains the single cell data 
-#'     extracted from the images using the cell segmentation masks, as well as 
-#'     the associated metadata, in the form of a 
-#'     \linkS4class{SingleCellExperiment}. This represents a total of 252,059 
+#'     \item \code{DamondPancreas2019_sce} contains the single cell data
+#'     extracted from the images using the cell segmentation masks, as well as
+#'     the associated metadata, in the form of a
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 252,059
 #'     cells x 38 channels.
 #' }
 #'
-#' All data are downloaded from ExperimentHub and cached for local re-use. 
+#' All data are downloaded from ExperimentHub and cached for local re-use.
 #' Specific resources can be retrieved by searching for
-#' \code{imcdatasets/DamondPancreas2019_sce}, 
-#' \code{imcdatasets/DamondPancreas2019_images}, or 
+#' \code{imcdatasets/DamondPancreas2019_sce},
+#' \code{imcdatasets/DamondPancreas2019_images}, or
 #' \code{imcdatasets/DamondPancreas2019_masks}.
-#' 
-#' Mapping between the three data objects is performed via variables located in 
-#' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList} 
-#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment} 
-#' object. Mapping at the image level can be performed with the 
-#' \code{ImageName} or \code{ImageNumber} variables. Mapping between cell 
-#' segmentation masks and single cell data is performed with the 
+#'
+#' Mapping between the three data objects is performed via variables located in
+#' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
+#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
+#' object. Mapping at the image level can be performed with the
+#' \code{ImageName} or \code{ImageNumber} variables. Mapping between cell
+#' segmentation masks and single cell data is performed with the
 #' \code{CellNumber} variable, the values of which correspond to the intensity
 #' values of the \code{DamondPancreas2019_masks} object. For practical
 #' examples, please refer to the "Accessing IMC datasets" vignette.
-#' 
-#' This dataset is a subset of the complete Damond et al. (2019) dataset 
-#' comprising the data from three pancreas donors at different stages of type 1 
+#'
+#' This dataset is a subset of the complete Damond et al. (2019) dataset
+#' comprising the data from three pancreas donors at different stages of type 1
 #' diabetes (T1D). The three donors present clearly diverging characteristics in
 #' terms of cell type composition and cell-cell interactions, which makes this
-#' dataset ideal for benchmarking spatial and neighborhood analysis algorithms. 
-#' 
-#' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object 
+#' dataset ideal for benchmarking spatial and neighborhood analysis algorithms.
+#'
+#' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
 #' contains two assays:
 #' \itemize{
 #'     \item \code{counts} contains mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
 #' }
-#' 
+#'
 #' The marker-associated metadata, including antibody information and metal tags
-#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment} 
+#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
 #' object.
-#' 
-#' The cell-associated metadata are stored in the \code{colData} of the 
-#' \linkS4class{SingleCellExperiment} object. These metadata include cell types 
-#' (in \code{colData(sce)$CellType}) and broader cell categories, such  as 
-#' "immune" or "islet" cells (in \code{colData(sce)$CellCat}). In addition, 
-#' for cells located inside pancreatic islets, the islet they belong to is 
-#' indicated in \code{colData(sce)$ParentIslet}. For cells not located in 
+#'
+#' The cell-associated metadata are stored in the \code{colData} of the
+#' \linkS4class{SingleCellExperiment} object. These metadata include cell types
+#' (in \code{colData(sce)$CellType}) and broader cell categories, such  as
+#' "immune" or "islet" cells (in \code{colData(sce)$CellCat}). In addition,
+#' for cells located inside pancreatic islets, the islet they belong to is
+#' indicated in \code{colData(sce)$ParentIslet}. For cells not located in
 #' islets, the "ParentIslet" value is set to 0 but the spatially closest islet
 #' can be identified with \code{colData(sce)$ClosestIslet}.
-#' 
+#'
 #' The donor-associated metadata are also stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. For instance, the donors' IDs can
-#' be retrieved with \code{colData(sce)$case} and the donors' disease stage can 
+#' be retrieved with \code{colData(sce)$case} and the donors' disease stage can
 #' be obtained with \code{colData(sce)$stage}.
-#' 
+#'
 #' The three donors present the following characteristics:
 #' \itemize{
 #'     \item \code{6126} is a non-diabetic donor, with large islets containing
-#'     many beta cells, severe infiltration of the exocrine pancreas with 
+#'     many beta cells, severe infiltration of the exocrine pancreas with
 #'     myeloid cells but limited infiltration of islets.
 #'     \item \code{6414} is a donor with recent T1D onset (shortly after
 #'     diagnosis) showing partial beta cell destruction and mild infiltration of
 #'     islets with T cells.
 #'     \item \code{6180} is a donor with long-duration T1D (11 years after
-#'     diagnosis), showing near-total beta cell destruction and limited immune 
+#'     diagnosis), showing near-total beta cell destruction and limited immune
 #'     cell infiltration in both the islets and the pancreas.
 #' }
-#' 
+#'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`DamondPancreas2019_images`}: size in memory = 7.4 Gb, size 
+#'     \item \code{`DamondPancreas2019_images`}: size in memory = 7.4 Gb, size
 #'     on disk = 1780 Mb.
-#'     \item \code{`DamondPancreas2019_masks`}: size in memory = 200.0 Mb, size 
+#'     \item \code{`DamondPancreas2019_masks`}: size in memory = 200.0 Mb, size
 #'     on disk = 8.6 Mb.
 #'     \item \code{`DamondPancreas2019_sce`}: size in memory = 248.6 Mb, size on
 #'     disk = 145 Mb.
 #' }
-#' 
-#' Original source: Damond et al. (2019): 
+#'
+#' Original source: Damond et al. (2019):
 #' https://doi.org/10.1016/j.cmet.2018.11.014
-#' 
+#'
 #' Original link to raw data, also containing the entire dataset:
 #' https://data.mendeley.com/datasets/cydmwsfztj/2
-#' 
+#'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
 #' \linkS4class{CytoImageList} object containing cell masks.
@@ -115,7 +115,6 @@
 #' sce <- DamondPancreas2019Data(data_type = "sce")
 #' images <- DamondPancreas2019Data(data_type = "images")
 #' masks <- DamondPancreas2019Data(data_type = "masks")
-#'
 #' @import cytomapper
 #' @import methods
 #' @importFrom utils download.file
@@ -125,18 +124,18 @@
 #'
 #' @export
 DamondPancreas2019Data <- function(data_type = c("sce", "images", "masks")) {
-    if(length(data_type) != 1) {
-        stop('The data_type argument should be of length 1.')
-    }    
-    
-    if(!(data_type %in% c("sce", "images", "masks"))) {
+    if (length(data_type) != 1) {
+        stop("The data_type argument should be of length 1.")
+    }
+
+    if (!(data_type %in% c("sce", "images", "masks"))) {
         stop('The data_type argument should be "sce", "images" or "masks".')
     }
-    
-    dataset_name = "DamondPancreas2019"
+
+    dataset_name <- "DamondPancreas2019"
     host <- file.path("imcdatasets", "damond-pancreas-2019")
     eh <- ExperimentHub()
-    
+
     if (data_type == "sce") {
         title <- paste(dataset_name, data_type, sep = "_")
         object_id <- eh[eh$title == title]$ah_id

@@ -4,14 +4,14 @@
 #' package.
 #'
 #' @details
-#' Each dataset contains single-cell data, multichannel images and cell 
+#' Each dataset contains single-cell data, multichannel images and cell
 #' segmentation masks.
 #'
 #' @return
 #' A \linkS4class{DataFrame} where each row corresponds to a dataset, containing
 #' the fields:
 #' \itemize{
-#'     \item \code{Reference}, a Markdown-formatted citation to 
+#'     \item \code{Reference}, a Markdown-formatted citation to
 #'     \code{scripts/ref.bib} in the \pkg{imcdatasets} installation directory.
 #'     \item \code{Species}, species of origin.
 #'     \item \code{Tissue}, the tissue that was imaged.
@@ -24,11 +24,10 @@
 #'
 #' @examples
 #' listDatasets()
-#'
 #' @export
 #' @importFrom S4Vectors DataFrame
 #' @importFrom utils read.csv
 listDatasets <- function() {
-    path <- system.file("extdata", "alldatasets.csv", package="imcdatasets")
-    DataFrame(read.csv(path, stringsAsFactors=FALSE))
+    path <- system.file("extdata", "alldatasets.csv", package = "imcdatasets")
+    DataFrame(read.csv(path, stringsAsFactors = FALSE))
 }
