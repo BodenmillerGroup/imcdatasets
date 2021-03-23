@@ -1,8 +1,10 @@
 # imcdatasets
 
+__Documentation is available at: https://bodenmillergroup.github.io/imcdatasets__
+
 ## Introduction
 
-The `imcdatasets` package is an extensible resource containing a set of publicly available Imaging Mass Cytometry datasets. Each dataset consists of three data objects:
+The `imcdatasets` package is an extensible resource containing a set of publicly available and curated Imaging Mass Cytometry datasets. Each dataset consists of three data objects:
 1. Single cell data in the form of a `SingleCellExperiment` class object.
 2. Multichannel images formatted into a `CytoImageList` class object.
 3. Cell segmentation masks formatted into a `CytoImageList` class object.
@@ -43,14 +45,16 @@ library(imcdatasets)
 
 ## Usage
 
-Detailed information on how to access the datasets is available in the `imcdatasets` vignette, which is available from `Bioconductor`: [Accessing IMC datasets](https://bioconductor.org/packages/devel/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html). It can also be viewed directly in R:
+Detailed information on how to access the datasets is available in the `imcdatasets` vignette, which is available here: https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html.
+
+The vignette can also be viewed directly in R:
 ```{r}
 vignette("imcdatasets")
 ```
 
 ## Details
 
-The `imcdatasets` package provides quick and easy access to published and curated Imaging Mass Cytometry datasets. Each dataset consists of three data objects that can be retrieved individually:
+The `imcdatasets` package provides quick and easy access to published and curated imaging mass cytometry datasets. Each dataset consists of three data objects that can be retrieved individually:
 
 1. __Single cell data__ in the form of a `SingleCellExperiment` class object:  
 This object contain cell-level expression values and metadata. The `rowData` of the `SingleCellExperiment` objects contain marker information while the `colData` contain cell-level metadata, including _image numbers_. The `assay` slots contain marker expression per cell values: the `counts` assay contains mean ion counts whereas the other assay contain counts transformation(s) (details available in the documentation of each dataset).
