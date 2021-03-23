@@ -126,15 +126,15 @@ panel <- fread(
 
 #Cluster labels (combine PhenoGraph cluster labels and metacluster labels)
 PG_clusters <- fread(
-  file.path(workdir, "Cluster_labels/PG_basel.csv"), header = T)
+  file.path(workdir, "Cluster_labels/PG_basel.csv"), header = TRUE)
 Meta_clusters <- fread(
-  file.path(workdir, "Cluster_labels/Basel_metaclusters.csv"), header = T)
-clusters <- merge(PG_clusters, Meta_clusters, by = "id", all.x = T)
+  file.path(workdir, "Cluster_labels/Basel_metaclusters.csv"), header = TRUE)
+clusters <- merge(PG_clusters, Meta_clusters, by = "id", all.x = TRUE)
 PG_clusters <- NULL
 Meta_clusters <- NULL
 
 #Single-cell locations
-locations <- fread(file.path(workdir, "Basel_SC_locations.csv"), header = T)
+locations <- fread(file.path(workdir, "Basel_SC_locations.csv"), header = TRUE)
 ```
 
 ##Select a set of 100 patients as an example dataset
@@ -151,7 +151,7 @@ meta <- meta[ncores == 1,]
 
 #Randomly sample 100 patients
 set.seed(2)
-meta <- meta[PID %in% sample(meta$PID, 100, replace = F),]
+meta <- meta[PID %in% sample(meta$PID, 100, replace = FALSE),]
 ```
 
 ##Subset single-cell data to cores of selected patients
@@ -243,7 +243,7 @@ meta <- meta[,ImageNb := 1:.N]
 singlecell_meta <- merge(
   singlecell_meta,
   meta[,-c("treatment", "DiseaseStage", "AllSamplesSVSp4.Array", "ncores")],
-  by = "core", all.x = T)
+  by = "core", all.x = TRUE)
 
 #Set ImageName, ImageNb and CellNb for cytomapper package
 # to map to CytoImageList objects
@@ -296,7 +296,7 @@ rows[marker == "phospho mTOR", `Metal Tag` := "Yb173"]
 
 #Add channel number from panel
 rows <- merge(rows, unique(panel[, c("Metal Tag", "FullStack")]),
-              by = "Metal Tag", all.x = T)
+              by = "Metal Tag", all.x = TRUE)
 
 #Add rowData to sce
 rows <- rows[order(match(original, rownames(sce)))]
