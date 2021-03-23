@@ -10,3 +10,7 @@ Changes in version 0.99.0 (2020-11-12):
 + Added function documentation
 + Added dataset documentation
 + Formatted the package for Bioconductor submission
+
+Changes in version 0.99.6 (2021-03-23):
+
++ Added data from Jackson, Fischer et al. Nature 578,615–620(2020)
