@@ -37,8 +37,8 @@ datasets generated using imaging mass cytometry (IMC) [@giesen2014imc].
 
 IMC is a technology that enables measurement of up to 50 markers from tissue 
 sections at a resolution of 1 $\mu m$ @giesen2014imc. In classical processing 
-pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline)
-, the multichannel images are segmented to generate cells masks. These masks are
+pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline), 
+the multichannel images are segmented to generate cells masks. These masks are 
 then used to extract single cell features from the multichannel images.  
 
 Each dataset in `imcdatasets` is composed of three elements that can be 
@@ -51,15 +51,27 @@ retrieved separately:
 `XYZ_masks.rds`).  
 Here, `XYZ` refers to the name of the dataset.
 
+# Available datasets
+
+The `listDatasets()` function returns all available datasets in `imcdatasets`, 
+along with associated information. The `FunctionCall` column gives the name of
+the R function that enables to load the dataset.
+
+```{r list-datasets}
+datasets <- listDatasets()
+datasets <- as.data.frame(datasets)
+datasets$FunctionCall <- sprintf("`%s`", datasets$FunctionCall)
+knitr::kable(datasets)
+```
 
 # Retrieving data
 
 Users can import the datasets by calling a single function and specifying the 
 type of data to retrieve. The following examples highlight accessing the dataset
 provided by _Damond, N. et al., A Map of Human Type 1 Diabetes Progression by 
-Imaging Mass Cytometry_[@damond2019pancreas].
+Imaging Mass Cytometry_ [@damond2019pancreas].
 
-Importing single-cell expression data and metadata:
+__Importing single-cell expression data and metadata__
 
 ```{r import-dataset}
 sce <- DamondPancreas2019Data(data_type = "sce")
@@ -80,27 +92,36 @@ masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 
-__Accessing the metadata__
+__Accessing data objects by name__
 
-Data files can also be individually accessed by name. The associated metadata 
-can be displayed as follows:
+Alternately, data objects can be imported using their name as a function:
+
+```{r access-by-name}
+sce <- DamondPancreas2019_sce()
+sce
+
+images <- DamondPancreas2019_images()
+images
+
+masks <- DamondPancreas2019_masks()
+masks
+```
+
+
+# Dataset info and metadata
+
+Additional information about each dataset is available in the help page:
+
+```{r function-help}
+?DamondPancreas2019Data
+```
+
+The metadata associated with a specific data object can be displayed as follows:
 
 ```{r access-metadata}
 DamondPancreas2019_sce(metadata = TRUE)
 DamondPancreas2019_images(metadata = TRUE)
 DamondPancreas2019_masks(metadata = TRUE)
-```
-
-# Available datasets
-
-The `listDatasets()` function returns all available datasets in `imcdatasets`, 
-along with associated information and the R function call to load them.
-
-```{r list-datasets}
-datasets <- listDatasets()
-datasets <- as.data.frame(datasets)
-datasets$FunctionCall <- sprintf("`%s`", datasets$FunctionCall)
-knitr::kable(datasets)
 ```
 
 # Usage

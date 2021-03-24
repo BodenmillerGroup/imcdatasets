@@ -14,3 +14,8 @@ Changes in version 0.99.0 (2020-11-12):
 Changes in version 0.99.6 (2021-03-23):
 
 + Added data from Jackson, Fischer et al. Nature 578,615–620(2020)
+
+Changes in version 0.99.7 (2021-03-24):
+
++ Improved documentation
++ pkgdown website
