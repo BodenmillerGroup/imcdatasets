@@ -6,7 +6,7 @@ name: Pkgdown
 
 jobs:
   pkgdown:
-     runs-on: macOS-latest
+    runs-on: macOS-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
