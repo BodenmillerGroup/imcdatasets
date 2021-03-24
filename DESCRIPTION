@@ -16,7 +16,10 @@ Authors@R:
         comment = c(ORCID = "0000-0003-3027-8989")),
       person("Nils", "Eling", role = c("aut"),
         email = "nils.eling@dqbm.uzh.ch",
-        comment = c(ORCID = "0000-0002-4711-1176")))
+        comment = c(ORCID = "0000-0002-4711-1176")),
+      person("Fischer", "Jana", role = c("aut"),
+        email = "jana.fischerg@dqbm.uzh.ch",
+        comment = c(ORCID = "0000-0001-9047-8400")))
 License: GPL-3
 NeedsCompilation: no
 Depends:
