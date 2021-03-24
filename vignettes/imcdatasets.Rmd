@@ -54,7 +54,8 @@ Here, `XYZ` refers to the name of the dataset.
 # Available datasets
 
 The `listDatasets()` function returns all available datasets in `imcdatasets`, 
-along with associated information and the R function call to load them.
+along with associated information. The `FunctionCall` column gives the name of
+the R function that enables to load the dataset.
 
 ```{r list-datasets}
 datasets <- listDatasets()
@@ -91,7 +92,23 @@ masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 
-# Retrieving metadata
+__Accessing data objects by name__
+
+Alternately, data objects can be imported using their name as a function:
+
+```{r access-by-name}
+sce <- DamondPancreas2019_sce()
+sce
+
+images <- DamondPancreas2019_images()
+images
+
+masks <- DamondPancreas2019_masks()
+masks
+```
+
+
+# Dataset info and metadata
 
 Additional information about each dataset is available in the help page:
 
