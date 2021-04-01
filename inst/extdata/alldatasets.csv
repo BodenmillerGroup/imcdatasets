@@ -1,3 +1,4 @@
 Reference,Species,Tissue,NumberOfCells,NumberOfImages,NumberOfChannels,FunctionCall
 @damond2019pancreas,Human,Pancreas,252059,100,38,DamondPancreas2019Data()
 @jacksonfischer2020,Human,PrimaryBreastTumour,285851,100,42,JacksonFischer2020Data()
+@zanotellispheroids2020,Human,CellLineSpheroids,229047,517,51,ZanotelliSpheroids2020Data()
