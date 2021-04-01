@@ -1,0 +1,425 @@
+---
+title: "Loading single cell data, images and masks of the Zanotelli et al dataset"
+author: "Nicolas Damond"
+date: "Created: Apr 06, 2021; Compiled: `r BiocStyle::doc_date()`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: inline
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+Load required R packages
+
+```{r load-packages}
+library(S4Vectors)
+library(SingleCellExperiment)
+library(data.table)
+library(cytomapper)
+library(igraph)
+```
+
+      This script downloads 100 example images, as well as the associated single-cell data and cell segmentation masks from the pancreas Imaging Mass Cytometry (IMC) dataset [available here](https://zenodo.org/record/4271910#.YGWR_T8kz-i). This represents a subset of the [full dataset](https://zenodo.org/record/4055781) associated with the following publication:  
+
+[Zanotelli et al. A quantitative analysis of the interplay of environment, neighborhood, and cell state in 3D spheroids. Mol Syst Biol (2020)16:e9798](https://doi.org/10.15252/msb.20209798)
+
+     The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation      pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.  
+
+
+# **Download the dataset**
+
+The cell lines dataset from [@zanotelli2020spheroids] is downloaded from https://zenodo.org/record/4271910#.YGWWHD8kz-j.
+
+## Set working and output directories
+
+```{r directories}
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+outdir <- file.path("..", "extdata", "zanotelli-spheroids-2020")
+if(!(dir.exists(outdir)))
+    dir.create(outdir)
+```
+
+## Download the dataset
+
+```{r download}
+timeout <- getOption('timeout')
+options(timeout=1000)
+url_dat <- ("https://zenodo.org/record/4271910/files/phys_analysis_export_v3.zip")
+
+download.file(url_dat, destfile = file.path(workdir, "CellLines.zip"))
+unzip(file.path(workdir, "CellLines.zip"), exdir = workdir)
+file.remove(file.path(workdir, "CellLines.zip"))
+
+# List unzipped files
+writeLines(list.files(workdir))
+```
+
+
+# **Single-cell data**
+
+## Import and format single-cell data
+
+### Read-in the data
+
+```{r read-in-data}
+cell_X <- fread(file.path(workdir, "cell_X.csv"))
+cell_obs <- fread(file.path(workdir, "cell_obs.csv"))
+cell_var <- fread(file.path(workdir, "cell_var.csv"))
+image_meta <- fread(file.path(workdir, "image_meta.csv"))
+cell_neighbors <- fread(file.path(workdir, "relations_cell_neighbors.csv"))
+```
+
+### Add row and column names
+
+```{r row-col-names}
+# Set object_id as cell_obs row names
+cell_obs <- cell_obs[, !duplicated(colnames(cell_obs)), with = FALSE]
+cell_obs <- DataFrame(cell_obs)
+rownames(cell_obs) <- cell_obs$object_id
+
+# Set measurement_id as cell_var row names
+cell_var <- DataFrame(cell_var)
+rownames(cell_var) <- cell_var$V1
+cell_var$V1 <- NULL
+
+# Make values in the "goodname" column as unique
+# (for barcoding channels and GFP)
+cell_var[cell_var$goodname == "BC", ]$goodname <-
+  paste0("BC_", cell_var[cell_var$goodname == "BC", ]$metal)
+
+cell_var[cell_var$goodname == "GFP", ]$goodname <-
+  paste0("GFP_", cell_var[cell_var$goodname == "GFP", ]$metal)
+
+# Set row and column names for the measurement matrix
+cell_X <- as.matrix(cell_X)
+rownames(cell_X) <- rownames(cell_obs)
+colnames(cell_X) <- rownames(cell_var)
+```
+
+
+## Cell metadata
+
+### Extract spatial measurements
+
+Measurements such as cell area, distance to rim, cell location, ... are extracted and added to cell observations. Units are `um`, unless otherwise specified.
+- `Center_X/Y`: object centroid position in image.  
+- `Area` : area of the cell (units = um^2).  
+- `dist-rim`: estimated distance to spheroid border.  
+- `dist-sphere`: distance to spheroid section border.  
+- `dist-other`: distance to other spheroid section in the same image.  
+- `dist-bg`: distance to background pixels.    
+
+```{r spatial}
+# Fix measurement_type for "dist-sphere", "dist-other" and "dist-bg"
+cell_var[cell_var$goodname %in% c("dist-sphere", "dist-other", "dist-bg"),
+         ]$measurement_type <- "Location"
+cell_var[cell_var$goodname == "dist-sphere", ]$measurement_name <- "dist-sphere"
+cell_var[cell_var$goodname == "dist-other", ]$measurement_name <- "dist-other"
+cell_var[cell_var$goodname == "dist-bg", ]$measurement_name <- "dist-bg"
+
+# Extract relevant columns
+spatial_meas <- cell_var[cell_var$measurement_type != "Intensity",
+                         "measurement_id"]
+spatial <- cell_X[, colnames(cell_X)  %in% spatial_meas]
+
+# Add column names
+spatial_names <- cell_var[cell_var$measurement_type != "Intensity", "goodname"]
+colnames(spatial) <- spatial_names
+
+# Add the data to cell observations
+spatial <- DataFrame(spatial)
+cell_obs <- merge(cell_obs, spatial, by = "row.names")
+```
+
+### Import image metadata
+
+See the [original dataset description](https://zenodo.org/record/4271910#.YGWWHD8kz-j) for description of the columns content.
+
+```{r import-image-meta}
+# Select relevant columns
+keep_col <- c("image_id", "cellline", "condition_name", "concentration",
+              "time_point", "condition_id", "plate_id", "well_name", "hastelox",
+              "sampleblock_name", "acquisition_id", "site_id", "slide_id",
+              "sampleblock_id", "image_shape_h", "image_shape_w",
+              "image_stack_filename_FullStackComp", "mask_filename_cell")
+
+image_meta <- DataFrame(image_meta[, ..keep_col])
+
+# Merge cell and image metadata
+cell_obs <- merge(cell_obs, image_meta, by = "image_id")
+rownames(cell_obs) <- cell_obs$object_id
+
+# Remove merged data frames
+remove(spatial, image_meta)
+```
+
+
+## Intensity measurements
+
+### Select measurements
+
+The measurement matrix contains different cell-level measurements:  
+- `MeanIntensityComp`: mean intensity per cell, spillover-compensated.  
+- `NbMeanMeanIntensityComp`:  mean intensity of neighboring cells, spillover-compensated.  
+
+The other measurements are not retained in the final SCE object:  
+- `MeanIntensity`:mean intensity measured on compensated images.   
+- `MinIntensity`: min intensity measured on compensated images.  
+- `MaxIntensity`: max intensity measured on compensated images.  
+- `StdIntensity`: intensity std measured on compensated images.  
+
+```{r select-measurements}
+# Subset intensity columns in cell variables and measurement matrix
+cell_var <- cell_var[cell_var$measurement_type == "Intensity", ]
+cell_X <- cell_X[, colnames(cell_X)  %in% cell_var$measurement_id]
+
+# Print the different cell intensity measurements
+writeLines(unique(cell_var$measurement_name))
+```
+
+### Extract counts
+
+Create one matrix for cell counts and one for neighboring cell counts
+
+```{r extract-counts}
+# Select the ids of measurements to subset
+cell_meas <- cell_var[cell_var$measurement_name == "MeanIntensityComp",
+                      ]$measurement_id
+neighb_meas <- cell_var[cell_var$measurement_name == "NbMeanMeanIntensityComp",
+                        ]$measurement_id
+
+# Create the two matrices
+counts_X <- cell_X[, colnames(cell_X)  %in% cell_meas]
+counts_neighb_X <- cell_X[, colnames(cell_X)  %in% neighb_meas]
+
+# Make sure the rows of "cell_var" and of counts matrices are in the same order
+counts_X <- counts_X[, order(match(
+  colnames(counts_X),
+  rownames(cell_var[cell_var$measurement_id %in% cell_meas, ])))]
+
+counts_neighb_X <- counts_neighb_X[, order(match(
+  colnames(counts_neighb_X),
+  rownames(cell_var[cell_var$measurement_id %in% neighb_meas, ])))]
+
+# Rename the columns of the matrices
+colnames(counts_X) <-
+  cell_var[cell_var$measurement_id %in% cell_meas, ]$goodname
+colnames(counts_neighb_X) <-
+  cell_var[cell_var$measurement_id %in% neighb_meas, ]$goodname
+
+# Remove original counts matrix
+remove(cell_X)
+```
+
+
+## Feature metadata
+
+### Reformat cell variables data frame
+
+```{r reformat-cell_var}
+# Use the "goodname" column as rownames
+rownames(cell_var) <- cell_var$goodname
+
+# Keep only relevant columns for features ("cell_var")
+col_keep <- c("metal", "goodname", "ref_plane_number", "working",
+              "Antibody.Clone", "is_cc")
+cell_var <- unique(cell_var[, colnames(cell_var) %in% col_keep])
+```
+
+
+## Generate a SingleCellExperiment object
+
+### Add counts
+
+Add cell mean intensities (as `counts`) and mean intensities of neighbouring cells (as `counts_neighb`).
+
+```{r create-SCE}
+sce <- SingleCellExperiment(assays = list(counts = t(counts_X)))
+assay(sce, "counts_neighb") <- t(counts_neighb_X)
+```
+
+### Add counts transformations
+
+Helper functions
+
+```{r helpers}
+censor_val = 0.999
+
+censor_dat = function(x, quant = 0.999, symmetric = FALSE){
+  if (symmetric){
+    lower_quant = (1 - quant) / 2
+    quant = quant + lower_quant
+  }
+  q = stats::quantile(x, quant)
+  x[x > q] = q
+  if(symmetric){
+    q = stats::quantile(x, lower_quant)
+    x[x < q] = q
+  }
+  return(x)
+}
+
+fun_censor <- function(x) censor_dat(x, censor_val)
+fun_scale <- function(x) y <- x / max(x)
+```
+
+Transform counts
+
+```{r transform-counts}
+# Arcsinh transformation
+assay(sce, "exprs") <- asinh(counts(sce) / 1)
+assay(sce, "exprs_neighb") <- asinh(assay(sce, "counts_neighb") / 1)
+
+# Censoring + 0-1 scaling
+assay(sce, "c_counts") <- t(apply(assay(sce, "counts"), 1, fun_censor))
+assay(sce, "c_scaled_counts") <- t(apply(assay(sce, "c_counts"), 1, fun_scale))
+assay(sce, "c_scaled_counts")[assay(sce, "c_scaled_counts") < 0] <- 0
+assay(sce, "c_counts") <- NULL
+```
+
+### Add cell and feature metadata
+
+```{r row-col-Data}
+# Match row and column names
+cell_obs <- cell_obs[order(match(rownames(cell_obs), colnames(sce))), ]
+cell_var <- cell_var[, order(match(colnames(cell_var), rownames(sce)))]
+
+# Add metadata
+colData(sce) <- cell_obs
+rowData(sce) <- cell_var
+
+# Add image names
+sce$ImageName <- gsub("_cell.tiff", "", sce$mask_filename_cell)
+```
+
+### Add cell neighborhood information
+
+Generate a neighborhood graph and add it to the metadata of the SCE object.
+
+```{r neighb-graph}
+g <- graph_from_data_frame(cell_neighbors)
+metadata(sce) <- list(graph = g)
+```
+
+### Save the SCE object
+
+We will save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-SCE}
+print(sce)
+saveRDS(sce, file.path(outdir, "sce.rds"))
+
+# Remove unused data objects
+remove(g, cell_obs, cell_neighbors, cell_var, counts_X, counts_neighb_X)
+```
+
+
+# *Images*
+
+## Masks
+
+### Select masks
+
+Remove mask images that are not in the SCE object
+
+```{r select-masks}
+mask_files <- list.files(file.path(workdir, "masks"))
+
+# delete unneeded masks
+mask_files <- mask_files[!(mask_files %in% sce$mask_filename_cell)]
+unlink(file.path(workdir, "masks", mask_files), recursive = TRUE)
+```
+
+
+### Load the masks as a CytoImageList object
+
+```{r load-masks}
+masks <- loadImages(file.path(workdir, "masks"), pattern = "_cell.tiff")
+```
+
+### Scale masks
+
+```{r scale-masks}
+masks <- scaleImages(masks, value = (2 ^ 16) - 1)
+```
+
+### Add metadata
+
+```{r mask-metadata}
+mcols(masks)$ImageName <- gsub("_cell", "", names(masks))
+```
+
+## Multichannel images
+
+### Select images
+
+Remove multichannel images that are not in the SCE object
+
+```{r select-images}
+image_files <- list.files(file.path(workdir, "images"))
+
+# delete unneeded masks
+image_files <- image_files[!(image_files %in%
+                               sce$image_stack_filename_FullStackComp)]
+unlink(file.path(workdir, "images", image_files), recursive = TRUE)
+```
+
+### Load the masks as a CytoImageList object
+
+```{r load-images}
+images <- loadImages(file.path(workdir, "images"), pattern = "_comp.tiff")
+```
+
+### Scale masks
+
+```{r scale-images}
+images <- scaleImages(images, value = (2 ^ 16) - 1)
+```
+
+### Add metadata
+
+```{r images-metadata}
+mcols(images)$ImageName <- gsub("_comp", "", names(images))
+```
+
+### Add channel names
+
+```{r add-channel-names}
+channelNames(images) <- rowData(sce)[order(
+  rowData(sce)[, "ref_plane_number"]), ]$goodname
+```
+
+### Save the CytoImageList objects
+
+Save the generated `CytoImageList` objects for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-cytoimagelists}
+saveRDS(images, file.path(outdir, "images.rds"))
+saveRDS(masks, file.path(outdir, "masks.rds"))
+```
+
+### Clean up
+
+Remove the downloaded objects to save storage space.
+
+```{r clean-up, message = FALSE}
+downloaded_files <- list.files(workdir)
+unlink(file.path(workdir, downloaded_files), recursive = TRUE)
+options(timeout=timeout)
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
+
