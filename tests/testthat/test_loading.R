@@ -33,6 +33,13 @@ test_that("DamondPancreas2019Data works", {
                   images,
                   masks)
   
+  # On disk storage works
+  cur_path <- tempdir()
+  on.exit(unlink(cur_path))
+  
+  expect_silent(masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE, 
+                                  h5FilesPath = cur_path))
+  
   # Fail
   expect_error(
     DamondPancreas2019Data(data_type = "test"), 
@@ -42,6 +49,7 @@ test_that("DamondPancreas2019Data works", {
     DamondPancreas2019Data(data_type = c("sce", "images")), 
     regexp = 'The data_type argument should be of length 1.'
   )
+  expect_error(DamondPancreas2019Data(data_type = "masks", on_disk = TRUE))
 })
 
 test_that("JacksonFischer2020Data works", {
@@ -56,6 +64,13 @@ test_that("JacksonFischer2020Data works", {
                   images,
                   masks)
   
+  # On disk storage works
+  cur_path <- tempdir()
+  on.exit(unlink(cur_path))
+  
+  expect_silent(masks <- JacksonFischer2020Data(data_type = "masks", on_disk = TRUE, 
+                                                h5FilesPath = cur_path))
+  
   # Fail
   expect_error(
     JacksonFischer2020Data(data_type = "test"), 
@@ -65,4 +80,5 @@ test_that("JacksonFischer2020Data works", {
     JacksonFischer2020Data(data_type = c("sce", "images")), 
     regexp = 'The data_type argument should be of length 1.'
   )
+  expect_error(JacksonFischer2020Data(data_type = "masks", on_disk = TRUE))
 })
