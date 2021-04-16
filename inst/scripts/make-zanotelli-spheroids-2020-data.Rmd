@@ -26,11 +26,15 @@ library(cytomapper)
 library(igraph)
 ```
 
-      This script downloads 100 example images, as well as the associated single-cell data and cell segmentation masks from the pancreas Imaging Mass Cytometry (IMC) dataset [available here](https://zenodo.org/record/4271910#.YGWR_T8kz-i). This represents a subset of the [full dataset](https://zenodo.org/record/4055781) associated with the following publication:  
+# **Introduction**
 
-[Zanotelli et al. A quantitative analysis of the interplay of environment, neighborhood, and cell state in 3D spheroids. Mol Syst Biol (2020)16:e9798](https://doi.org/10.15252/msb.20209798)
+This script downloads 517 images, as well as the associated single-cell data and cell segmentation masks from the Imaging Mass Cytometry (IMC) cell line spheroid dataset, which is available from zenodo: https://doi.org/10.5281/zenodo.4271910. This dataset is associated with the following publication:  
 
-     The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation      pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.  
+[Zanotelli et al. A quantitative analysis of the interplay of environment, neighborhood, and cell state in 3D spheroids. Mol Syst Biol (2020)16:e9798](https://doi.org/10.15252/msb.20209798)  
+
+The code used to generate this dataset is available from the [SpheroidPublication GitHub repository]https://github.com/BodenmillerGroup/SpheroidPublication). Additional data associated with the same publication is available from the zenodo parent repository: https://doi.org/10.5281/zenodo.4055781.  
+
+The current script downloads the processed single-cell data from zenodo and processes these data to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. The [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package is used to load the multichannel IMC images and cell segmentation masks and save them as `CytoImageList` objects.
 
 
 # **Download the dataset**
@@ -188,7 +192,7 @@ writeLines(unique(cell_var$measurement_name))
 
 ### Extract counts
 
-Create one matrix for cell counts and one for neighboring cell counts
+Create one matrix for cell counts and one for average counts of neighboring cells.
 
 ```{r extract-counts}
 # Select the ids of measurements to subset
@@ -247,7 +251,7 @@ sce <- SingleCellExperiment(assays = list(counts = t(counts_X)))
 assay(sce, "counts_neighb") <- t(counts_neighb_X)
 ```
 
-### Add counts transformations
+### Add count transformations
 
 Helper functions
 
@@ -308,6 +312,7 @@ Generate a neighborhood graph and add it to the metadata of the SCE object.
 ```{r neighb-graph}
 g <- graph_from_data_frame(cell_neighbors)
 metadata(sce) <- list(graph = g)
+sce
 ```
 
 ### Save the SCE object
@@ -315,7 +320,6 @@ metadata(sce) <- list(graph = g)
 We will save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-SCE}
-print(sce)
 saveRDS(sce, file.path(outdir, "sce.rds"))
 
 # Remove unused data objects
@@ -323,9 +327,9 @@ remove(g, cell_obs, cell_neighbors, cell_var, counts_X, counts_neighb_X)
 ```
 
 
-# *Images*
+# **Masks and Images**
 
-## Masks
+## Cell segmentation masks
 
 ### Select masks
 
@@ -358,6 +362,14 @@ masks <- scaleImages(masks, value = (2 ^ 16) - 1)
 mcols(masks)$ImageName <- gsub("_cell", "", names(masks))
 ```
 
+### Save the masks as CytoImageList objects
+
+Save the generated `CytoImageList` masks for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-masks-CIL}
+saveRDS(masks, file.path(outdir, "masks.rds"))
+```
+
 ## Multichannel images
 
 ### Select images
@@ -367,19 +379,19 @@ Remove multichannel images that are not in the SCE object
 ```{r select-images}
 image_files <- list.files(file.path(workdir, "images"))
 
-# delete unneeded masks
+# delete unneeded images
 image_files <- image_files[!(image_files %in%
                                sce$image_stack_filename_FullStackComp)]
 unlink(file.path(workdir, "images", image_files), recursive = TRUE)
 ```
 
-### Load the masks as a CytoImageList object
+### Load the images as a CytoImageList object
 
 ```{r load-images}
 images <- loadImages(file.path(workdir, "images"), pattern = "_comp.tiff")
 ```
 
-### Scale masks
+### Scale images
 
 ```{r scale-images}
 images <- scaleImages(images, value = (2 ^ 16) - 1)
@@ -398,13 +410,12 @@ channelNames(images) <- rowData(sce)[order(
   rowData(sce)[, "ref_plane_number"]), ]$goodname
 ```
 
-### Save the CytoImageList objects
+### Save the images as CytoImageList objects
 
-Save the generated `CytoImageList` objects for upload to `r Biocpkg("ExperimentHub")`.
+Save the generated `CytoImageList` images for upload to `r Biocpkg("ExperimentHub")`.
 
-```{r save-cytoimagelists}
+```{r save-images-CIL}
 saveRDS(images, file.path(outdir, "images.rds"))
-saveRDS(masks, file.path(outdir, "masks.rds"))
 ```
 
 ### Clean up
@@ -422,4 +433,3 @@ options(timeout=timeout)
 ```{r session-info}
 sessionInfo()
 ```
-

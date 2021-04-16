@@ -19,3 +19,7 @@ Changes in version 0.99.7 (2021-03-24):
 
 + Improved documentation
 + pkgdown website
+
+Changes in version 0.99.8 (2021-04-13):
+
++ Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
