@@ -92,6 +92,25 @@ masks <- DamondPancreas2019Data(data_type = "masks")
 masks
 ```
 
+Objects containing multi-channel images and segmentation masks can furthermore
+be stored on disk rather than in memory. Nevertheless, they need to be loaded
+into memory once before writing them to disk. This process takes longer than
+keeping them in memory but reduces memory requirements during downstream
+analysis.
+
+To write images or masks to disk, set `on_disk = TRUE` and specify a path
+where images/masks will be stored as .h5 files:
+
+```{r on_disk}
+# Create temporary location
+cur_path <- tempdir()
+
+masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE,
+                                h5FilesPath = cur_path)
+masks
+```
+
+
 __Accessing data objects by name__
 
 Alternately, data objects can be imported using their name as a function:

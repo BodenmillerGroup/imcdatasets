@@ -20,6 +20,12 @@ Changes in version 0.99.7 (2021-03-24):
 + Improved documentation
 + pkgdown website
 
+<<<<<<< HEAD
 Changes in version 0.99.8 (2021-04-13):
 
 + Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
+=======
+Changes in version 0.99.8 (2021-04-15):
+
++ Allow on disk storage of images and masks
+>>>>>>> 9f81660e60f953ec5be80af9d2e82c91a999c363

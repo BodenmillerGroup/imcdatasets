@@ -4,11 +4,29 @@
 \alias{JacksonFischer2020Data}
 \title{Obtain the jackson-fischer-2020 dataset}
 \usage{
-JacksonFischer2020Data(data_type = c("sce", "images", "masks"))
+JacksonFischer2020Data(
+  data_type = c("sce", "images", "masks"),
+  on_disk = FALSE,
+  h5FilesPath = NULL,
+  force = FALSE
+)
 }
 \arguments{
 \item{data_type}{type of data to load, should be `sce` for single cell data, 
 `images` for multichannel images or `masks` for cell segmentation masks.}
+
+\item{on_disk}{logical indicating if images in form of
+\linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
+rather than in memory. This setting is valid when downloading \code{images} and 
+\code{masks}.}
+
+\item{h5FilesPath}{path to where the .h5 files for on disk representation
+are stored. This path needs to be defined when \code{on_disk = TRUE}.
+When files should only temporarily be stored on disk, please set
+\code{h5FilesPath = getHDF5DumpDir()}}
+
+\item{force}{logical indicating if images should be overwritten when files
+with the same name already exist on disk.}
 }
 \value{
 A \linkS4class{SingleCellExperiment} object with single cell data, a
@@ -89,6 +107,11 @@ File sizes:
     \item \code{`JacksonFischer2020_sce`}: size in memory = 517 Mb, size on
     disk = 272 Mb.
 }
+
+When storing images on disk, these need to be first fully read into memory
+before writing them to disk. This means the process of downloading the data
+is slower than directly keeping them in memory. However, downstream analysis
+will loose its memory overhead when storing images on disk.
 
 Original source: Jackson, Fischer et al. (2020): 
 https://doi.org/10.1038/s41586-019-1876-x

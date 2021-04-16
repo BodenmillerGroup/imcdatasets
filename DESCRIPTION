@@ -1,6 +1,6 @@
 Package: imcdatasets
-Version: 0.99.7
-Date: 2021-03-23
+Version: 0.99.8
+Date: 2021-04-15
 Title: Collection of publicly available imaging mass cytometry (IMC) datasets
 Description:
     The imcdatasets package provides access to publicly available IMC datasets.
@@ -14,10 +14,10 @@ Authors@R:
     c(person("Nicolas", "Damond", role = c("aut", "cre"),
         email = "nicolas.damond@dqbm.uzh.ch",
         comment = c(ORCID = "0000-0003-3027-8989")),
-      person("Nils", "Eling", role = c("aut"),
+      person("Nils", "Eling", role = c("ctb"),
         email = "nils.eling@dqbm.uzh.ch",
         comment = c(ORCID = "0000-0002-4711-1176")),
-      person("Fischer", "Jana", role = c("aut"),
+      person("Fischer", "Jana", role = c("ctb"),
         email = "jana.fischerg@dqbm.uzh.ch",
         comment = c(ORCID = "0000-0001-9047-8400")))
 License: GPL-3
@@ -30,11 +30,14 @@ Imports:
     methods,
     utils,
     ExperimentHub,
-    S4Vectors
+    S4Vectors,
+    DelayedArray,
+    HDF5Array
 Suggests:
     BiocStyle,
     knitr,
     rmarkdown,
+    markdown,
     testthat
 biocViews:
    ExperimentHub,
