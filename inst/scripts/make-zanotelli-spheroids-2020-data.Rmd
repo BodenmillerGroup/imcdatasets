@@ -258,45 +258,6 @@ sce <- SingleCellExperiment(assays = list(counts = t(counts_X)))
 assay(sce, "counts_neighb") <- t(counts_neighb_X)
 ```
 
-### Add count transformations
-
-Helper functions
-
-```{r helpers}
-censor_val = 0.999
-
-censor_dat = function(x, quant = 0.999, symmetric = FALSE){
-  if (symmetric){
-    lower_quant = (1 - quant) / 2
-    quant = quant + lower_quant
-  }
-  q = stats::quantile(x, quant)
-  x[x > q] = q
-  if(symmetric){
-    q = stats::quantile(x, lower_quant)
-    x[x < q] = q
-  }
-  return(x)
-}
-
-fun_censor <- function(x) censor_dat(x, censor_val)
-fun_scale <- function(x) y <- x / max(x)
-```
-
-Transform counts
-
-```{r transform-counts}
-# Arcsinh transformation
-assay(sce, "exprs") <- asinh(counts(sce) / 1)
-assay(sce, "exprs_neighb") <- asinh(assay(sce, "counts_neighb") / 1)
-
-# Censoring + 0-1 scaling
-assay(sce, "c_counts") <- t(apply(assay(sce, "counts"), 1, fun_censor))
-assay(sce, "c_scaled_counts") <- t(apply(assay(sce, "c_counts"), 1, fun_scale))
-assay(sce, "c_scaled_counts")[assay(sce, "c_scaled_counts") < 0] <- 0
-assay(sce, "c_counts") <- NULL
-```
-
 ### Add cell and feature metadata
 
 ```{r row-col-Data}
