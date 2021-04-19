@@ -1,5 +1,5 @@
 ---
-title: "Loading single cell data, images and masks of the Zanotelli et al dataset"
+title: "Loading single cell data, images and masks from the Zanotelli et al dataset"
 author: "Nicolas Damond"
 date: "Created: Apr 06, 2021; Compiled: `r BiocStyle::doc_date()`"
 output:
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 
 Load required R packages
 
-```{r load-packages}
+```{r load-packages, message=FALSE}
 library(S4Vectors)
 library(SingleCellExperiment)
 library(data.table)
@@ -47,7 +47,7 @@ The cell lines dataset from [@zanotelli2020spheroids] is downloaded from https:/
 workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
-outdir <- file.path("..", "extdata", "zanotelli-spheroids-2020")
+outdir <- file.path("inst", "extdata", "zanotelli-spheroids-2020")
 if(!(dir.exists(outdir)))
     dir.create(outdir)
 ```
@@ -161,6 +161,13 @@ image_meta <- DataFrame(image_meta[, ..keep_col])
 # Merge cell and image metadata
 cell_obs <- merge(cell_obs, image_meta, by = "image_id")
 rownames(cell_obs) <- cell_obs$object_id
+
+
+# Rename "object_number" as "CellNumber" for consistency with other datasets
+colnames(cell_obs)[colnames(cell_obs) == "object_number"] <- "CellNumber"
+
+# # Rename "image_id" as "ImageNumber" for consistency with other datasets
+colnames(cell_obs)[colnames(cell_obs) == "image_id"] <- "ImageNumber"
 
 # Remove merged data frames
 remove(spatial, image_meta)
@@ -295,11 +302,14 @@ assay(sce, "c_counts") <- NULL
 ```{r row-col-Data}
 # Match row and column names
 cell_obs <- cell_obs[order(match(rownames(cell_obs), colnames(sce))), ]
-cell_var <- cell_var[, order(match(colnames(cell_var), rownames(sce)))]
+cell_var <- cell_var[order(match(rownames(cell_var), rownames(sce))), ]
 
 # Add metadata
 colData(sce) <- cell_obs
 rowData(sce) <- cell_var
+
+# Order the dataset by ImageNumber and CellNumber
+sce <- sce[, order(sce$ImageNumber, sce$CellNumber)]
 
 # Add image names
 sce$ImageName <- gsub("_cell.tiff", "", sce$mask_filename_cell)
@@ -360,6 +370,10 @@ masks <- scaleImages(masks, value = (2 ^ 16) - 1)
 
 ```{r mask-metadata}
 mcols(masks)$ImageName <- gsub("_cell", "", names(masks))
+
+# Add ImageNumber to te metadata columns of the `masks` object
+masks <- masks[order(match(mcols(masks)$ImageName, unique(sce$ImageName)))]
+mcols(masks)$ImageNumber <- unique(sce$ImageNumber)
 ```
 
 ### Save the masks as CytoImageList objects
@@ -401,6 +415,10 @@ images <- scaleImages(images, value = (2 ^ 16) - 1)
 
 ```{r images-metadata}
 mcols(images)$ImageName <- gsub("_comp", "", names(images))
+
+# Add ImageNumber to te metadata columns of the `images` object
+images <- images[order(match(mcols(images)$ImageName, unique(sce$ImageName)))]
+mcols(images)$ImageNumber <- unique(sce$ImageNumber)
 ```
 
 ### Add channel names
