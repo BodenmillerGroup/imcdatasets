@@ -97,7 +97,7 @@ For more information, please refer to the [ExperimentHub vignette](https://bioco
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2021). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 0.99.6, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J (2021). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 0.99.9, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 
