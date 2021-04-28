@@ -2,6 +2,7 @@
 
 export(DamondPancreas2019Data)
 export(JacksonFischer2020Data)
+export(ZanotelliSpheroids2020Data)
 export(listDatasets)
 import(cytomapper)
 import(methods)

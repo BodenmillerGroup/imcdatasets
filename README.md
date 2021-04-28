@@ -57,7 +57,7 @@ vignette("imcdatasets")
 The `imcdatasets` package provides quick and easy access to published and curated imaging mass cytometry datasets. Each dataset consists of three data objects that can be retrieved individually:
 
 1. __Single cell data__ in the form of a `SingleCellExperiment` class object:
-This object contain cell-level expression values and metadata. The `rowData` of the `SingleCellExperiment` objects contain marker information while the `colData` contain cell-level metadata, including _image numbers_. The `assay` slots contain marker expression per cell values: the `counts` assay contains mean ion counts whereas the other assay contain counts transformation(s) (details available in the documentation of each dataset).
+This object contains cell-level expression values and metadata. The `rowData` contain marker information while the `colData` contain cell-level metadata, including _image numbers_. The `assay` slots contain marker expression per cell values: the `counts` assay contains average ion counts per cell whereas the other assays contain counts transformation(s) (details available in the documentation of each dataset).
 
 2. __Multichannel images__ formatted into a `CytoImageList` class object.
 This object contains multichannel images and metadata, including channel names and _image numbers_.
@@ -90,7 +90,7 @@ library(ExperimentHub)
 
 View available datasets:
 ```{r}
-eh = ExperimentHub()
+eh <- ExperimentHub()
 query(eh, "imcdatasets")
 ```
 For more information, please refer to the [ExperimentHub vignette](https://bioconductor.org/packages/release/bioc/vignettes/ExperimentHub/inst/doc/ExperimentHub.html).
@@ -101,9 +101,9 @@ Damond N, Eling N, Fischer J (2021). _imcdatasets: Collection of publicly availa
 
 ## Authors
 
-[Nicolas Damond](https://github.com/ndamond) (maintainer)
-[Nils Eling](https://github.com/nilseling)
-[Jana Fischer](https://github.com/JanaFischer)
+[Nicolas Damond](https://github.com/ndamond) (author, maintainer)
+[Nils Eling](https://github.com/nilseling) (contributor)
+[Jana Fischer](https://github.com/JanaFischer) (contributor)
 
 ## References
 
