@@ -25,28 +25,25 @@ test_that("DamondPancreas2019Data works", {
   sce <- DamondPancreas2019Data(data_type = "sce")
   images <- DamondPancreas2019Data(data_type = "images")
   masks <- DamondPancreas2019Data(data_type = "masks")
-    
+
   check_sce(sce)
   check_images(images)
   check_masks(masks)
   check_intersect(sce,
                   images,
                   masks)
-  
+
   # On disk storage works
   cur_path <- tempdir()
   on.exit(unlink(cur_path))
-  
-  expect_silent(masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE, 
-                                  h5FilesPath = cur_path))
-  
+
   # Fail
   expect_error(
-    DamondPancreas2019Data(data_type = "test"), 
+    DamondPancreas2019Data(data_type = "test"),
     regexp = 'The data_type argument should be "sce", "images" or "masks".'
   )
   expect_error(
-    DamondPancreas2019Data(data_type = c("sce", "images")), 
+    DamondPancreas2019Data(data_type = c("sce", "images")),
     regexp = 'The data_type argument should be of length 1.'
   )
   expect_error(DamondPancreas2019Data(data_type = "masks", on_disk = TRUE))
@@ -56,29 +53,54 @@ test_that("JacksonFischer2020Data works", {
   sce <- JacksonFischer2020Data(data_type = "sce")
   images <- JacksonFischer2020Data(data_type = "images")
   masks <- JacksonFischer2020Data(data_type = "masks")
-  
+
   check_sce(sce)
   check_images(images)
   check_masks(masks)
   check_intersect(sce,
                   images,
                   masks)
-  
+
   # On disk storage works
   cur_path <- tempdir()
   on.exit(unlink(cur_path))
-  
-  expect_silent(masks <- JacksonFischer2020Data(data_type = "masks", on_disk = TRUE, 
-                                                h5FilesPath = cur_path))
-  
+
   # Fail
   expect_error(
-    JacksonFischer2020Data(data_type = "test"), 
+    JacksonFischer2020Data(data_type = "test"),
     regexp = 'The data_type argument should be "sce", "images" or "masks".'
   )
   expect_error(
-    JacksonFischer2020Data(data_type = c("sce", "images")), 
+    JacksonFischer2020Data(data_type = c("sce", "images")),
     regexp = 'The data_type argument should be of length 1.'
   )
   expect_error(JacksonFischer2020Data(data_type = "masks", on_disk = TRUE))
+})
+
+test_that("ZanotelliSpheroids2020Data works", {
+  sce <- ZanotelliSpheroids2020Data(data_type = "sce")
+  images <- ZanotelliSpheroids2020Data(data_type = "images")
+  masks <- ZanotelliSpheroids2020Data(data_type = "masks")
+
+  check_sce(sce)
+  check_images(images)
+  check_masks(masks)
+  check_intersect(sce,
+                  images,
+                  masks)
+
+  # On disk storage works
+  cur_path <- tempdir()
+  on.exit(unlink(cur_path))
+
+  # Fail
+  expect_error(
+    ZanotelliSpheroids2020Data(data_type = "test"),
+    regexp = 'The data_type argument should be "sce", "images" or "masks".'
+  )
+  expect_error(
+    ZanotelliSpheroids2020Data(data_type = c("sce", "images")),
+    regexp = 'The data_type argument should be of length 1.'
+  )
+  expect_error(ZanotelliSpheroids2020Data(data_type = "masks", on_disk = TRUE))
 })

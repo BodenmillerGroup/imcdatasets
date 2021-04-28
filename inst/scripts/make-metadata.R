@@ -50,9 +50,34 @@ df_JacksonFischer2020 <- cbind(
     TaxonomyId = 9606,
     Coordinate_1_based = NA,
     DataProvider = "University of Zurich",
-    Maintainer = "Jana Fischer <jana.fischer@dqbm.uzh.ch>",
+    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
     RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
     RDataPath = file.path("imcdatasets", "jackson-fischer-2020",
+                          c("sce.rds", "images.rds", "masks.rds")),
+    DataType = c("sce", "images", "masks"),
+    Notes = c("","","")
+)
+
+# ------------
+# ZanotelliSpheroids2020
+# ------------
+df_ZanotelliSpheroids2020 <- cbind(
+    df_base,
+    Title = sprintf("ZanotelliSpheroids2020_%s", c("sce", "images", "masks")),
+    Description = sprintf(
+        "%s for the ZanotelliSpheroids2020 imaging mass cytometry dataset",
+        c("Single cell data", "Multichannel images", "Cell masks")),
+    BiocVersion = rep("3.13", 3),
+    SourceType = rep("Zip", 3),
+    SourceUrl = rep("https://zenodo.org/record/4271910#.YGWR_T8kz-i", 3),
+    SourceVersion = "Aug 20 2020",
+    Species = "Homo sapiens",
+    TaxonomyId = 9606,
+    Coordinate_1_based = NA,
+    DataProvider = "University of Zurich",
+    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
+    RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
+    RDataPath = file.path("imcdatasets", "zanotelli-spheroids-2020",
                           c("sce.rds", "images.rds", "masks.rds")),
     DataType = c("sce", "images", "masks"),
     Notes = c("","","")
@@ -64,10 +89,10 @@ df_JacksonFischer2020 <- cbind(
 
 # Combine all datasets
 df_all <- rbind(
-    df_DamondPancreas2019, df_JacksonFischer2020
+    df_DamondPancreas2019, df_JacksonFischer2020, df_ZanotelliSpheroids2020
 )
 
 # Save as .csv file
 write.csv(df_all,
-          file = "../extdata/metadata.csv",
+          file = file.path(".", "inst", "extdata", "metadata.csv"),
           row.names = FALSE)

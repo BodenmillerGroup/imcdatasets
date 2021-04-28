@@ -23,3 +23,7 @@ Changes in version 0.99.7 (2021-03-24):
 Changes in version 0.99.8 (2021-04-15):
 
 + Allow on disk storage of images and masks
+
+Changes in version 0.99.9 (2021-04-20):
+
++ Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
