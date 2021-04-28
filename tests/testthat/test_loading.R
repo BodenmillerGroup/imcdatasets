@@ -37,12 +37,6 @@ test_that("DamondPancreas2019Data works", {
   cur_path <- tempdir()
   on.exit(unlink(cur_path))
 
-  expect_silent(masks <- DamondPancreas2019Data(
-    data_type = "masks",
-    on_disk = TRUE,
-    h5FilesPath = cur_path)
-  )
-
   # Fail
   expect_error(
     DamondPancreas2019Data(data_type = "test"),
@@ -71,12 +65,6 @@ test_that("JacksonFischer2020Data works", {
   cur_path <- tempdir()
   on.exit(unlink(cur_path))
 
-  expect_silent(masks <- JacksonFischer2020Data(
-    data_type = "masks",
-    on_disk = TRUE,
-    h5FilesPath = cur_path)
-  )
-
   # Fail
   expect_error(
     JacksonFischer2020Data(data_type = "test"),
@@ -104,12 +92,6 @@ test_that("ZanotelliSpheroids2020Data works", {
   # On disk storage works
   cur_path <- tempdir()
   on.exit(unlink(cur_path))
-
-  expect_silent(masks <- ZanotelliSpheroids2020Data(
-    data_type = "masks",
-    on_disk = TRUE,
-    h5FilesPath = cur_path)
-  )
 
   # Fail
   expect_error(
