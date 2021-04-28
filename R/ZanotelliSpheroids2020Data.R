@@ -2,11 +2,12 @@
 #'
 #' Obtain the zanotelli-spheroids-2020 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
-#' The data was obtained by imaging mass cytometry of spheroid sections obtained
-#' by seeding cells from four different cell lines.
+#' The data were obtained by imaging mass cytometry of sections of 3D spheroids
+#' generated from different cell lines.
 #'
-#' @param data_type type of data to load, should be `sce` for single cell data,
-#' `images` for multichannel images or `masks` for cell segmentation masks.
+#' @param data_type type of data to load, should be \code{sce} for single cell 
+#' data, \code{images} for multichannel images or \code{masks} for cell 
+#' segmentation masks.
 #' @param on_disk logical indicating if images in form of
 #' \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
 #' rather than in memory. This setting is valid when downloading \code{images}
@@ -22,8 +23,9 @@
 #' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 #' consisting of three data objects:
 #' \itemize{
-#'     \item \code{ZanotelliSpheroids2020_images} contains 517 51-channel
-#'     images in the form of a \linkS4class{CytoImageList} class object.
+#'     \item \code{ZanotelliSpheroids2020_images} contains 517 multichannel 
+#'     images, each containing 51 channels, in the form of a 
+#'     \linkS4class{CytoImageList} class object.
 #'     \item \code{ZanotelliSpheroids2020_masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
@@ -53,22 +55,22 @@
 #' This dataset was obtained as following (the names of the experimental
 #' variables, located in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object, are indicated in parentheses):
-#' _i)_ Cells from fourvdifferent cell lines (`cellline`) were seeded at three
-#' different densities (`concentration` relative densities) and grown for two
-#' either 72 or 96 hours (`time_point`, duration in hours). In the appropriate
-#' experimental conditions (see the paper for details), the cells aggregate into
-#'  3D spheroids. _ii)_ Cells were harvested and pooled into a 60-well barcoding
-#'  plate. _iii)_ A pellet of each spheroid pool was generated and cut into
-#' several 6 um-thick sections. _iv)_ A subset of these sections (`site_id`)
-#' were stained with an IMC panel and acquired as one or more acquisitions
-#' (`acquisition_id`) containing multiple spheres each. _v)_ Spheres in these
-#' acquisitions were identified by computer vision and cropped into individual
-#' images (`ImageNumber`).
+#' \emph{i)} Cells from four different cell lines (\code{cellline}) were seeded 
+#' at three different densities (\code{concentration}, relative densities) and 
+#' grown for either 72 or 96 hours (\code{time_point}, duration in hours). In 
+#' the appropriate experimental conditions (see the paper for details), the 
+#' cells aggregate into 3D spheroids. \emph{ii)} Cells were harvested and pooled
+#' into 60-well barcoding plates. \emph{iii)} A pellet of each spheroid pool was
+#' generated and cut into several 6 um-thick sections. \emph{iv)} A subset of 
+#' these sections (\code{site_id}) were stained with an IMC panel and acquired 
+#' as one or more acquisitions (\code{acquisition_id}) containing multiple 
+#' spheres each. \emph{v)} Spheres in these acquisitions were identified by 
+#' computer vision and cropped into individual images (\code{ImageNumber}).
 #'
 #' Other relevant cell metadata include:
 #' \itemize{
 #'     \item \code{condition_name}: experimental conditions in the format:
-#'     "Cell line name"_c"seeding density (relative)"_tp"time point (hours)".
+#'     \code{"Cell line name"_c"seeding density"_tp"time point"}.
 #'     \item \code{Center_X/Y}: object centroid position in image.
 #'     \item \code{Area}: area of the cell (um^2).
 #'     \item \code{dist.rim}: estimated distance to spheroid border.
@@ -101,22 +103,22 @@
 #'
 #'The \code{metadata} slot of the \linkS4class{SingleCellExperiment} object
 #'contains a graph of cell neighbors, generated with the
-#'\link[igraph]{igraph::graph_from_data_frame} function.
+#'\code{igraph::graph_from_data_frame} function.
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`DamondPancreas2019_images`}: size in memory = 21.2 Gb, size
-#'     on disk = 881 Mb.
-#'     \item \code{`DamondPancreas2019_masks`}: size in memory = 426 Mb, size
-#'     on disk = 11.6 Mb.
-#'     \item \code{`DamondPancreas2019_sce`}: size in memory = 584 Mb, size on
+#'     \item \code{`ZanotelliSpheroids2020_images`}: size in memory = 21.2 Gb, 
+#'     size on disk = 881 Mb.
+#'     \item \code{`ZanotelliSpheroids2020_masks`}: size in memory = 426 Mb, 
+#'     size on disk = 11.6 Mb.
+#'     \item \code{`ZanotelliSpheroids2020_sce`}: size in memory = 584 Mb, size on
 #'     disk = 340 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
 #' before writing them to disk. This means the process of downloading the data
 #' is slower than directly keeping them in memory. However, downstream analysis
-#' will loose its memory overhead when storing images on disk.
+#' will lose its memory overhead when storing images on disk.
 #'
 #' Original source: Zanotelli et al. (2020):
 #' https://doi.org/10.15252/msb.20209798
@@ -126,7 +128,7 @@
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
-#' \linkS4class{CytoImageList} object containing cell masks.
+#' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
 #' @author Nicolas Damond
 #'
