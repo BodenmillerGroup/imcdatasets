@@ -17,14 +17,14 @@ It builds on data objects contained in the [SingleCellExperiment](https://www.bi
 
 ## Installation
 
-The [release version](https://www.bioconductor.org/packages/release/bioc/html/imcdatasets.html) of `imcdatasets` can be installed by following standard `Bioconductor` package installation procedures:
+The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) of `imcdatasets` can be installed by following standard `Bioconductor` package installation procedures:
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("imcdatasets")
 ```
 
-The [development version](https://github.com/BodenmillerGroup/imcdatasets) of `imcdatasets` can be installed from Github using `devtools` in R:
+The development version can be installed from GitHub using `devtools`:
 ```{r}
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
@@ -77,7 +77,7 @@ imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
 imc
 ```
-Detailed information about each dataset is available in the help pages (e.g., `?DamondPancreas2019Data`).
+Detailed information about each dataset is available in the help pages (e.g., `?JacksonFischer2020Data`).
 
 Alternately, available datasets can be viewed with [ExperimentHub](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). This package can be installed and loaded as following:
 ```{r}
