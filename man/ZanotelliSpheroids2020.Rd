@@ -125,9 +125,12 @@ ZanotelliSpheroids2020_masks(metadata = FALSE)
 dataset should be loaded. Default = FALSE, which loads the whole dataset.}
 }
 \examples{
-sce <- ZanotelliSpheroids2020_sce()
-images <- ZanotelliSpheroids2020_images()
-masks <- ZanotelliSpheroids2020_masks()
+sce <- ZanotelliSpheroids2020Data(data_type = "sce")
+sce
+images <- ZanotelliSpheroids2020Data(data_type = "images")
+head(images)
+masks <- ZanotelliSpheroids2020Data(data_type = "masks")
+head(masks)
 }
 \value{
 Returns a \code{\linkS4class{SingleCellExperiment}} or 

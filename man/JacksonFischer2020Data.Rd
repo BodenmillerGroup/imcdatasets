@@ -121,8 +121,11 @@ https://doi.org/10.5281/zenodo.3518284
 }
 \examples{
 sce <- JacksonFischer2020Data(data_type = "sce")
+sce
 images <- JacksonFischer2020Data(data_type = "images")
+head(images)
 masks <- JacksonFischer2020Data(data_type = "masks")
+head(masks)
 
 }
 \references{

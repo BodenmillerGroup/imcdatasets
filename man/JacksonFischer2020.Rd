@@ -92,9 +92,12 @@ JacksonFischer2020_masks(metadata = FALSE)
 dataset should be loaded. Default = FALSE, which loads the whole dataset.}
 }
 \examples{
-sce <- JacksonFischer2020_sce()
-images <- JacksonFischer2020_images()
-masks <- JacksonFischer2020_masks()
+sce <- JacksonFischer2020Data(data_type = "sce")
+sce
+images <- JacksonFischer2020Data(data_type = "images")
+head(images)
+masks <- JacksonFischer2020Data(data_type = "masks")
+head(masks)
 }
 \value{
 Returns a \code{\linkS4class{SingleCellExperiment}} object with single cell 

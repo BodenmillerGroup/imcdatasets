@@ -128,8 +128,11 @@
 #'
 #' @examples
 #' sce <- DamondPancreas2019Data(data_type = "sce")
+#' sce
 #' images <- DamondPancreas2019Data(data_type = "images")
+#' head(images)
 #' masks <- DamondPancreas2019Data(data_type = "masks")
+#' head(masks)
 #'
 #' @import cytomapper
 #' @import methods

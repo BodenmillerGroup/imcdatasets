@@ -149,8 +149,11 @@ https://doi.org/10.5281/zenodo.4271910
 }
 \examples{
 sce <- ZanotelliSpheroids2020Data(data_type = "sce")
+sce
 images <- ZanotelliSpheroids2020Data(data_type = "images")
+head(images)
 masks <- ZanotelliSpheroids2020Data(data_type = "masks")
+head(masks)
 
 }
 \references{

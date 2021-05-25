@@ -112,9 +112,12 @@ DamondPancreas2019_masks(metadata = FALSE)
 dataset should be loaded. Default = FALSE, which loads the whole dataset.}
 }
 \examples{
-sce <- DamondPancreas2019_sce()
-images <- DamondPancreas2019_images()
-masks <- DamondPancreas2019_masks()
+sce <- DamondPancreas2019Data(data_type = "sce")
+sce
+images <- DamondPancreas2019Data(data_type = "images")
+head(images)
+masks <- DamondPancreas2019Data(data_type = "masks")
+head(masks)
 }
 \value{
 Returns a \code{\linkS4class{SingleCellExperiment}} or 
