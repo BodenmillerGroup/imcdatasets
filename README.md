@@ -71,7 +71,21 @@ For more information about the `SingleCellExperiment` and `CytoImageList` object
 
 ## Available datasets
 
-Currently available datasets can be viewed with:
+### List of available datasets
+
+* __JacksonFischer2020__: Tumour tissue from patients with breast cancer.  
+  - Documentation: [JacksonFischer2020Data](https://bodenmillergroup.github.io/imcdatasets/reference/JacksonFischer2020Data.html).
+  - Publication: [Jackson, Fischer et al. _Nature_ (2020) 578:615–620](https://doi.org/10.1038/s41586-019-1876-x)
+* __ZanotelliSpheroids2020__: 3D spheroids generated from different cell lines.  
+  - Documentation: [ZanotelliSpheroids2020Data](https://bodenmillergroup.github.io/imcdatasets/reference/ZanotelliSpheroids2020Data.html).   
+  - Publication: [Zanotelli et al. _Mol Syst Biol_ (2020) 16:e9798](https://doi.org/10.15252/msb.20209798).  
+* __DamondPancreas2019__: Pancreas sections from donors with type 1 diabetes.    
+  - Documentation: [DamondPancreas2019Data](https://bodenmillergroup.github.io/imcdatasets/reference/DamondPancreas2019Data.html).  
+  - Publication: [Damond et al. _Cell Metab_ (2019) 29(3):755-768.e5](https://doi.org/10.1016/j.cmet.2018.11.014).
+
+### View available datasets directly in R
+
+In R, currently available datasets can be viewed with:
 ```{r}
 imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
@@ -79,17 +93,16 @@ imc
 ```
 Detailed information about each dataset is available in the help pages (e.g., `?JacksonFischer2020Data`).
 
-Alternately, available datasets can be viewed with [ExperimentHub](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html). This package can be installed and loaded as following:
+Alternately, available datasets can be viewed without installing `imcdatasets` with [ExperimentHub](https://bioconductor.org/packages/release/bioc/html/ExperimentHub.html), as following:
 ```{r}
+# Install and load the ExperimentHub package
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("ExperimentHub")
 library(ExperimentHub)
-```
 
-View available datasets:
-```{r}
+# View available datasets
 eh <- ExperimentHub()
 query(eh, "imcdatasets")
 ```
@@ -97,7 +110,7 @@ For more information, please refer to the [ExperimentHub vignette](https://bioco
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2021). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 0.99.9, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J (2021). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 1.1.1, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

@@ -27,3 +27,11 @@ Changes in version 0.99.8 (2021-04-15):
 Changes in version 0.99.9 (2021-04-20):
 
 + Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
+
+Changes in version 1.0.0 (2021-05-19):
+
++ First release version in Bioconductor
+
+Changes in version 1.1.1 (2021-05-25):
+
++ Added documentation (dataset list in README, print out examples in help pages)
