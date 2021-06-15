@@ -20,7 +20,8 @@ vignette: >
 ---
 
 ```{r style, echo=FALSE}
-knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE,
+                      fig.retina = 0.75)
 library(BiocStyle)
 ```
 
