@@ -1,0 +1,286 @@
+---
+title: "Loading single cell data, images and masks of the Hoch T, Schulz D et al dataset"
+author: "Nicolas Damond, Nils Eling and Tobias Hoch"
+date: "Created: Jun 17, 2022; Compiled: `r BiocStyle::doc_date()`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+# Loading required R packages
+
+```{r load-packages}
+library(S4Vectors)
+library(SingleCellExperiment)
+library(dplyr)
+library(cytomapper)
+```
+
+This script downloads 50 example images from both data sets, as well as the associated single-cell data and cell segmentation masks from the pancreas Imaging Mass Cytometry (IMC) dataset available [here](http://doi.org/10.1126/sciimmunol.abk1692). The dataset is associated to the following publication:
+
+[Damond et al. A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry. Cell Metabolism. 2019 Mar 5;29(3):755-768](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6821395)
+
+The images and masks have been created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.  
+
+Setting the working and output directories
+
+```{r directories}
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+outdir <- file.path("inst", "extdata", "hochschulz-melanoma-2022")
+if(!(dir.exists(outdir)))
+    dir.create(outdir)
+```
+
+# **Single-cell data**
+
+## Obtain and read-in data
+
+Here, a subset of single-cell data corresponding to 100 images from [@damond2019pancreas] is downloaded.
+
+### Read in SCE objects
+
+We download the sce objects from both data sets and subset 50 (corresponding) images based on the highest fraction of B cells. 
+
+```{r download-cell-data, message=FALSE}
+# download file using command-line curl
+system2("curl", args = c("-o", 
+                         file.path(workdir, "sceFiles.zip"), 
+                         "https://zenodo.org/record/5994136/files/data_for_analysis.zip?download=1",
+                         "--max-time 900"))
+
+system2("unzip", args = c("-o", file.path(workdir, "sceFiles.zip"), # path to zip archive
+                          "*sce_*.rds",  # folder to unzip
+                          "-d", workdir)) # output 
+
+# remove .zip folder
+file.remove(file.path(workdir, "sceFiles.zip"))
+
+# Retrieve sce objects
+sce_rna <- readRDS(file.path(workdir, "data_for_analysis_zenodo/sce_RNA.rds"))
+sce_protein <- readRDS(file.path(workdir, "data_for_analysis_zenodo/sce_protein.rds"))
+```
+
+## Subset both sce objects to contain the 50 images with the most B cells
+
+```{r}
+# select top 50 images with the most B cells
+toKeep <- as.data.frame(colData(sce_protein)) %>%
+  group_by(Description, celltype) %>%
+  summarise(numberOfcells=n()) %>%
+  filter(celltype == "B cell") %>%
+  ungroup() %>%
+  slice_max(numberOfcells, n=50) %>%
+  select(Description)
+
+# subset both sce's 
+sce_protein_sub <- sce_protein[,sce_protein$Description %in% toKeep$Description]
+sce_rna_sub <- sce_rna[,sce_rna$Description %in% toKeep$Description]
+
+# remove both full data sets
+sce_protein <- NULL
+sce_rna <- NULL
+```
+
+## Save the SCE object
+
+For further analysis, we will save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-SCE}
+saveRDS(sce_protein_sub, file.path(outdir, "sce_protein.rds"))
+saveRDS(sce_rna_sub, file.path(outdir, "sce_rna.rds"))
+```
+
+# Images and cell masks
+
+## Download and read-in images
+
+Here, a subset of 50 images from is downloaded.
+We use the `loadImages` function of the `cytomapper` package to read them into a `CytoImageList` object.
+
+```{r load-images, message=FALSE}
+# Download the zipped folder image and unzip it
+# download file using command-line curl
+system2("curl", args = c("-o", 
+                         file.path(workdir, "ImageSubset.zip"), 
+                         "https://zenodo.org/record/6004986/files/full_data.zip?download=1",
+                         "--max-time 900"))
+
+# unzip file using command-line
+system2("unzip", args = c("-o", file.path(workdir, "ImageSubset.zip"), # path to zip archive
+                          "full_data/rna/cpout/*.tiff",  # folder to unzip
+                          "-d", workdir)) # output 
+system2("unzip", args = c("-o", file.path(workdir, "ImageSubset.zip"), # path to zip archive
+                          "full_data/protein/cpout/*.tiff",  # folder to unzip
+                          "-d", workdir)) # output 
+system2("unzip", args = c("-o", file.path(workdir, "ImageSubset.zip"), # path to zip archive
+                          "full_data/rna/cpout/Image.csv",  # folder to unzip
+                          "-d", workdir)) # output 
+system2("unzip", args = c("-o", file.path(workdir, "ImageSubset.zip"), # path to zip archive
+                          "full_data/protein/cpout/Image.csv",  # folder to unzip
+                          "-d", workdir)) # output 
+
+file.remove(file.path(workdir, "ImageSubset.zip"))
+
+rna_directory = file.path(workdir, "/full_data/rna/cpout/")
+prot_directory = file.path(workdir, "/full_data/protein/cpout")
+
+# retrieve filenames of images/masks from the 50 images that we selected 
+fileNames_rna <- read.csv2(file.path(workdir, "full_data/rna/cpout/Image.csv"), sep = ",")
+info_rna <- fileNames_rna[fileNames_rna$Metadata_Description %in% toKeep$Description,]
+
+fileNames_protein <- read.csv2(file.path(workdir, "full_data/protein/cpout/Image.csv"), sep = ",")
+info_prot <- fileNames_protein[fileNames_protein$Metadata_Description %in% toKeep$Description,]
+
+# Load the images as a CytoImageList object
+images_rna <- loadImages(rna_directory, pattern = info_rna$FileName_SpillCorrected)
+images_prot <- loadImages(prot_directory, pattern = info_prot$FileName_SpillCorrected)
+
+# Load the masks as a CytoImageList object
+masks_rna <- loadImages(rna_directory, pattern = info_rna$FileName_cellmask)
+masks_prot <- loadImages(prot_directory, pattern = info_prot$FileName_cellmask)
+```
+
+## Process images and masks
+
+We will now have to process the images to make them compatible with `cytomapper`.
+The masks are 16-bit images and need to be re-scaled in order to obtain integer cell IDs.
+
+```{r scale-masks}
+masks_rna <- scaleImages(masks_rna, value = info_rna$Scaling_cellmask[[1]])
+masks_prot <- scaleImages(masks_prot, value = info_prot$Scaling_cellmask[[1]])
+```
+
+Next, we will add the `ImageName` to the images and masks objects.
+This information is stored in the metadata columns of the `CytoImageList` objects
+and is used by `cytomapper` to match single cell data, images and mask
+
+## add the ImageNumber to masks - RNA&protein data 
+
+```{r match image numbers}
+# we extract only the FileNames of the masks as they are in the all_masks object
+df_mask_rna <- data.frame(cellmask = info_rna$FileName_cellmask,
+                         ImageNumber = info_rna$ImageNumber,
+                         Description = info_rna$Metadata_Description)
+
+df_image_rna <- data.frame(cellmask = info_rna$FileName_SpillCorrected,
+                         ImageNumber = info_rna$ImageNumber,
+                         Description = info_rna$Metadata_Description)
+
+# we set the rownames of the extracted data to be equal to the names of all_masks
+rownames(df_mask_rna) <- gsub(pattern = ".tiff",replacement = "",info_rna$FileName_cellmask)
+rownames(df_image_rna) <- gsub(pattern = ".tiff",replacement = "",info_rna$FileName_SpillCorrected)
+
+# we add the extracted information via mcols in the order of the all_masks object
+mcols(masks_rna) <- df_mask_rna[names(masks_rna),]
+mcols(images_rna) <- df_image_rna[names(images_rna),]
+```
+
+## add the ImageNumber to masks - Protein data 
+
+```{r match image numbers}
+# we extract only the FileNames of the masks as they are in the all_masks object
+df_mask_prot <- data.frame(cellmask = info_prot$FileName_cellmask,
+                         ImageNumber = info_prot$ImageNumber,
+                         Description = info_prot$Metadata_Description)
+
+df_image_prot <- data.frame(cellmask = info_prot$FileName_SpillCorrected,
+                         ImageNumber = info_prot$ImageNumber,
+                         Description = info_prot$Metadata_Description)
+
+# we set the rownames of the extracted data to be equal to the names of all_masks
+rownames(df_mask_prot) <- gsub(pattern = ".tiff",replacement = "",info_prot$FileName_cellmask)
+rownames(df_image_prot) <- gsub(pattern = ".tiff",replacement = "",info_prot$FileName_SpillCorrected)
+
+# we add the extracted information via mcols in the order of the all_masks object
+mcols(masks_prot) <- df_mask_prot[names(masks_prot),]
+mcols(images_prot) <- df_image_prot[names(images_prot),]
+```
+
+Quality Control
+
+```{r add-image-numbers}
+identical(mcols(masks_rna)$Description, mcols(images_rna)$Description)
+identical(mcols(masks_prot)$Description, mcols(images_prot)$Description)
+```
+
+## add the channel names - RNA&Protein data
+
+```{r add channel names}
+panel_rna <- rowData(sce_rna_sub)
+
+# order according to  metal mass
+panel_rna = panel_rna[order(panel_rna$Metal.Tag),]
+
+# assign channel number, matching with the measured channles in cellprofiler
+panel_rna$channel = c(1:nrow(panel_rna))
+
+channelNames(images_rna) <- panel_rna$clean_target
+```
+
+## add the channel names - RNA&Protein data
+
+```{r add channel names}
+panel_prot <- rowData(sce_protein_sub)
+
+# order according to  metal mass
+panel_prot = panel_prot[order(panel_prot$Metal.Tag),]
+
+# assign channel number, matching with the measured channles in cellprofiler
+panel_prot$channel = c(1:nrow(panel_prot))
+
+channelNames(images_prot) <- panel_prot$clean_target
+```
+
+## Plot example image to see if everything works
+
+```{r Fig_4B_example_images_B2Mexpression, dev=("pdf")}
+plotCells(mask = masks_prot[1], 
+          object = sce_protein_sub,
+          img_id = "Description", cell_id = "CellNumber",
+          colour_by = c("CD3","CD20", "CD4", "CD11b", "SOX10"),
+          colour = list(CD3 = c("black", "green"),
+                        CD20 = c("black", "green"),
+                        CD4 = c("black", "blue"),
+                        CD11b = c("black", "blue"),
+                        SOX10 = c("black", "red")),
+          display = "single",
+          exprs_values = "scaled_asinh",
+          scale = TRUE)
+```
+
+## Save the CytoImageList objects
+
+Here, we will save the generated `CytoImageList` objects for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-cytoimagelists}
+saveRDS(images_rna, file.path(outdir, "images_rna.rds"))
+saveRDS(masks_rna, file.path(outdir, "masks_rna.rds"))
+
+saveRDS(images_prot, file.path(outdir, "images_protein.rds"))
+saveRDS(masks_prot, file.path(outdir, "masks_protein.rds"))
+```
+
+## Clean up
+
+Remove all files from tmp/*
+
+```{r clean-up-panel, message = FALSE}
+unlink(workdir, recursive = T)
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
