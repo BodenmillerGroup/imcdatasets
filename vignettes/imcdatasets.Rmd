@@ -113,23 +113,6 @@ masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE,
 masks
 ```
 
-
-__Accessing data objects by name__
-
-Alternately, data objects can be imported using their name as a function:
-
-```{r access-by-name}
-sce <- DamondPancreas2019_sce()
-sce
-
-images <- DamondPancreas2019_images()
-images
-
-masks <- DamondPancreas2019_masks()
-masks
-```
-
-
 # Dataset info and metadata
 
 Additional information about each dataset is available in the help page:
@@ -140,11 +123,22 @@ Additional information about each dataset is available in the help page:
 
 The metadata associated with a specific data object can be displayed as follows:
 
-```{r access-metadata}
+```{r access-metadata, eval = FALSE}
 DamondPancreas2019_sce(metadata = TRUE)
 DamondPancreas2019_images(metadata = TRUE)
 DamondPancreas2019_masks(metadata = TRUE)
 ```
+
+Note: the onLoad functions will be deprecated. In future releases 
+(Bioconductor >= 3.16), please use the wrapper functions:
+
+```{r access-metadata-future-releases, eval = FALSE}
+DamondPancreas2019Data(data_type = "sce", metadata = TRUE)
+DamondPancreas2019Data(data_type = "images", metadata = TRUE)
+DamondPancreas2019Data(data_type = "masks", metadata = TRUE)
+```
+
+
 
 # Usage
 
@@ -156,8 +150,7 @@ workflow.
 The `CytoImageList` class objects can be used for plotting cell and pixel 
 information. Some typical use cases are given below. For more information, 
 please see the `r Biocpkg("cytomapper")` package and the
-[associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html)
-.  
+[associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html).  
 
 __Subsetting the images and masks__
 
