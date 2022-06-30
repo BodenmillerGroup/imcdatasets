@@ -22,23 +22,17 @@
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 #' (2020), consisting of three data objects:
 #' \itemize{
-#'     \item \code{JacksonFischer2020_images} contains a hundred 42-channel
+#'     \item \code{images} contains a hundred 42-channel
 #'     images in the form of a \linkS4class{CytoImageList} class object.
-#'     \item \code{JacksonFischer2020_masks} contains the cell segmentation
+#'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{JacksonFischer2020_sce} contains the single cell data
+#'     \item \code{sce} contains the single cell data
 #'     extracted from the images using the cell segmentation masks, as well as
 #'     the associated metadata, in the form of a
 #'     \linkS4class{SingleCellExperiment}. This represents a total of 285,851
 #'     cells x 42 channels.
 #' }
-#'
-#' All data are downloaded from ExperimentHub and cached for local re-use.
-#' Specific resources can be retrieved by searching for
-#' \code{imcdatasets/JacksonFischer2020_sce},
-#' \code{imcdatasets/JacksonFischer2020_images}, or
-#' \code{imcdatasets/JacksonFischer2020_masks}.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -79,11 +73,11 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`JacksonFischer2020_images`}: size in memory = 17.8 Gb, size
+#'     \item \code{`images`}: size in memory = 17.8 Gb, size
 #'     on disk = 1996 Mb.
-#'     \item \code{`JacksonFischer2020_masks`}: size in memory = 433 Mb, size
+#'     \item \code{`masks`}: size in memory = 433 Mb, size
 #'     on disk = 10.2 Mb.
-#'     \item \code{`JacksonFischer2020_sce`}: size in memory = 517 Mb, size on
+#'     \item \code{`sce`}: size in memory = 517 Mb, size on
 #'     disk = 272 Mb.
 #' }
 #'

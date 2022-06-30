@@ -22,23 +22,17 @@
 #' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 #' consisting of three data objects:
 #' \itemize{
-#'     \item \code{DamondPancreas2019_images} contains a hundred 38-channel
+#'     \item \code{images} contains a hundred 38-channel
 #'     images in the form of a \linkS4class{CytoImageList} class object.
-#'     \item \code{DamondPancreas2019_masks} contains the cell segmentation
+#'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{DamondPancreas2019_sce} contains the single cell data
+#'     \item \code{sce} contains the single cell data
 #'     extracted from the images using the cell segmentation masks, as well as
 #'     the associated metadata, in the form of a
 #'     \linkS4class{SingleCellExperiment}. This represents a total of 252,059
 #'     cells x 38 channels.
 #' }
-#'
-#' All data are downloaded from ExperimentHub and cached for local re-use.
-#' Specific resources can be retrieved by searching for
-#' \code{imcdatasets/DamondPancreas2019_sce},
-#' \code{imcdatasets/DamondPancreas2019_images}, or
-#' \code{imcdatasets/DamondPancreas2019_masks}.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -96,11 +90,11 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`DamondPancreas2019_images`}: size in memory = 7.4 Gb, size
+#'     \item \code{`images`}: size in memory = 7.4 Gb, size
 #'     on disk = 1780 Mb.
-#'     \item \code{`DamondPancreas2019_masks`}: size in memory = 200.0 Mb, size
+#'     \item \code{`masks`}: size in memory = 200.0 Mb, size
 #'     on disk = 8.6 Mb.
-#'     \item \code{`DamondPancreas2019_sce`}: size in memory = 248.6 Mb, size on
+#'     \item \code{`sce`}: size in memory = 248.6 Mb, size on
 #'     disk = 145 Mb.
 #' }
 #'

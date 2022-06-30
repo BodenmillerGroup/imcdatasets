@@ -3,33 +3,33 @@
 \alias{JacksonFischer2020_images}
 \alias{JacksonFischer2020_masks}
 \docType{data}
-\title{'JacksonFischer2020' dataset}
+\title{Deprecated function - 'JacksonFischer2020' dataset}
 \description{
+These functions are provided for compatibility with older versions of 
+\sQuote{imcdatasets} only, and will be defunct at the next release.
 This dataset consists of three data objects: single cell data, multichannel 
 images and cell segmentation masks. The data was obtained by imaging mass 
 cytometry of tumour tissue from patients with breast cancer.
 }
 \details{
 This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
-(2020), consisting of three data objects:
+(2020), consisting of three data objects. Note: The following functions are 
+deprecated and will be made defunct; use the replacements indicated below:
 \itemize{
-    \item \code{JacksonFischer2020_images} contains a hundred 42-channel
-    images in the form of a \linkS4class{CytoImageList} class object.
-    \item \code{JacksonFischer2020_masks} contains the cell segmentation 
-    masks associated with the images, in the form of a 
+    \item{JacksonFischer2020_images -> \code{\link{JacksonFischer2020Data}}} 
+    contains a hundred 42-channel images in the form of a 
     \linkS4class{CytoImageList} class object.
-    \item \code{JacksonFischer2020_sce} contains the single cell data 
-    extracted from the images using the cell segmentation masks, as well as 
-    the associated metadata, in the form of a 
+    \item{JacksonFischer2020_masks -> \code{\link{JacksonFischer2020Data}}} 
+    contains the cell segmentation masks associated with the images, in the form
+    of a \linkS4class{CytoImageList} class object.
+    \item{JacksonFischer2020_sce -> \code{\link{JacksonFischer2020Data}}} 
+    contains the single cell data extracted from the images using the cell 
+    segmentation masks, as well as the associated metadata, in the form of a 
     \linkS4class{SingleCellExperiment}. This represents a total of 285,851 cells
     x 42 channels.
 }
 
-All data are downloaded from ExperimentHub and cached for local re-use. 
-Specific resources can be retrieved by searching for
-\code{imcdatasets/JacksonFischer2020_sce}, 
-\code{imcdatasets/JacksonFischer2020_images}, or 
-\code{imcdatasets/JacksonFischer2020_masks}.
+All data are downloaded from ExperimentHub and cached for local re-use.  
 
 Mapping between the three data objects is performed via variables located in 
 their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList} 
@@ -40,8 +40,9 @@ the \code{CellNb} variable, the values of which correspond to the intensity
 values of the \code{JacksonFischer2020_masks} object. For practical examples,
 please refer to the "Accessing IMC datasets" vignette.
 
-This dataset is a subset of the complete Jackson, Fischer et al. (2020) dataset comprising the data from tumour tissue from 100 patients with breast cancer
-(one image per patient).
+This dataset is a subset of the complete Jackson, Fischer et al. (2020)
+dataset comprising the data from tumour tissue from 100 patients with breast 
+cancer (one image per patient).
 
 The \code{assay} slot of the \linkS4class{SingleCellExperiment} object 
 contains three assays:
@@ -57,7 +58,8 @@ are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
 object.
 
 The cell-associated metadata are stored in the \code{colData} of the 
-\linkS4class{SingleCellExperiment} object. These metadata include clusters (in \code{colData(sce)$PhenoGraphBasel}) and metaclusters (in 
+\linkS4class{SingleCellExperiment} object. These metadata include clusters 
+(in \code{colData(sce)$PhenoGraphBasel}) and metaclusters (in 
 \code{colData(sce)$metacluster}), as well as spatial information (e.g., cell 
 areas are stored in \code{colData(sce)$Area}).
 
@@ -67,12 +69,9 @@ can be retrieved with \code{colData(sce)$grade}.
 
 File sizes:
 \itemize{
-    \item \code{`JacksonFischer2020_images`}: size in memory = 17.8 Gb, size 
-    on disk = 1996 Mb.
-    \item \code{`JacksonFischer2020_masks`}: size in memory = 433 Mb, size 
-    on disk = 10.2 Mb.
-    \item \code{`JacksonFischer2020_sce`}: size in memory = 517 Mb, size on
-    disk = 272 Mb.
+    \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1996 Mb.
+    \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
+    \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
 }
 
 Original source: Jackson, Fischer et al. (2020): 

@@ -23,24 +23,18 @@
 #' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 #' consisting of three data objects:
 #' \itemize{
-#'     \item \code{ZanotelliSpheroids2020_images} contains 517 multichannel 
+#'     \item \code{images} contains 517 multichannel 
 #'     images, each containing 51 channels, in the form of a 
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{ZanotelliSpheroids2020_masks} contains the cell segmentation
+#'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{ZanotelliSpheroids2020_sce} contains the single cell data
+#'     \item \code{sce} contains the single cell data
 #'     extracted from the images using the cell segmentation masks, as well as
 #'     the associated metadata, in the form of a
 #'     \linkS4class{SingleCellExperiment}. This represents a total of 229,047
 #'     cells x 51 channels.
 #' }
-#'
-#' All data are downloaded from ExperimentHub and cached for local re-use.
-#' Specific resources can be retrieved by searching for
-#' \code{imcdatasets/ZanotelliSpheroids2020_sce},
-#' \code{imcdatasets/ZanotelliSpheroids2020_images}, or
-#' \code{imcdatasets/ZanotelliSpheroids2020_masks}.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -107,11 +101,11 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`ZanotelliSpheroids2020_images`}: size in memory = 21.2 Gb, 
+#'     \item \code{`images`}: size in memory = 21.2 Gb, 
 #'     size on disk = 881 Mb.
-#'     \item \code{`ZanotelliSpheroids2020_masks`}: size in memory = 426 Mb, 
+#'     \item \code{`masks`}: size in memory = 426 Mb, 
 #'     size on disk = 11.6 Mb.
-#'     \item \code{`ZanotelliSpheroids2020_sce`}: size in memory = 584 Mb, size on
+#'     \item \code{`sce`}: size in memory = 584 Mb, size on
 #'     disk = 340 Mb.
 #' }
 #'

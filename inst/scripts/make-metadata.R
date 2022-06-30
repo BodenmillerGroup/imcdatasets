@@ -14,6 +14,8 @@ df_base <- data.frame(
 df_DamondPancreas2019 <- cbind(
     df_base,
     Title = sprintf("DamondPancreas2019_%s", c("sce", "images", "masks")),
+    FunctionCall = sprintf("DamondPancreas2019Data(data_type = '%s",
+                           c("sce')", "images')", "masks')")),
     Description = sprintf(
         "%s for the DamondPancreas2019 imaging mass cytometry dataset",
         c("Single cell data", "Multichannel images", "Cell masks")),
@@ -39,6 +41,8 @@ df_DamondPancreas2019 <- cbind(
 df_JacksonFischer2020 <- cbind(
     df_base,
     Title = sprintf("JacksonFischer2020_%s", c("sce", "images", "masks")),
+    FunctionCall = sprintf("JacksonFischer2020Data(data_type = '%s",
+                           c("sce')", "images')", "masks')")),
     Description = sprintf(
         "%s for the JacksonFischer2020 imaging mass cytometry dataset",
         c("Single cell data", "Multichannel images", "Cell masks")),
@@ -64,6 +68,8 @@ df_JacksonFischer2020 <- cbind(
 df_ZanotelliSpheroids2020 <- cbind(
     df_base,
     Title = sprintf("ZanotelliSpheroids2020_%s", c("sce", "images", "masks")),
+    FunctionCall = sprintf("ZanotelliSpheroids2020Data(data_type = '%s",
+                           c("sce')", "images')", "masks')")),
     Description = sprintf(
         "%s for the ZanotelliSpheroids2020 imaging mass cytometry dataset",
         c("Single cell data", "Multichannel images", "Cell masks")),
