@@ -12,7 +12,7 @@ The `imcdatasets` package is an extensible resource containing a set of publicly
 These formats facilitate accession and integration into R/Bioconductor workflows. The data objects are hosted on Bioconductor's `ExperimentHub` platform.
 
 ## Requirements
-The `imcdatasets` package requires R version >= 4.1.
+The `imcdatasets` package requires R version >= 4.2.
 It builds on data objects contained in the [SingleCellExperiment](https://www.bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) and [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) packages. These packages must, therefore, be installed (see below).
 
 ## Installation
@@ -57,15 +57,15 @@ vignette("imcdatasets")
 The `imcdatasets` package provides quick and easy access to published and curated imaging mass cytometry datasets. Each dataset consists of three data objects that can be retrieved individually:
 
 1. __Single cell data__ in the form of a `SingleCellExperiment` class object:
-This object contains cell-level expression values and metadata. The `rowData` contain marker information while the `colData` contain cell-level metadata, including _image numbers_. The `assay` slots contain marker expression per cell values: the `counts` assay contains average ion counts per cell whereas the other assays contain counts transformation(s) (details available in the documentation of each dataset).
+This object contains cell-level expression values and metadata. The `rowData` contain marker information while the `colData` contain cell-level metadata, including _image names_. The `assay` slots contain marker expression per cell values: the `counts` assay contains average ion counts per cell whereas the other assays contain counts transformation(s) (details available in the documentation of each dataset).
 
 2. __Multichannel images__ formatted into a `CytoImageList` class object.
-This object contains multichannel images and metadata, including channel names and _image numbers_.
+This object contains multichannel images and metadata, including channel names and _image names_.
 
 3. __Cell segmentation masks__ formatted into a `CytoImageList` class object.
-This object contains single-channel images representing cell segmentation masks and metadata, including _image numbers_.
+This object contains single-channel images representing cell segmentation masks and metadata, including _image names_.
 
-The three data objects can be mapped using the _image numbers_ contained in the metadata of each object. Details are available in the vignette (see above).
+The three data objects can be mapped using the _image names_ contained in the metadata of each object. Details are available in the vignette (see above).
 
 For more information about the `SingleCellExperiment` and `CytoImageList` objects, please refer to the [SingleCellExperiment](https://www.bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) and [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) packages, respectively.
 
@@ -110,7 +110,7 @@ For more information, please refer to the [ExperimentHub vignette](https://bioco
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 1.4.1, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 1.5.2, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

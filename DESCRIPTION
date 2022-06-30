@@ -1,6 +1,6 @@
 Package: imcdatasets
-Version: 1.5.1
-Date: 2021-06-30
+Version: 1.5.2
+Date: 2022-07-04
 Title: Collection of publicly available imaging mass cytometry (IMC) datasets
 Description:
     The imcdatasets package provides access to publicly available IMC datasets.
@@ -40,11 +40,16 @@ Suggests:
     markdown,
     testthat
 biocViews:
-   ExperimentHub,
-   SingleCellData,
-   TechnologyData,
-   PackageTypeData,
-   Tissue
+    ExperimentData,
+    ExperimentHub,
+    SingleCellData,
+    SpatialData,
+    Homo_sapiens_Data,
+    ImmunoOncologyData,
+    TechnologyData,
+    PackageTypeData,
+    ReproducibleResearch,
+    Tissue
 VignetteBuilder: knitr
 URL: https://github.com/BodenmillerGroup/imcdatasets
 BugReports: https://github.com/BodenmillerGroup/imcdatasets/issues

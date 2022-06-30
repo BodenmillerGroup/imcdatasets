@@ -39,3 +39,7 @@ Changes in version 1.1.1 (2021-05-25):
 Changes in version 1.4.1 (2022-06-29):
 
 + Added deprecation note for .onLoad functions
+
+Changes in version 1.5.2 (2022-07-04):
+
++ Updated BiocViews and documentation
