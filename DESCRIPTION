@@ -20,7 +20,7 @@ Authors@R:
       person("Fischer", "Jana", role = c("ctb"),
         email = "jana.fischerg@dqbm.uzh.ch",
         comment = c(ORCID = "0000-0001-9047-8400")))
-License: GPL-3
+License: GPL-3 + file LICENSE
 NeedsCompilation: no
 Depends:
     R (>= 4.2),

@@ -6,6 +6,7 @@
 \usage{
 ZanotelliSpheroids2020Data(
   data_type = c("sce", "images", "masks"),
+  metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
   force = FALSE
@@ -15,6 +16,10 @@ ZanotelliSpheroids2020Data(
 \item{data_type}{type of data to load, should be \code{sce} for single cell 
 data, \code{images} for multichannel images or \code{masks} for cell 
 segmentation masks.}
+
+\item{metadata}{if FALSE (default), the data object selected in 
+\code{data_type} is returned. If TRUE, only the metadata associated to this
+object is returned.}
 
 \item{on_disk}{logical indicating if images in form of
 \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
@@ -44,18 +49,18 @@ generated from different cell lines.
 This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 consisting of three data objects:
 \itemize{
-    \item \code{images} contains 517 multichannel 
-    images, each containing 51 channels, in the form of a 
-    \linkS4class{CytoImageList} class object.
+    \item \code{images} contains 517 multichannel images, each containing 51 
+    channels, in the form of a \linkS4class{CytoImageList} class object.
     \item \code{masks} contains the cell segmentation
     masks associated with the images, in the form of a
     \linkS4class{CytoImageList} class object.
-    \item \code{sce} contains the single cell data
-    extracted from the images using the cell segmentation masks, as well as
-    the associated metadata, in the form of a
-    \linkS4class{SingleCellExperiment}. This represents a total of 229,047
-    cells x 51 channels.
+    \item \code{sce} contains the single cell data extracted from the 
+    multichannel images using the cell segmentation masks, as well as the 
+    associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
+     This represents a total of 229,047 cells x 51 channels.
 }
+
+All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables located in
 their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -93,8 +98,10 @@ Other relevant cell metadata include:
     \item \code{dist.other}: distance to the closest of the other spheroid
     sections in the same image (if there is any).
     \item \code{dist.bg}: distance to background pixels.
-    \item \code{counts_neighb}: contains arsinh-transformed counts, with cofactor 1.
-    \item \code{exprs_neighb}: contains arsinh-transformed counts, with cofactor 1.
+    \item \code{counts_neighb}: contains arsinh-transformed counts 
+    (cofactor = 1).
+    \item \code{exprs_neighb}: contains arsinh-transformed counts 
+    (cofactor 1).
 }
 For a full description of the other experimental variables, please refer to
 the publication (https://doi.org/10.15252/msb.20209798) and to the
@@ -122,12 +129,9 @@ contains a graph of cell neighbors, generated with the
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 21.2 Gb, 
-    size on disk = 881 Mb.
-    \item \code{`masks`}: size in memory = 426 Mb, 
-    size on disk = 11.6 Mb.
-    \item \code{`sce`}: size in memory = 584 Mb, size on
-    disk = 340 Mb.
+    \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
+    \item \code{`masks`}: size in memory = 426 Mb,  size on disk = 11.6 Mb.
+    \item \code{`sce`}: size in memory = 584 Mb, size on disk = 340 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory
@@ -142,12 +146,18 @@ Original link to raw data, also containing the entire dataset:
 https://doi.org/10.5281/zenodo.4271910
 }
 \examples{
+# Load single cell data
 sce <- ZanotelliSpheroids2020Data(data_type = "sce")
-sce
-images <- ZanotelliSpheroids2020Data(data_type = "images")
-head(images)
-masks <- ZanotelliSpheroids2020Data(data_type = "masks")
-head(masks)
+print(sce)
+
+# Display metadata
+ZanotelliSpheroids2020Data(data_type = "sce", metadata = TRUE)
+
+# Load masks on disk
+library(HDF5Array)
+masks <- ZanotelliSpheroids2020Data(data_type = "masks", on_disk = TRUE,
+h5FilesPath = getHDF5DumpDir())
+print(head(masks))
 
 }
 \references{

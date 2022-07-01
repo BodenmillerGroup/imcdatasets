@@ -5,12 +5,16 @@
 #' The data was obtained by imaging mass cytometry of tumour tissue from
 #' patients with breast cancer.
 #'
-#' @param data_type type of data to load, should be `sce` for single cell data,
-#' `images` for multichannel images or `masks` for cell segmentation masks.
+#' @param data_type type of object to load, should be `sce` for single cell
+#' data, `images` for multichannel images or `masks` for cell segmentation
+#' masks.
+#' @param metadata if FALSE (default), the data object selected in 
+#' \code{data_type} is returned. If TRUE, only the metadata associated to this
+#' object is returned.
 #' @param on_disk logical indicating if images in form of
 #' \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
-#' rather than in memory. This setting is valid when downloading \code{images} and
-#' \code{masks}.
+#' rather than in memory. This setting is valid when downloading \code{images}
+#' and \code{masks}.
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
@@ -27,12 +31,13 @@
 #'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{sce} contains the single cell data
-#'     extracted from the images using the cell segmentation masks, as well as
-#'     the associated metadata, in the form of a
-#'     \linkS4class{SingleCellExperiment}. This represents a total of 285,851
-#'     cells x 42 channels.
+#'     \item \code{sce} contains the single cell data extracted from the 
+#'     multichannel images using the cell segmentation masks, as well as the 
+#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
+#'      This represents a total of 285,851 cells x 42 channels.
 #' }
+#'
+#' All data are downloaded from ExperimentHub and cached for local re-use.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -73,12 +78,9 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 17.8 Gb, size
-#'     on disk = 1996 Mb.
-#'     \item \code{`masks`}: size in memory = 433 Mb, size
-#'     on disk = 10.2 Mb.
-#'     \item \code{`sce`}: size in memory = 517 Mb, size on
-#'     disk = 272 Mb.
+#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1.99 Gb.
+#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
+#'     \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -104,12 +106,19 @@
 #' \emph{Nature} 578(7796), 615-620.
 #'
 #' @examples
+#' # Load single cell data
 #' sce <- JacksonFischer2020Data(data_type = "sce")
-#' sce
-#' images <- JacksonFischer2020Data(data_type = "images")
-#' head(images)
-#' masks <- JacksonFischer2020Data(data_type = "masks")
-#' head(masks)
+#' print(sce)
+#' 
+#' # Display metadata
+#' JacksonFischer2020Data(data_type = "sce", metadata = TRUE)
+#' 
+#' # Load masks on disk
+#' library(HDF5Array)
+#' masks <- JacksonFischer2020Data(data_type = "masks", on_disk = TRUE,
+#' h5FilesPath = getHDF5DumpDir())
+#' print(head(masks))
+#' 
 #'
 #' @import cytomapper
 #' @import methods
@@ -117,72 +126,23 @@
 #' @importFrom utils read.csv
 #' @importFrom ExperimentHub ExperimentHub
 #' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom HDF5Array writeHDF5Array
+#' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-JacksonFischer2020Data <- function(data_type = c("sce", "images", "masks"),
-                                   on_disk = FALSE,
-                                   h5FilesPath = NULL,
-                                   force = FALSE) {
-    if(length(data_type) != 1) {
-      stop('The data_type argument should be of length 1.')
-    }
-
-    if(!(data_type %in% c("sce", "images", "masks"))) {
-      stop('The data_type argument should be "sce", "images" or "masks".')
-    }
-
-    if (on_disk) {
-        if (is.null(h5FilesPath)) {
-            stop("When storing the images on disk, please specify a 'h5FilesPath'. \n",
-                 "You can use 'h5FilesPath = getHDF5DumpDir()' to temporarily store the images.\n",
-                 "If doing so, .h5 files will be deleted once the R session ends.")
-        }
-    }
-
-    dataset_name = "JacksonFischer2020"
-    host <- file.path("imcdatasets", "jackson-fischer-2020")
-    eh <- ExperimentHub()
-
-    if (data_type == "sce") {
-      title <- paste(dataset_name, data_type, sep = "_")
-      object_id <- eh[eh$title == title]$ah_id
-      cur_dat <- eh[[object_id]]
-    } else if (data_type == "images") {
-      title <- paste(dataset_name, data_type, sep = "_")
-      object_id <- eh[eh$title == title]$ah_id
-      cur_dat <- eh[[object_id]]
-
-      if (on_disk) {
-          # Check if files exist
-          cur_files <- file.path(h5FilesPath, paste0(names(cur_dat), ".h5"))
-
-          if (all(file.exists(cur_files)) & !force) {
-              stop("All .h5 files already exist.",
-                   " Please specify 'force = TRUE' to overwrite existing files.")
-          }
-
-          cur_dat <- CytoImageList(cur_dat, on_disk = on_disk,
-                                   h5FilesPath = h5FilesPath)
-      }
-
-    } else if (data_type == "masks") {
-      title <- paste(dataset_name, data_type, sep = "_")
-      object_id <- eh[eh$title == title]$ah_id
-      cur_dat <- eh[[object_id]]
-
-      if (on_disk) {
-          # Check if files exist
-          cur_files <- file.path(h5FilesPath, paste0(names(cur_dat), ".h5"))
-
-          if (all(file.exists(cur_files)) & !force) {
-              stop("All .h5 files already exist.",
-                   " Please specify 'force = TRUE' to overwrite existing files.")
-          }
-
-          cur_dat <- CytoImageList(cur_dat, on_disk = on_disk,
-                                   h5FilesPath = h5FilesPath)
-      }
-
-    }
-    cur_dat
+JacksonFischer2020Data <- function (
+    data_type = c("sce", "images", "masks"),
+    metadata = FALSE,
+    on_disk = FALSE,
+    h5FilesPath = NULL,
+    force = FALSE
+) {
+    .checkArguments(data_type, metadata,
+                    on_disk, h5FilesPath, force)
+  
+    dataset_name <- "JacksonFischer2020"
+    host <- file.path("imcdatasets", "jacksonfischer-breastcancer-2020")
+  
+    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+                               on_disk, h5FilesPath, force)
 }

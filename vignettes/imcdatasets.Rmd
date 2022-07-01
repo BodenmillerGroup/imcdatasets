@@ -26,9 +26,11 @@ library(BiocStyle)
 ```
 
 ```{r library, echo=FALSE}
-library(cytomapper)
-library(SingleCellExperiment)
-library(imcdatasets)
+suppressPackageStartupMessages(c(
+  library(SingleCellExperiment),
+  library(cytomapper),
+  library(imcdatasets)
+))
 ```
 
 # Introduction

@@ -6,19 +6,25 @@
 \usage{
 DamondPancreas2019Data(
   data_type = c("sce", "images", "masks"),
+  metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
   force = FALSE
 )
 }
 \arguments{
-\item{data_type}{type of data to load, should be `sce` for single cell data,
-`images` for multichannel images or `masks` for cell segmentation masks.}
+\item{data_type}{type of object to load, should be `sce` for single cell
+data, `images` for multichannel images or `masks` for cell segmentation
+masks.}
+
+\item{metadata}{if FALSE (default), the data object selected in 
+\code{data_type} is returned. If TRUE, only the metadata associated to this
+object is returned.}
 
 \item{on_disk}{logical indicating if images in form of
 \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
-rather than in memory. This setting is valid when downloading \code{images} and
-\code{masks}.}
+rather than in memory. This setting is valid when downloading \code{images}
+and \code{masks}.}
 
 \item{h5FilesPath}{path to where the .h5 files for on disk representation
 are stored. This path needs to be defined when \code{on_disk = TRUE}.
@@ -48,12 +54,13 @@ consisting of three data objects:
     \item \code{masks} contains the cell segmentation
     masks associated with the images, in the form of a
     \linkS4class{CytoImageList} class object.
-    \item \code{sce} contains the single cell data
-    extracted from the images using the cell segmentation masks, as well as
-    the associated metadata, in the form of a
-    \linkS4class{SingleCellExperiment}. This represents a total of 252,059
-    cells x 38 channels.
+    \item \code{sce} contains the single cell data extracted from the 
+    multichannel images using the cell segmentation masks, as well as the 
+    associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
+     This represents a total of 252,059 cells x 38 channels.
 }
+
+All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables located in
 their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -111,12 +118,9 @@ The three donors present the following characteristics:
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 7.4 Gb, size
-    on disk = 1780 Mb.
-    \item \code{`masks`}: size in memory = 200.0 Mb, size
-    on disk = 8.6 Mb.
-    \item \code{`sce`}: size in memory = 248.6 Mb, size on
-    disk = 145 Mb.
+    \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.78 Gb.
+    \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.6 Mb.
+    \item \code{`sce`}: size in memory = 248 Mb, size on disk = 145 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory
@@ -131,12 +135,18 @@ Original link to raw data, also containing the entire dataset:
 https://data.mendeley.com/datasets/cydmwsfztj/2
 }
 \examples{
+# Load single cell data
 sce <- DamondPancreas2019Data(data_type = "sce")
-sce
-images <- DamondPancreas2019Data(data_type = "images")
-head(images)
-masks <- DamondPancreas2019Data(data_type = "masks")
-head(masks)
+print(sce)
+
+# Display metadata
+DamondPancreas2019Data(data_type = "sce", metadata = TRUE)
+
+# Load masks on disk
+library(HDF5Array)
+masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE,
+h5FilesPath = getHDF5DumpDir())
+print(head(masks))
 
 }
 \references{

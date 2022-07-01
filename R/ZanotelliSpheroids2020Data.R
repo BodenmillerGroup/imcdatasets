@@ -8,6 +8,9 @@
 #' @param data_type type of data to load, should be \code{sce} for single cell 
 #' data, \code{images} for multichannel images or \code{masks} for cell 
 #' segmentation masks.
+#' @param metadata if FALSE (default), the data object selected in 
+#' \code{data_type} is returned. If TRUE, only the metadata associated to this
+#' object is returned.
 #' @param on_disk logical indicating if images in form of
 #' \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
 #' rather than in memory. This setting is valid when downloading \code{images}
@@ -23,18 +26,18 @@
 #' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 #' consisting of three data objects:
 #' \itemize{
-#'     \item \code{images} contains 517 multichannel 
-#'     images, each containing 51 channels, in the form of a 
-#'     \linkS4class{CytoImageList} class object.
+#'     \item \code{images} contains 517 multichannel images, each containing 51 
+#'     channels, in the form of a \linkS4class{CytoImageList} class object.
 #'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
 #'     \linkS4class{CytoImageList} class object.
-#'     \item \code{sce} contains the single cell data
-#'     extracted from the images using the cell segmentation masks, as well as
-#'     the associated metadata, in the form of a
-#'     \linkS4class{SingleCellExperiment}. This represents a total of 229,047
-#'     cells x 51 channels.
+#'     \item \code{sce} contains the single cell data extracted from the 
+#'     multichannel images using the cell segmentation masks, as well as the 
+#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
+#'      This represents a total of 229,047 cells x 51 channels.
 #' }
+#'
+#' All data are downloaded from ExperimentHub and cached for local re-use.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
@@ -72,8 +75,10 @@
 #'     \item \code{dist.other}: distance to the closest of the other spheroid
 #'     sections in the same image (if there is any).
 #'     \item \code{dist.bg}: distance to background pixels.
-#'     \item \code{counts_neighb}: contains arsinh-transformed counts, with cofactor 1.
-#'     \item \code{exprs_neighb}: contains arsinh-transformed counts, with cofactor 1.
+#'     \item \code{counts_neighb}: contains arsinh-transformed counts 
+#'     (cofactor = 1).
+#'     \item \code{exprs_neighb}: contains arsinh-transformed counts 
+#'     (cofactor 1).
 #' }
 #' For a full description of the other experimental variables, please refer to
 #' the publication (https://doi.org/10.15252/msb.20209798) and to the
@@ -101,12 +106,9 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 21.2 Gb, 
-#'     size on disk = 881 Mb.
-#'     \item \code{`masks`}: size in memory = 426 Mb, 
-#'     size on disk = 11.6 Mb.
-#'     \item \code{`sce`}: size in memory = 584 Mb, size on
-#'     disk = 340 Mb.
+#'     \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
+#'     \item \code{`masks`}: size in memory = 426 Mb,  size on disk = 11.6 Mb.
+#'     \item \code{`sce`}: size in memory = 584 Mb, size on disk = 340 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -133,12 +135,18 @@
 #' \emph{Mol Syst Biol} 16(12), e9798.
 #'
 #' @examples
+#' # Load single cell data
 #' sce <- ZanotelliSpheroids2020Data(data_type = "sce")
-#' sce
-#' images <- ZanotelliSpheroids2020Data(data_type = "images")
-#' head(images)
-#' masks <- ZanotelliSpheroids2020Data(data_type = "masks")
-#' head(masks)
+#' print(sce)
+#'
+#' # Display metadata
+#' ZanotelliSpheroids2020Data(data_type = "sce", metadata = TRUE)
+#' 
+#' # Load masks on disk
+#' library(HDF5Array)
+#' masks <- ZanotelliSpheroids2020Data(data_type = "masks", on_disk = TRUE,
+#' h5FilesPath = getHDF5DumpDir())
+#' print(head(masks))
 #'
 #' @import cytomapper
 #' @import methods
@@ -150,70 +158,20 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-ZanotelliSpheroids2020Data <- function(data_type = c("sce", "images", "masks"),
-                                       on_disk = FALSE,
-                                       h5FilesPath = NULL,
-                                       force = FALSE) {
-    if(length(data_type) != 1) {
-        stop('The data_type argument should be of length 1.')
-    }
-
-    if(!(data_type %in% c("sce", "images", "masks"))) {
-        stop('The data_type argument should be "sce", "images" or "masks".')
-    }
-
-    if (on_disk) {
-        if (is.null(h5FilesPath)) {
-            stop("When storing the images on disk, please specify a 'h5FilesPath'. \n",
-                 "You can use 'h5FilesPath = getHDF5DumpDir()' to temporarily store the images.\n",
-                 "If doing so, .h5 files will be deleted once the R session ends.")
-        }
-    }
-
-    dataset_name = "ZanotelliSpheroids2020"
+ZanotelliSpheroids2020Data <- function (
+    data_type = c("sce", "images", "masks"),
+    metadata = FALSE,
+    on_disk = FALSE,
+    h5FilesPath = NULL,
+    force = FALSE
+) {
+  
+    .checkArguments(data_type, metadata,
+                    on_disk, h5FilesPath, force)
+  
+    dataset_name <- "ZanotelliSpheroids2020"
     host <- file.path("imcdatasets", "zanotelli-spheroids-2020")
-    eh <- ExperimentHub()
-
-    if (data_type == "sce") {
-        title <- paste(dataset_name, data_type, sep = "_")
-        object_id <- eh[eh$title == title]$ah_id
-        cur_dat <- eh[[object_id]]
-    } else if (data_type == "images") {
-        title <- paste(dataset_name, data_type, sep = "_")
-        object_id <- eh[eh$title == title]$ah_id
-        cur_dat <- eh[[object_id]]
-
-        if (on_disk) {
-            # Check if files exist
-            cur_files <- file.path(h5FilesPath, paste0(names(cur_dat), ".h5"))
-
-            if (all(file.exists(cur_files)) & !force) {
-                stop("All .h5 files already exist.",
-                     " Please specify 'force = TRUE' to overwrite existing files.")
-            }
-
-            cur_dat <- CytoImageList(cur_dat, on_disk = on_disk,
-                                     h5FilesPath = h5FilesPath)
-        }
-
-    } else if (data_type == "masks") {
-        title <- paste(dataset_name, data_type, sep = "_")
-        object_id <- eh[eh$title == title]$ah_id
-        cur_dat <- eh[[object_id]]
-
-        if (on_disk) {
-            # Check if files exist
-            cur_files <- file.path(h5FilesPath, paste0(names(cur_dat), ".h5"))
-
-            if (all(file.exists(cur_files)) & !force) {
-                stop("All .h5 files already exist.",
-                     " Please specify 'force = TRUE' to overwrite existing files.")
-            }
-
-            cur_dat <- CytoImageList(cur_dat, on_disk = on_disk,
-                                     h5FilesPath = h5FilesPath)
-        }
-
-    }
-    cur_dat
+  
+    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+                               on_disk, h5FilesPath, force)
 }
