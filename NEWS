@@ -40,8 +40,9 @@ Changes in version 1.4.1 (2022-06-29):
 
 + Added deprecation note for .onLoad functions
 
-Changes in version 1.5.2 (2022-06-30):
+Changes in version 1.5.2 (2022-07-04):
 
 + Updated wrapper functions
++ Updated test functions
 + Updated BiocViews and documentation
 + Added LICENSE file
