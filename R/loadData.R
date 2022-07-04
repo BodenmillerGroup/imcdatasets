@@ -1,6 +1,4 @@
-#' Argument check for wrapper functions
-#' @keywords internal
-#' @noRd
+# Argument check for wrapper functions
 .checkArguments <- function(
     data_type, metadata,
     on_disk, h5FilesPath, force
@@ -35,11 +33,7 @@
     }
 }
 
-#' Load data objects
-#' @importFrom cytomapper CytoImageList
-#' @importFrom ExperimentHub ExperimentHub
-#' @keywords internal
-#' @noRd
+# Load data objects
 .loadDataObject <- function(
     dataset_name, host,
     data_type, metadata,
