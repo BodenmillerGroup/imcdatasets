@@ -1,0 +1,96 @@
+---
+title: "Contribution guidelines and datasets format"
+date: "Created: 13 September, 2022; Compiled: `r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"
+author:
+- name: Nicolas Damond
+  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  email: nicolas.damond@dqbm.uzh.ch
+output:
+    BiocStyle::html_document:
+        toc_float: yes
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+vignette: >
+    %\VignetteIndexEntry{"Contributing guidelines and datasets format"}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo=FALSE}
+knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
+library(BiocStyle)
+```
+
+# **Introduction**
+
+This vignette describes the procedure to contribute new datasets to the `imcdatasets` package and how the datasets should be formatted.
+
+
+# **Contribution guidelines**
+
+Contributions or suggestions for new imaging mass cytometry (IMC) datasets to add to the `imcdatasets` package are always welcome. New datasets can be suggested by opening an issue at the `imcdatasets` [GitHub page](https://github.com/BodenmillerGroup/imcdatasets/issues). The only requirements are that the new dataset is publicly available and has been described in a published scientific article.
+
+Details about creating Bioconductor's `ExperimentHub` packages [is available here](https://bioconductor.org/packages/release/bioc/html/HubPub.html).
+
+
+## Create a data generation script
+
+The first step is to create a new branch at the `imcdatasets` [GitHub page](https://github.com/BodenmillerGroup/imcdatasets/branches).
+
+Then, create an R markdown (`.Rmd`) script in `.inst/scripts/` to generate the data objects:
+
+* Download single cell data, IMC images and cell segmentation masks.
+* Format the single cell data into a [SingleCellExperiment object](https://bioconductor.org/packages/SingleCellExperiment).
+* Format the images and masks into [CytoImageList objects](https://bioconductor.org/packages/CytoImageList).
+* Save the three data objects so that they can be uploaded to `ExperimentHub`.
+* The three data objects should be matched so that they are compatible with the [cytomapper package](https://bioconductor.org/packages/cytomapper) and can be matched as described in the [imcdatset vignette](https://www.bioconductor.org/packages/release/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html#5_Usage).
+
+The `.Rmd` script should be formatted in a similar way as existing scripts. Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/inst/scripts/make-Damond-2019-Pancreas.Rmd) and [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/inst/scripts/make-JacksonFischer-2020-BreastCancer.Rmd). Each step should be clearly and comprehensively documented.
+
+For usability of the package, the data objects should be formatted as described in the guidelines described in the `Dataset format` section below.
+
+
+## Update the documentation
+
+Other files the `imcdatasets` package should be updated to include the new dataset:
+
+* Make a new `./R/DatasetData.R` file with a function to load the new dataset and extensive documentation. Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/DamondPancreas2019Data.R) and [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/JacksonFischer2020Data.R).
+* Run roxygenize to generate `man` documentation files (go to the `imcdatasets` directory and run `roxygen2::roxygenise(".")`).
+* Update the `./inst/scripts/make-metadata.R` R script and run it. This will update the  `./inst/extdata/metadata.csv` file that contains information about datasets for `ExperimentHub`.
+* Add the reference of the paper that describes the dataset to the `./inst/scripts/ref.bib` file.
+* Add the new dataset to the `./inst/extdata/alldatasets.csv` file.
+* Add the new dataset to the dataset list in `./tests/testthat/test_loading.R`.
+
+
+## Open a pull request
+
+After these steps have been completed, open a pull request at the [imcdataset GitHub page](https://github.com/BodenmillerGroup/imcdatasets/pulls).
+
+The package maintainers will do the following:
+
+* Check the R markdown script for data generation.
+* Generate the data objects by knitting the R markdown script.
+* Make sure the data objects are well formatted and consistent with the other datasets.
+* Check all other modifications to the package.
+* Upload the data objects to `AWS S3` and announce the upload to bioconductor hubs.
+* Download the data objects from `ExperimentHub` and check the format again.
+* Update the `NEWS`, `DESCRIPTION` (add new contributor, version bump) and `README.md` (if needed) files.
+* Build and check the package, make sure it passes all R and Bioconductor checks.
+* Push to GitHub and check that the `imcdatasets` package can be installed from there.
+* Test the package functionality in R.
+* Once everything works, approve the pull request and merge with the master branch.
+
+Contributors will be recognized by having their names added to the DESCRIPTION file of the `imcdatasets` package.
+
+
+
+# **Dataset format**
+
+
+
+
+# **Session info** {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
