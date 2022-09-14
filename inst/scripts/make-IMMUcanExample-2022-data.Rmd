@@ -1,0 +1,63 @@
+---
+title: "Prepare single-cell data, images and masks from the IMMUcan example dataset"
+author: "Nils Eling"
+date: "Created: Sep 14, 2022; Compiled: `r BiocStyle::doc_date()`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+This script loads example data acquired by the [IMMUcan](https://immucan.eu/) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/6810879](https://zenodo.org/record/6810879).   
+
+Loading required R packages
+
+```{r libraries}
+library(SpatialExperiment)
+library(cytomapper)
+```
+
+Setting the working and output directories
+
+```{r directories}
+workdir <- tempdir()
+
+outdir <- file.path("..", "..", "inst", "extdata", "IMMUcanExample2022")
+if (!(dir.exists(outdir))) dir.create(outdir)
+```
+
+# Single-cell and imaging data
+
+Here, we will only download the already processed data and convert the spe into a sce object.
+
+```{r download data}
+options(timeout = 10000)
+download.file("https://zenodo.org/record/7079294/files/spe.rds", 
+              destfile = paste0(workdir, "spe.rds"))
+download.file("https://zenodo.org/record/7079294/files/images.rds", 
+              destfile = paste0(outdir, "/images.rds"))
+download.file("https://zenodo.org/record/7079294/files/masks.rds", 
+              destfile = paste0(outdir, "/masks.rds"))
+
+spe <- readRDS(paste0(workdir, "spe.rds"))
+sce <- as(spe, "SingleCellExperiment")
+colData(sce)$Pos_X <- spatialCoords(spe)[,"Pos_X"]
+colData(sce)$Pos_Y <- spatialCoords(spe)[,"Pos_Y"]
+
+saveRDS(sce, paste0(outdir, "/sce.rds"))
+
+unlink(paste0(workdir, "spe.rds"))
+```
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```

@@ -68,6 +68,25 @@ df_list <- list(
                             c("sce.rds", "images.rds", "masks.rds")),
       DataType = c("sce", "images", "masks"),
       Notes = c("","","")
+    ),
+    
+    # IMMUcanExample2022
+    data.frame(
+        Title = sprintf("IMMUcanExample2022_%s", c("sce", "images", "masks")),
+        FunctionCall = sprintf("IMMUcanExample2022Data(data_type = '%s",
+                               c("sce')", "images')", "masks')")),
+        Description = sprintf(
+            "%s for the IMMUcanExample2022 imaging mass cytometry dataset",
+            c("Single cell data", "Multichannel images", "Cell masks")),
+        BiocVersion = rep("3.16", 3),
+        SourceType = rep("RDS", 3),
+        SourceUrl = rep("https://zenodo.org/record/6810879", 3),
+        SourceVersion = "Sep 14 2022",
+        RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
+        RDataPath = file.path("imcdatasets", "immucan-example-2022",
+                              c("sce.rds", "images.rds", "masks.rds")),
+        DataType = c("sce", "images", "masks"),
+        Notes = c("","","")
     )
 )
 

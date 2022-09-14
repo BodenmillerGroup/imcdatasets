@@ -24,7 +24,8 @@ check_intersect <- function(sce, img, msk) {
 datasets <- list(
     "DamondPancreas2019Data",
     "JacksonFischer2020Data",
-    "ZanotelliSpheroids2020Data"
+    "ZanotelliSpheroids2020Data",
+    "IMMUcanExample2022"
 )
 
 testDatasetWorks <- function(x) {

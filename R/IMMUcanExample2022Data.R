@@ -1,0 +1,164 @@
+#'Obtain the immucan-example-2022 dataset
+#'
+#'Obtain the immucan-example-2022 dataset, which consists of three data objects:
+#'single cell data, multichannel images and cell segmentation masks. The data
+#'were obtained by imaging mass cytometry of sections of 4 patients with
+#'different tumor indications.
+#'
+#'@param data_type type of data to load, should be \code{sce} for single cell
+#'  data, \code{images} for multichannel images or \code{masks} for cell
+#'  segmentation masks.
+#'@param metadata if FALSE (default), the data object selected in
+#'  \code{data_type} is returned. If TRUE, only the metadata associated to this
+#'  object is returned.
+#'@param on_disk logical indicating if images in form of \linkS4class{HDF5Array}
+#'  objects (as .h5 files) should be stored on disk rather than in memory. This
+#'  setting is valid when downloading \code{images} and \code{masks}.
+#'@param h5FilesPath path to where the .h5 files for on disk representation are
+#'  stored. This path needs to be defined when \code{on_disk = TRUE}. When files
+#'  should only temporarily be stored on disk, please set \code{h5FilesPath =
+#'  getHDF5DumpDir()}
+#'@param force logical indicating if images should be overwritten when files
+#'  with the same name already exist on disk.
+#'
+#'@details This is an Imaging Mass Cytometry (IMC) dataset used in the
+#'\href{https://bodenmillergroup.github.io/IMCDataAnalysis/}{IMC data analysis
+#'book} \itemize{ \item \code{images} contains 14 multichannel images, each
+#'containing 50 channels, in the form of a \linkS4class{CytoImageList} class
+#'object. \item \code{masks} contains the cell segmentation masks associated
+#'with the images, in the form of a \linkS4class{CytoImageList} class object.
+#'\item \code{sce} contains the single cell data extracted from the multichannel
+#'images using the cell segmentation masks, as well as the associated metadata,
+#'in the form of a \linkS4class{SingleCellExperiment}. This represents a total
+#'of 46,825 cells x 40 channels. }
+#'
+#'All data are downloaded from ExperimentHub and cached for local re-use.
+#'
+#'Mapping between the three data objects is performed via variables located in
+#'their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
+#'objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
+#'object. Mapping at the image level can be performed with the \code{sample_id}
+#'variables. Mapping between cell segmentation masks and single cell data is
+#'performed with the \code{ObjectNumber} variable, the values of which
+#'correspond to the intensity values of the \code{IMMUcanExample2022_masks}
+#'object. For practical examples, please refer to the "Accessing IMC datasets"
+#'vignette.
+#'
+#'This imaging mass cytometry dataset serves as an example to demonstrate
+#'downstream analysis tools including spatial data analysis. The data was
+#'generated as part of the Integrated iMMUnoprofiling of large adaptive CANcer
+#'patient cohorts (IMMUcan) project (\href{immucan.eu}{immucan.eu}) using the
+#'Hyperion imaging system.
+#'
+#'Relevant entries to the \code{colData} slot are as follows:
+#'
+#'\itemize{
+#'\item \code{sample_id} image name  
+#'\item \code{ObjectNumber} cell identifier       
+#'\item \code{width_px} width of the image
+#'\item \code{height_px} height of the image
+#'\item \code{patient_id} patient identifier       
+#'\item \code{ROI} region of interest identifier
+#'\item \code{indication} cancer type
+#'\item \code{cell_labels} labels of manually labelled cells
+#'\item \code{celltype} cell type as defined by classification
+#'\item \code{spatial_community} identifiers of each spatial tumor or non-tumor 
+#'community
+#'\item \code{cn_celltypes} cellular neighborhoods as defined by clustering 
+#'cells based on the frequency of neighboring cell types
+#'\item \code{cn_expression} cellular neighborhoods as defined by clustering 
+#'cells based on the mean expression of neighboring cells
+#'\item \code{lisa_clusters} cellular neighborhoods as detected by the lisaClust
+#'package
+#'\item \code{spatial_context} spatial contexts defined on the \code{cn_celltype}
+#'\item \code{spatial_context_filtered} filtered spatial context identifiers
+#'\item \code{patch_id} identifier of the spatial tumor patch
+#'\item \code{Pos_X} spatial x coordinate 
+#'\item \code{Pos_Y} spatial y coordinate
+#'}
+#'
+#'The marker-associated metadata, including antibody information and metal tags
+#'are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
+#'object. 
+#'
+#'The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
+#'contains two assays: 
+#'
+#'\itemize{ 
+#'\item \code{counts}: mean ion counts per cell
+#'\item \code{exprs}: arsinh-transformed counts per cell, with cofactor 1. 
+#'}
+#'
+#'The \code{colPair} slot of the \linkS4class{SingleCellExperiment} object
+#'contains the following spatial object graphs:
+#'
+#'\itemize{
+#'\item \code{neighborhood} steinbock generated graph
+#'\item \code{knn_interaction_graph} 20-nearest neighbor graph
+#'\item \code{expansion_interaction_graph} expansion graph using a threshold of 20
+#'\item \code{delaunay_interaction_graph} interaction graph constructed by 
+#'delaunay triangulation
+#'\item \code{knn_spatialcontext_graph} 40-nearest neighbor graph
+#'}
+#'
+#'File sizes: 
+#'
+#'\itemize{ 
+#'\item \code{`images`}: size in memory = 1.6 Gb,  size on disk = 823 Mb. \item
+#'\code{`masks`}: size in memory = 426 Mb,  size on disk = 1.2 Mb. \item
+#'\code{`sce`}: size in memory = 188 Mb, size on disk = 84 Mb.
+#'}
+#'
+#'When storing images on disk, these need to be first fully read into memory
+#'before writing them to disk. This means the process of downloading the data is
+#'slower than directly keeping them in memory. However, downstream analysis will
+#'lose its memory overhead when storing images on disk.
+#'
+#'
+#'@return A \linkS4class{SingleCellExperiment} object with single cell data, a
+#'  \linkS4class{CytoImageList} object containing multichannel images, or a
+#'  \linkS4class{CytoImageList} object containing cell segmentation masks.
+#'
+#'@author Nils Eling
+#'
+#' @examples
+#' # Load single cell data
+#' sce <- IMMUcanExample2022Data(data_type = "sce")
+#' print(sce)
+#'
+#' # Display metadata
+#' IMMUcanExample2022Data(data_type = "sce", metadata = TRUE)
+#'
+#' # Load masks on disk
+#' library(HDF5Array)
+#' masks <- IMMUcanExample2022Data(data_type = "masks", on_disk = TRUE,
+#' h5FilesPath = getHDF5DumpDir())
+#' print(head(masks))
+#'
+#'@import cytomapper
+#'@import methods
+#'@importFrom utils download.file
+#'@importFrom utils read.csv
+#'@importFrom ExperimentHub ExperimentHub
+#'@importFrom SingleCellExperiment SingleCellExperiment
+#'@importFrom HDF5Array writeHDF5Array
+#'@importFrom DelayedArray DelayedArray
+#'
+#'@export
+IMMUcanExample2022Data <- function (
+    data_type = c("sce", "images", "masks"),
+    metadata = FALSE,
+    on_disk = FALSE,
+    h5FilesPath = NULL,
+    force = FALSE
+) {
+  
+    .checkArguments(data_type, metadata,
+                    on_disk, h5FilesPath, force)
+  
+    dataset_name <- "IMMUcanExample2022"
+    host <- file.path("imcdatasets", "immucan-example-2020")
+  
+    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+                               on_disk, h5FilesPath, force)
+}
