@@ -40,7 +40,7 @@ datasets generated using imaging mass cytometry (IMC) [@giesen2014imc].
 
 IMC is a technology that enables measurement of up to 50 markers from tissue
 sections at a resolution of 1 $\mu m$ @giesen2014imc. In classical processing
-pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline),
+pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) or [steinbock](https://bodenmillergroup.github.io/steinbock/latest/), 
 the multichannel images are segmented to generate cells masks. These masks are
 then used to extract single cell features from the multichannel images.  
 
@@ -77,21 +77,21 @@ Imaging Mass Cytometry_ [@damond2019pancreas].
 __Importing single-cell expression data and metadata__
 
 ```{r import-dataset}
-sce <- DamondPancreas2019Data(data_type = "sce")
+sce <- Damond_2019_Pancreas(data_type = "sce")
 sce
 ```
 
 __Importing multichannel images__
 
 ```{r import-images}
-images <- DamondPancreas2019Data(data_type = "images")
+images <- Damond_2019_Pancreas(data_type = "images")
 images
 ```
 
 __Importing cell segmentation masks__
 
 ```{r import-masks}
-masks <- DamondPancreas2019Data(data_type = "masks")
+masks <- Damond_2019_Pancreas(data_type = "masks")
 masks
 ```
 
@@ -110,8 +110,8 @@ where images/masks will be stored as .h5 files:
 # Create temporary location
 cur_path <- tempdir()
 
-masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE,
-                                h5FilesPath = cur_path)
+masks <- Damond_2019_Pancreas(data_type = "masks", on_disk = TRUE,
+                              h5FilesPath = cur_path)
 masks
 ```
 
@@ -120,15 +120,15 @@ masks
 Additional information about each dataset is available in the help page:
 
 ```{r function-help}
-?DamondPancreas2019Data
+?Damond_2019_Pancreas
 ```
 
 The metadata associated with a specific data object can be displayed as follows:
 
 ```{r access-metadata, eval = FALSE}
-DamondPancreas2019Data(data_type = "sce", metadata = TRUE)
-DamondPancreas2019Data(data_type = "images", metadata = TRUE)
-DamondPancreas2019Data(data_type = "masks", metadata = TRUE)
+Damond_2019_Pancreas(data_type = "sce", metadata = TRUE)
+Damond_2019_Pancreas(data_type = "images", metadata = TRUE)
+Damond_2019_Pancreas(data_type = "masks", metadata = TRUE)
 ```
 
 # Usage
@@ -173,7 +173,7 @@ The `masks` and `sce` objects can be combined to display cell-level data.
 ```{r usage-cell}
 plotCells(
     cur_masks, object = sce,
-    img_id = "ImageNumber", cell_id = "CellNumber",
+    img_id = "image_number", cell_id = "cell_number",
     colour_by = c("CD8a", "PIN"),
     exprs_values = "exprs"
 )
@@ -187,12 +187,12 @@ Cell information can be displayed on top of images by combining the `images`,
 ```{r usage-outline}
 plotPixels(
     cur_images, mask = cur_masks, object = sce,
-    img_id = "ImageNumber", cell_id = "CellNumber",
+    img_id = "image_number", cell_id = "cell_number",
     outline_by = "CellType",
-    colour_by = c("H3", "CD99", "CDH"),
+    colour_by = c("H3", "CD99", "CDH1"),
     bcg = list(
         CD99 = c(0,2,1),
-        CDH = c(0,8,1),
+        CDH1 = c(0,8,1),
         H3 = c(0,5,1)
     )
 )

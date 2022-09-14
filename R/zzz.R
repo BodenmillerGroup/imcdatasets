@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
     .Deprecated(
         msg = ".onLoad functions will be deprecated, please use wrapper
-        functions instead, e.g. 'JacksonFischer2020Data(data_type = 'sce')'
+        functions instead, e.g. 'JacksonFischer_2020_BreastCancer(data_type = 'sce')'
         rather than 'JacksonFischer2020_sce()'"
     )
 
