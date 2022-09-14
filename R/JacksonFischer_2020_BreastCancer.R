@@ -1,11 +1,9 @@
-#' Obtain the jackson-fischer-2020 dataset
+#' Obtain the JacksonFischer-2020-BreastCancer dataset
 #'
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{JacksonFischer_2020_BreastCancer}.
-#' Obtain the jackson-fischer-2020 dataset, which consists of three data
-#' objects: single cell data, multichannel images and cell segmentation masks.
-#' The data was obtained by imaging mass cytometry of tumour tissue from
+#' Obtain the JacksonFischer-2020-BreastCancer dataset, which consists of three 
+#' data objects: single cell data, multichannel images and cell segmentation 
+#' masks.
+#' The data was obtained by imaging mass cytometry (IMC) of tumour tissue from
 #' patients with breast cancer.
 #'
 #' @param data_type type of object to load, should be `sce` for single cell
@@ -26,9 +24,6 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{JacksonFischer_2020_BreastCancer}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 #' (2020), consisting of three data objects:
 #' \itemize{
@@ -49,11 +44,11 @@
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
 #' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
 #' object. Mapping at the image level can be performed with the
-#' \code{ImageNb} variable. Mapping between cell segmentation masks and single
-#' cell data is performed with the \code{CellNb} variable, the values of which
-#' correspond to the intensity values of the \code{JacksonFischer2020_masks}
-#' object. For practical examples, please refer to the "Accessing IMC datasets"
-#' vignette.
+#' \code{image_name} variable. Mapping between cell segmentation masks and
+#' single cell data is performed with the \code{cell_number} variable, the 
+#' values of which correspond to the intensity values of the 
+#' \code{masks} object. For practical examples, please refer 
+#' to the "Accessing IMC datasets" vignette.
 #'
 #' This dataset is a subset of the complete Jackson, Fischer et al. (2020)
 #' dataset comprising the data from tumour tissue from 100 patients with breast
@@ -74,13 +69,13 @@
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. These metadata include clusters
-#' (in \code{colData(sce)$PhenoGraphBasel}) and metaclusters (in
-#' \code{colData(sce)$metacluster}), as well as spatial information (e.g., cell
-#' areas are stored in \code{colData(sce)$Area}).
+#' (in \code{colData(sce)$cell_cluster_phenograph}) and metaclusters (in
+#' \code{colData(sce)$cell_metacluster}), as well as spatial information (e.g., 
+#' cell areas are stored in \code{colData(sce)$cell_area}).
 #'
-#' The patient-associated clinical data are also stored in the \code{colData} of
-#' the \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
-#' can be retrieved with \code{colData(sce)$grade}.
+#' The clinical data are also stored in the \code{colData} of the 
+#' \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
+#' can be retrieved with \code{colData(sce)$tumor_grade}.
 #'
 #' File sizes:
 #' \itemize{
@@ -113,16 +108,16 @@
 #'
 #' @examples
 #' # Load single cell data
-#' sce <- JacksonFischer2020Data(data_type = "sce")
+#' sce <- JacksonFischer_2020_BreastCancer(data_type = "sce")
 #' print(sce)
 #' 
 #' # Display metadata
-#' JacksonFischer2020Data(data_type = "sce", metadata = TRUE)
+#' JacksonFischer_2020_BreastCancer(data_type = "sce", metadata = TRUE)
 #' 
 #' # Load masks on disk
 #' library(HDF5Array)
-#' masks <- JacksonFischer2020Data(data_type = "masks", on_disk = TRUE,
-#' h5FilesPath = getHDF5DumpDir())
+#' masks <- JacksonFischer_2020_BreastCancer(data_type = "masks", on_disk = 
+#' TRUE, h5FilesPath = getHDF5DumpDir())
 #' print(head(masks))
 #' 
 #'
@@ -136,19 +131,18 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-JacksonFischer2020Data <- function (
+JacksonFischer_2020_BreastCancer <- function (
     data_type = c("sce", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
     force = FALSE
 ) {
-    .Deprecated("JacksonFischer_2020_BreastCancer()")
     .checkArguments(data_type, metadata,
                     on_disk, h5FilesPath, force)
   
-    dataset_name <- "JacksonFischer2020"
-    host <- file.path("imcdatasets", "jacksonfischer-breastcancer-2020")
+    dataset_name <- "JacksonFischer_2020_BreastCancer"
+    host <- file.path("imcdatasets", "JacksonFischer-2020-BreastCancer")
   
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
                                on_disk, h5FilesPath, force)
