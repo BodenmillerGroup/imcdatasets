@@ -2,7 +2,7 @@ Changes in version 0.1.0 (2020-11-02):
 
 + Initial commit
 + Creation of the imcdatasets package
-+ Added the damond-pancreas-2019 dataset
++ Added data from Damond et al (2019) Cell Metab 29(3):755-768
 
 Changes in version 0.99.0 (2020-11-12):
 
@@ -13,7 +13,7 @@ Changes in version 0.99.0 (2020-11-12):
 
 Changes in version 0.99.6 (2021-03-23):
 
-+ Added data from Jackson, Fischer et al. Nature 578,615–620(2020)
++ Added data from Jackson, Fischer et al (2020) Nature 578:615–620
 
 Changes in version 0.99.7 (2021-03-24):
 
@@ -26,7 +26,7 @@ Changes in version 0.99.8 (2021-04-15):
 
 Changes in version 0.99.9 (2021-04-20):
 
-+ Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
++ Added data from Zanotelli et al (2020) Mol Syst Biol 16:e9798
 
 Changes in version 1.0.0 (2021-05-19):
 
@@ -46,3 +46,12 @@ Changes in version 1.5.2 (2022-07-04):
 + Updated test functions
 + Updated BiocViews and documentation
 + Added LICENSE file
+
+Changes in version 1.5.3 (2022-09-27):
+
++ Updated all datasets to have consistent object formatting.
++ Uploaded the updated datasets to ExperimentHub.
++ Updated dataset loading functions.
++ Added dataset versioning.
++ New vignette with guidelines for contribution and dataset formatting.
++ Deprecation notes for old datasets and associated loading functions.
