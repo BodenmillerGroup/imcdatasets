@@ -3,11 +3,11 @@
     data_type, metadata, version, available_versions,
     on_disk, h5FilesPath, force
 ) {
-    if(length(data_type) != 1) {
+    if (length(data_type) != 1) {
         stop('The data_type argument should be of length 1.')
     }
   
-    if(!(data_type %in% c("sce", "images", "masks"))) {
+    if (!(data_type %in% c("sce", "images", "masks"))) {
         stop('The data_type argument should be "sce", "images" or "masks".')
     }
   
@@ -15,11 +15,11 @@
         stop('"metadata" should be either TRUE or FALSE')
     }
   
-    if(length(version) != 1) {
+    if (length(version) != 1) {
         stop('The version argument should be of length 1.')
     }
   
-    if(!version %in% available_versions)) {
+    if (!(version %in% available_versions)) {
         stop('"version" should be "latest" or one of the available dataset
             versions, e.g., "v1".')
     }
