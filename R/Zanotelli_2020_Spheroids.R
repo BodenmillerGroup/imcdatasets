@@ -18,7 +18,8 @@
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
-#' \code{h5FilesPath = getHDF5DumpDir()}
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
@@ -107,6 +108,14 @@
 #' object are represented by unique integers that map to the 
 #' \code{cell_number_absolute} column of \code{colData(sce)}.
 #' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved. The original version 
+#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
+#' \code{ZanotelliSpheroids2020Data} function.
+#' \itemize{
+#'     \item \code{`v1`}: first version of the dataset.
+#' }
+#' 
 #' File sizes:
 #' \itemize{
 #'     \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
@@ -166,15 +175,21 @@ Zanotelli_2020_Spheroids <- function (
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
+    version = "latest",
     force = FALSE
 ) {
-  
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
+    available_versions <- c("v1")
     dataset_name <- "Zanotelli_2020_Spheroids"
-    host <- file.path("imcdatasets", "Zanotelli-2020-Spheroids")
+    dataset_version = ifelse(version == "latest",
+        tail(available_versions, n=1), version)
+    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
+    host <- file.path("imcdatasets", dataset_path)
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
   
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+        on_disk, h5FilesPath, force)
+    
+    return(cur_dat)
 }

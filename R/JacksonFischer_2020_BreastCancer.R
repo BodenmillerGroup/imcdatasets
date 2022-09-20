@@ -19,7 +19,8 @@
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
-#' \code{h5FilesPath = getHDF5DumpDir()}
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
@@ -76,6 +77,14 @@
 #' The clinical data are also stored in the \code{colData} of the 
 #' \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
 #' can be retrieved with \code{colData(sce)$tumor_grade}.
+#' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved. The original version 
+#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
+#' \code{JacksonFischer2020Data} function.
+#' \itemize{
+#'     \item \code{`v1`}: first version of the dataset.
+#' }
 #'
 #' File sizes:
 #' \itemize{
@@ -136,14 +145,21 @@ JacksonFischer_2020_BreastCancer <- function (
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
+    version = "latest",
     force = FALSE
 ) {
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
+    available_versions <- c("v1")
     dataset_name <- "JacksonFischer_2020_BreastCancer"
-    host <- file.path("imcdatasets", "JacksonFischer-2020-BreastCancer")
-  
+    dataset_version = ifelse(version == "latest",
+        tail(available_versions, n=1), version)
+    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
+    host <- file.path("imcdatasets", dataset_path)
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
+    
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+        on_disk, h5FilesPath, force)
+    
+    return(cur_dat)
 }

@@ -1,6 +1,6 @@
 # Argument check for wrapper functions
 .checkArguments <- function(
-    data_type, metadata,
+    data_type, metadata, version, available_versions,
     on_disk, h5FilesPath, force
 ) {
     if(length(data_type) != 1) {
@@ -13,6 +13,15 @@
   
     if (!(isTRUE(metadata) | isFALSE(metadata))) {
         stop('"metadata" should be either TRUE or FALSE')
+    }
+  
+    if(length(version) != 1) {
+        stop('The version argument should be of length 1.')
+    }
+  
+    if(!version %in% available_versions)) {
+        stop('"version" should be "latest" or one of the available dataset
+            versions, e.g., "v1".')
     }
   
     if (!(isTRUE(on_disk) | isFALSE(on_disk))) {
@@ -61,7 +70,24 @@
             "Please specify 'force = TRUE' to overwrite existing files.")
         }
         cur_dat <- CytoImageList(cur_dat, on_disk = on_disk,
-                                 h5FilesPath = h5FilesPath)
+            h5FilesPath = h5FilesPath)
     }
     return(cur_dat)
 }
+
+# # Convert SCE to SPE
+# .SCEtoSPE <- function(sce, dataset_name) {
+#     # Load the SCE object
+#     eh <- ExperimentHub()
+#     title <- paste(dataset_name, "sce", sep = "_")
+#     object_id <- eh[eh$title == title]$ah_id
+#     spe <- eh[[object_id]]
+#     
+#     # Convert to SPE
+#     spe <- as(spe, "SpatialExperiment")
+#     spe$sample_id <- spe$image_number
+#     spatialCoords(spe) <- as.matrix(
+#         colData(spe)[, c("cell_x", "cell_y")])
+#     spe$cell_x <- NULL
+#     spe$cell_y <- NULL
+# }

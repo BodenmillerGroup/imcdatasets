@@ -22,12 +22,14 @@ df_list <- list(
           "%s for the Damond_2019_Pancreas imaging mass cytometry dataset",
           c("Single cell data", "Multichannel images", "Cell masks")),
       BiocVersion = rep("3.16", 3),
+      DatasetVersion = rep("v1", 3),
       SourceType = rep("Zip", 3),
       SourceUrl = rep("http://dx.doi.org/10.17632/cydmwsfztj.2", 3),
       SourceVersion = "Apr 04 2020",
       RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-      RDataPath = file.path("imcdatasets", "Damond-2019-Pancreas",
-                            c("sce.rds", "images.rds", "masks.rds")),
+      RDataPath = file.path(
+        "imcdatasets", "Damond_2019_Pancreas_v1",
+        c("sce.rds", "images.rds", "masks.rds")),
       DataType = c("sce", "images", "masks"),
       Notes = c("","","")
     ),
@@ -43,12 +45,14 @@ df_list <- list(
           dataset",
           c("Single cell data", "Multichannel images", "Cell masks")),
       BiocVersion = rep("3.16", 3),
+      DatasetVersion = rep("v1", 3),
       SourceType = rep("Zip", 3),
       SourceUrl = rep("https://doi.org/10.5281/zenodo.3518284", 3),
       SourceVersion = "Nov 04 2019",
       RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-      RDataPath = file.path("imcdatasets", "JacksonFischer-2020-BreastCancer",
-                            c("sce.rds", "images.rds", "masks.rds")),
+      RDataPath = file.path(
+        "imcdatasets", "JacksonFischer_2020_BreastCancer_v1",
+        c("sce.rds", "images.rds", "masks.rds")),
       DataType = c("sce", "images", "masks"),
       Notes = c("","","")
     ),
@@ -63,12 +67,14 @@ df_list <- list(
           "%s for the Zanotelli_2020_Spheroids imaging mass cytometry dataset",
           c("Single cell data", "Multichannel images", "Cell masks")),
       BiocVersion = rep("3.16", 3),
+      DatasetVersion = rep("v1", 3),
       SourceType = rep("Zip", 3),
       SourceUrl = rep("https://zenodo.org/record/4271910#.YGWR_T8kz-i", 3),
       SourceVersion = "Aug 20 2020",
       RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-      RDataPath = file.path("imcdatasets", "Zanotelli-2020-Spheroids",
-                            c("sce.rds", "images.rds", "masks.rds")),
+      RDataPath = file.path(
+        "imcdatasets", "Zanotelli_2020_Spheroids_v1",
+        c("sce.rds", "images.rds", "masks.rds")),
       DataType = c("sce", "images", "masks"),
       Notes = c("","","")
     )
