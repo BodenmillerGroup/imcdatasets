@@ -1,7 +1,7 @@
-\name{DamondPancreas2019}
-\alias{DamondPancreas2019_sce}
-\alias{DamondPancreas2019_images}
-\alias{DamondPancreas2019_masks}
+\name{DamondPancreas2019-deprecated}
+\alias{DamondPancreas2019_sce-deprecated}
+\alias{DamondPancreas2019_images-deprecated}
+\alias{DamondPancreas2019_masks-deprecated}
 \docType{data}
 \title{Deprecated function - 'DamondPancreas2019' dataset}
 \description{
@@ -16,17 +16,18 @@ This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 consisting of three data objects. Note: The following functions are deprecated 
 and will be made defunct; use the replacements indicated below:
 \itemize{
-    \item{DamondPancreas2019_images -> \code{\link{DamondPancreas2019Data}}}
-    contains a hundred 38-channel images in the form of a
-    \linkS4class{CytoImageList} class object.
-    \item{DamondPancreas2019_masks -> \code{\link{DamondPancreas2019Data}}}
-    contains the cell segmentation masks associated with the images, in the
-    form of a \linkS4class{CytoImageList} class object.
-    \item{DamondPancreas2019_sce -> \code{\link{DamondPancreas2019Data}}}
-    contains the single cell data extracted from the images using the cell 
-    segmentation masks, as well as the associated metadata, in the form of a 
-    \linkS4class{SingleCellExperiment}. This represents a total of 252,059 
-    cells x 38 channels.
+    \item{DamondPancreas2019_images -> 
+    \code{\link{Damond_2019_Pancreas}}} contains a hundred 38-channel images in 
+    the form of a \linkS4class{CytoImageList} class object.
+    \item{DamondPancreas2019_masks -> 
+    \code{\link{Damond_2019_Pancreas}}} contains the cell segmentation masks 
+    associated with the images, in the form of a \linkS4class{CytoImageList} 
+    class object.
+    \item{DamondPancreas2019_sce -> 
+    \code{\link{Damond_2019_Pancreas}}} contains the single cell data extracted 
+    from the images using the cellsegmentation masks, as well as the associated 
+    metadata, in the form of a \linkS4class{SingleCellExperiment}. This 
+    represents a total of 252,059 cells x 38 channels.
 }
 
 All data are downloaded from ExperimentHub and cached for local re-use.  

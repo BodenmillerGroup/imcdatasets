@@ -1,7 +1,7 @@
-\name{ZanotelliSpheroids2020}
-\alias{ZanotelliSpheroids2020_sce}
-\alias{ZanotelliSpheroids2020_images}
-\alias{ZanotelliSpheroids2020_masks}
+\name{ZanotelliSpheroids2020-deprecated}
+\alias{ZanotelliSpheroids2020_sce-deprecated}
+\alias{ZanotelliSpheroids2020_images-deprecated}
+\alias{ZanotelliSpheroids2020_masks-deprecated}
 \docType{data}
 \title{Deprecated function - `ZanotelliSpheroids2020` dataset}
 \description{
@@ -18,15 +18,15 @@ consisting of three data objects. Note: The following functions are deprecated
 and will be made defunct; use the replacements indicated below:
 \itemize{
     \item{ZanotelliSpheroids2020_images -> 
-    \code{\link{ZanotelliSpheroids2020Data}}} contains 517 multichannel images, 
+    \code{\link{Zanotelli_2020_Spheroids}}} contains 517 multichannel images, 
     each containing 51 channels, in the form of a \linkS4class{CytoImageList} 
     class object.
     \item{ZanotelliSpheroids2020_masks -> 
-    \code{\link{ZanotelliSpheroids2020Data}}} contains the cell segmentation
+    \code{\link{Zanotelli_2020_Spheroids}}} contains the cell segmentation
     masks associated with the images, in the form of a 
     \linkS4class{CytoImageList} class object.
     \item{ZanotelliSpheroids2020_sce -> 
-    \code{\link{ZanotelliSpheroids2020Data}}} contains the single cell data 
+    \code{\link{Zanotelli_2020_Spheroids}}} contains the single cell data 
     extracted from the images using the cell segmentation masks, as well as the 
     associated metadata, in the form of a \linkS4class{SingleCellExperiment}. 
     This represents a total of 229,047 cells x 51 channels.

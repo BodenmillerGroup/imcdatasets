@@ -1,12 +1,9 @@
-#' Obtain the zanotelli-spheroids-2020 dataset
+#' Obtain the Zanotelli-2020-Spheroids dataset
 #'
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Zanotelli_2020_Spheroids}.
-#' Obtain the zanotelli-spheroids-2020 dataset, which consists of three data
+#' Obtain the Zanotelli-2020-Spheroids dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
-#' The data were obtained by imaging mass cytometry of sections of 3D spheroids
-#' generated from different cell lines.
+#' The data were obtained by imaging mass cytometry (IMC) of sections of 3D
+#' spheroids generated from different cell lines.
 #'
 #' @param data_type type of data to load, should be \code{sce} for single cell 
 #' data, \code{images} for multichannel images or \code{masks} for cell 
@@ -21,14 +18,12 @@
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
-#' \code{h5FilesPath = getHDF5DumpDir()}
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Zanotelli_2020_Spheroids}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 #' consisting of three data objects:
 #' \itemize{
@@ -49,42 +44,39 @@
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
 #' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
 #' object. Mapping at the image level can be performed with the
-#' \code{ImageName} or \code{ImageNumber} variables. Mapping between cell
+#' \code{image_name} or \code{image_number} variables. Mapping between cell
 #' segmentation masks and single cell data is performed with the
-#' \code{CellNumber} variable, the values of which correspond to the intensity
-#' values of the \code{ZanotelliSpheroids2020_masks} object. For practical
-#' examples, please refer to the "Accessing IMC datasets" vignette.
+#' \code{cell_number} variable, the values of which correspond to the intensity
+#' values of the \code{masks} object. For practical examples, please refer to 
+#' the "Accessing IMC datasets" vignette.
 #'
 #' This dataset was obtained as following (the names of the experimental
 #' variables, located in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object, are indicated in parentheses):
-#' \emph{i)} Cells from four different cell lines (\code{cellline}) were seeded 
-#' at three different densities (\code{concentration}, relative densities) and 
-#' grown for either 72 or 96 hours (\code{time_point}, duration in hours). In 
-#' the appropriate experimental conditions (see the paper for details), the 
-#' cells aggregate into 3D spheroids. \emph{ii)} Cells were harvested and pooled
-#' into 60-well barcoding plates. \emph{iii)} A pellet of each spheroid pool was
-#' generated and cut into several 6 um-thick sections. \emph{iv)} A subset of 
-#' these sections (\code{site_id}) were stained with an IMC panel and acquired 
-#' as one or more acquisitions (\code{acquisition_id}) containing multiple 
-#' spheres each. \emph{v)} Spheres in these acquisitions were identified by 
-#' computer vision and cropped into individual images (\code{ImageNumber}).
+#' \emph{i)} Cells from four different cell lines (\code{cell_line}) were seeded 
+#' at three different densities (\code{treatment_concentration}, relative
+#' densities) and grown for either 72 or 96 hours (\code{treatment_time_point}, 
+#' duration in hours). In the appropriate experimental conditions (see the paper
+#'  for details), the cells aggregate into 3D spheroids. \emph{ii)} Cells were 
+#' harvested and pooled into 60-well barcoding plates. \emph{iii)} A pellet of 
+#' each spheroid pool was generated and cut into several 6 um-thick sections. 
+#' \emph{iv)} A subset of these sections (\code{site_id}) were stained with an 
+#' IMC panel and acquired as one or more acquisitions (\code{acquisition_id}) 
+#' containing multiple spheres each. \emph{v)} Spheres in these acquisitions 
+#' were identified by computer vision and cropped into individual images 
+#' (\code{image_number}).
 #'
 #' Other relevant cell metadata include:
 #' \itemize{
-#'     \item \code{condition_name}: experimental conditions in the format:
+#'     \item \code{treatment_name}: experimental conditions in the format:
 #'     \code{"Cell line name"_c"seeding density"_tp"time point"}.
-#'     \item \code{Center_X/Y}: object centroid position in image.
-#'     \item \code{Area}: area of the cell (um^2).
-#'     \item \code{dist.rim}: estimated distance to spheroid border.
-#'     \item \code{dist.sphere}: distance to spheroid section border.
-#'     \item \code{dist.other}: distance to the closest of the other spheroid
-#'     sections in the same image (if there is any).
-#'     \item \code{dist.bg}: distance to background pixels.
-#'     \item \code{counts_neighb}: contains arsinh-transformed counts 
-#'     (cofactor = 1).
-#'     \item \code{exprs_neighb}: contains arsinh-transformed counts 
-#'     (cofactor 1).
+#'     \item \code{cell_x/cell_y}: cell centroid position in the image.
+#'     \item \code{cell_area}: area of the cell (um^2).
+#'     \item \code{distance_rim}: estimated distance to spheroid border.
+#'     \item \code{distance_sphere}: distance to spheroid section border.
+#'     \item \code{distance_other_sphere}: distance to the closest of the other 
+#'     spheroid sections in the same image (if there is any).
+#'     \item \code{distance_background}: distance to background pixels.
 #' }
 #' For a full description of the other experimental variables, please refer to
 #' the publication (https://doi.org/10.15252/msb.20209798) and to the
@@ -97,24 +89,38 @@
 #' indicated in brackets.
 #'
 #' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
-#' contains four assays:
+#' contains three assays:
 #' \itemize{
-#'     \item \code{counts}: mean ion counts per cell.
-#'     \item \code{exprs}: arsinh-transformed counts per cell, with cofactor 1.
-#'     \item \code{counts_neighb}: mean ion counts of the neighboring cells.
-#'     \item \code{exprs_neighb}: arsinh-transformed counts (cofactor 1) of the
-#'     neighboring cells.
+#'     \item \code{counts} contains raw mean ion counts per cell.
+#'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
+#'     \item \code{quant_norm} contains counts censored at the 99th percentile 
+#'     and scaled 0-1.
 #' }
+#' 
+#' In addition, the \code{altExp} slot of the \linkS4class{SingleCellExperiment}
+#' object contains another \linkS4class{SingleCellExperiment} object where the 
+#' counts matrix represents raw mean ion counts for cells neighboring the
+#' current cell.
 #'
-#'The \code{metadata} slot of the \linkS4class{SingleCellExperiment} object
-#'contains a graph of cell neighbors, generated with the
-#'\code{igraph::graph_from_data_frame} function.
-#'
+#' Neighborhood information, defined here as cells that are localized next to 
+#' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
+#' slot of the \code{SingleCellExperiment} object. Cells in the \code{SelfHits} 
+#' object are represented by unique integers that map to the 
+#' \code{cell_number_absolute} column of \code{colData(sce)}.
+#' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved. The original version 
+#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
+#' \code{ZanotelliSpheroids2020Data} function.
+#' \itemize{
+#'     \item \code{`v1`}: first version of the dataset.
+#' }
+#' 
 #' File sizes:
 #' \itemize{
 #'     \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
 #'     \item \code{`masks`}: size in memory = 426 Mb,  size on disk = 11.6 Mb.
-#'     \item \code{`sce`}: size in memory = 584 Mb, size on disk = 340 Mb.
+#'     \item \code{`sce`}: size in memory = 584 Mb, size on disk = 326 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -142,15 +148,15 @@
 #'
 #' @examples
 #' # Load single cell data
-#' sce <- ZanotelliSpheroids2020Data(data_type = "sce")
+#' sce <- Zanotelli_2020_Spheroids(data_type = "sce")
 #' print(sce)
 #'
 #' # Display metadata
-#' ZanotelliSpheroids2020Data(data_type = "sce", metadata = TRUE)
+#' Zanotelli_2020_Spheroids(data_type = "sce", metadata = TRUE)
 #' 
 #' # Load masks on disk
 #' library(HDF5Array)
-#' masks <- ZanotelliSpheroids2020Data(data_type = "masks", on_disk = TRUE,
+#' masks <- Zanotelli_2020_Spheroids(data_type = "masks", on_disk = TRUE,
 #' h5FilesPath = getHDF5DumpDir())
 #' print(head(masks))
 #'
@@ -164,20 +170,26 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-ZanotelliSpheroids2020Data <- function (
+Zanotelli_2020_Spheroids <- function (
     data_type = c("sce", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
+    version = "latest",
     force = FALSE
 ) {
-    .Deprecated("Zanotelli_2020_Spheroids()")
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
-    dataset_name <- "ZanotelliSpheroids2020"
-    host <- file.path("imcdatasets", "zanotelli-spheroids-2020")
+    available_versions <- c("v1")
+    dataset_name <- "Zanotelli_2020_Spheroids"
+    dataset_version = ifelse(version == "latest",
+        tail(available_versions, n=1), version)
+    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
+    host <- file.path("imcdatasets", dataset_path)
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
   
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+        on_disk, h5FilesPath, force)
+    
+    return(cur_dat)
 }

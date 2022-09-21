@@ -22,10 +22,16 @@ check_intersect <- function(sce, img, msk) {
 }
 
 datasets <- list(
+<<<<<<< HEAD
     "DamondPancreas2019Data",
     "JacksonFischer2020Data",
     "ZanotelliSpheroids2020Data",
     "IMMUcanExample2022"
+=======
+    "Damond_2019_Pancreas",
+    "JacksonFischer_2020_BreastCancer",
+    "Zanotelli_2020_Spheroids"
+>>>>>>> master
 )
 
 testDatasetWorks <- function(x) {

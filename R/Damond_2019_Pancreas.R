@@ -1,12 +1,9 @@
-#' Obtain the damond-pancreas-2019 dataset
-#' 
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
-#' Obtain the damond-pancreas-2019 dataset, which consists of three data
+#' Obtain the Damond-2019-Pancreas dataset
+#'
+#' Obtain the Damond-2019-Pancreas dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
-#' The data was obtained by imaging mass cytometry of human pancreas sections
-#' from donors with type 1 diabetes.
+#' The data was obtained by imaging mass cytometry (IMC) of human pancreas 
+#' sections from donors with type 1 diabetes.
 #'
 #' @param data_type type of object to load, should be `sce` for single cell
 #' data, `images` for multichannel images or `masks` for cell segmentation
@@ -21,14 +18,12 @@
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
-#' \code{h5FilesPath = getHDF5DumpDir()}
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 #' consisting of three data objects:
 #' \itemize{
@@ -49,10 +44,10 @@
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
 #' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
 #' object. Mapping at the image level can be performed with the
-#' \code{ImageName} or \code{ImageNumber} variables. Mapping between cell
+#' \code{image_name} or \code{image_number} variables. Mapping between cell
 #' segmentation masks and single cell data is performed with the
-#' \code{CellNumber} variable, the values of which correspond to the intensity
-#' values of the \code{DamondPancreas2019_masks} object. For practical
+#' \code{cell_number} variable, the values of which correspond to the intensity
+#' values of the \code{masks} object. For practical
 #' examples, please refer to the "Accessing IMC datasets" vignette.
 #'
 #' This dataset is a subset of the complete Damond et al. (2019) dataset
@@ -62,10 +57,12 @@
 #' dataset ideal for benchmarking spatial and neighborhood analysis algorithms.
 #'
 #' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
-#' contains two assays:
+#' contains three assays:
 #' \itemize{
-#'     \item \code{counts} contains mean ion counts per cell.
+#'     \item \code{counts} contains raw mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
+#'     \item \code{quant_norm} contains counts censored at the 99th percentile 
+#'     and scaled 0-1.
 #' }
 #'
 #' The marker-associated metadata, including antibody information and metal tags
@@ -74,17 +71,23 @@
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. These metadata include cell types
-#' (in \code{colData(sce)$CellType}) and broader cell categories, such  as
-#' "immune" or "islet" cells (in \code{colData(sce)$CellCat}). In addition,
+#' (in \code{colData(sce)$cell_type}) and broader cell categories, such  as
+#' "immune" or "islet" cells (in \code{colData(sce)$cell_category}). In addition,
 #' for cells located inside pancreatic islets, the islet they belong to is
-#' indicated in \code{colData(sce)$ParentIslet}. For cells not located in
-#' islets, the "ParentIslet" value is set to 0 but the spatially closest islet
-#' can be identified with \code{colData(sce)$ClosestIslet}.
+#' indicated in \code{colData(sce)$islet_parent}. For cells not located in
+#' islets, the "islet_parent" value is set to 0 but the spatially closest islet
+#' can be identified with \code{colData(sce)$islet_closest}.
 #'
 #' The donor-associated metadata are also stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. For instance, the donors' IDs can
-#' be retrieved with \code{colData(sce)$case} and the donors' disease stage can
-#' be obtained with \code{colData(sce)$stage}.
+#' be retrieved with \code{colData(sce)$patient_id} and the donors' disease 
+#' stage can be obtained with \code{colData(sce)$patient_stage}.
+#' 
+#' Neighborhood information, defined here as cells that are localized next to 
+#' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
+#' slot of the \code{SingleCellExperiment} object. Cells in the \code{SelfHits} 
+#' object are represented by unique integers that map to the 
+#' \code{cell_number_absolute} column of \code{colData(sce)}.
 #'
 #' The three donors present the following characteristics:
 #' \itemize{
@@ -98,12 +101,20 @@
 #'     diagnosis), showing near-total beta cell destruction and limited immune
 #'     cell infiltration in both the islets and the pancreas.
 #' }
-#'
+#' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved. The original version 
+#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
+#' \code{DamondPancreas2019Data} function.
+#' \itemize{
+#'     \item \code{`v1`}: first version of the dataset.
+#' }
+#' 
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.78 Gb.
-#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.6 Mb.
-#'     \item \code{`sce`}: size in memory = 248 Mb, size on disk = 145 Mb.
+#'     \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.71 Gb.
+#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.4 Mb.
+#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 216 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -119,7 +130,7 @@
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
-#' \linkS4class{CytoImageList} object containing cell masks.
+#' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
 #' @author Nicolas Damond
 #'
@@ -130,15 +141,15 @@
 #'
 #' @examples
 #' # Load single cell data
-#' sce <- DamondPancreas2019Data(data_type = "sce")
+#' sce <- Damond_2019_Pancreas(data_type = "sce")
 #' print(sce)
 #' 
 #' # Display metadata
-#' DamondPancreas2019Data(data_type = "sce", metadata = TRUE)
+#' Damond_2019_Pancreas(data_type = "sce", metadata = TRUE)
 #' 
 #' # Load masks on disk
 #' library(HDF5Array)
-#' masks <- DamondPancreas2019Data(data_type = "masks", on_disk = TRUE,
+#' masks <- Damond_2019_Pancreas(data_type = "masks", on_disk = TRUE,
 #' h5FilesPath = getHDF5DumpDir())
 #' print(head(masks))
 #'
@@ -152,21 +163,26 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-DamondPancreas2019Data <- function (
+Damond_2019_Pancreas <- function (
     data_type = c("sce", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
+    version = "latest",
     force = FALSE
 ) {
-    .Deprecated("Damond_2019_Pancreas()")
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
+    available_versions <- c("v1")
+    dataset_name <- "Damond_2019_Pancreas"
+    dataset_version = ifelse(version == "latest",
+        tail(available_versions, n=1), version)
+    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
+    host <- file.path("imcdatasets", dataset_path)
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
   
-    dataset_name <- "DamondPancreas2019"
-    host <- file.path("imcdatasets", "damond-pancreas-2019")
-  
-    cur_dat <- .loadDataObject(
-      dataset_name, host, data_type, metadata,
-      on_disk, h5FilesPath, force)
+    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+        on_disk, h5FilesPath, force)
+    
+    return(cur_dat)
 }

@@ -1,7 +1,7 @@
-\name{JacksonFischer2020}
-\alias{JacksonFischer2020_sce}
-\alias{JacksonFischer2020_images}
-\alias{JacksonFischer2020_masks}
+\name{JacksonFischer2020-deprecated}
+\alias{JacksonFischer2020_sce-deprecated}
+\alias{JacksonFischer2020_images-deprecated}
+\alias{JacksonFischer2020_masks-deprecated}
 \docType{data}
 \title{Deprecated function - 'JacksonFischer2020' dataset}
 \description{
@@ -16,15 +16,18 @@ This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 (2020), consisting of three data objects. Note: The following functions are 
 deprecated and will be made defunct; use the replacements indicated below:
 \itemize{
-    \item{JacksonFischer2020_images -> \code{\link{JacksonFischer2020Data}}} 
+    \item{JacksonFischer2020_images -> 
+    \code{\link{JacksonFischer_2020_BreastCancer}}} 
     contains a hundred 42-channel images in the form of a 
     \linkS4class{CytoImageList} class object.
-    \item{JacksonFischer2020_masks -> \code{\link{JacksonFischer2020Data}}} 
+    \item{JacksonFischer2020_masks -> 
+    \code{\link{JacksonFischer_2020_BreastCancer}}} 
     contains the cell segmentation masks associated with the images, in the form
     of a \linkS4class{CytoImageList} class object.
-    \item{JacksonFischer2020_sce -> \code{\link{JacksonFischer2020Data}}} 
-    contains the single cell data extracted from the images using the cell 
-    segmentation masks, as well as the associated metadata, in the form of a 
+    \item{JacksonFischer2020_sce -> 
+    \code{\link{JacksonFischer_2020_BreastCancer}}} contains the single cell 
+    data extracted from the images using the cell segmentation masks, as well as
+    the associated metadata, in the form of a 
     \linkS4class{SingleCellExperiment}. This represents a total of 285,851 cells
     x 42 channels.
 }
