@@ -40,16 +40,28 @@ Here, we will only download the already processed data and convert the spe into 
 ```{r download data}
 options(timeout = 10000)
 download.file("https://zenodo.org/record/7079294/files/spe.rds", 
-              destfile = paste0(workdir, "spe.rds"))
+              destfile = paste0(workdir, "/spe.rds"))
 download.file("https://zenodo.org/record/7079294/files/images.rds", 
               destfile = paste0(outdir, "/images.rds"))
 download.file("https://zenodo.org/record/7079294/files/masks.rds", 
               destfile = paste0(outdir, "/masks.rds"))
 
+# Modify SCE object
 spe <- readRDS(paste0(workdir, "spe.rds"))
 sce <- as(spe, "SingleCellExperiment")
-colData(sce)$Pos_X <- spatialCoords(spe)[,"Pos_X"]
-colData(sce)$Pos_Y <- spatialCoords(spe)[,"Pos_Y"]
+colData(sce)$cell_x <- spatialCoords(spe)[,"Pos_X"]
+colData(sce)$cell_y <- spatialCoords(spe)[,"Pos_Y"]
+
+sce$image_name <- sce$sample_id
+sce$cell_number <- sce$ObjectNumber
+sce$cell_id <- paste0(sce$image_name, "_", sce$cell_number)
+
+# Fix rowData
+marker_df <- data.frame(row.names = rownames(sce),
+                        full_name = c("Myeloperoxidase", ),
+                        short_name = c())
+
+# Add image_name to images and masks
 
 saveRDS(sce, paste0(outdir, "/sce.rds"))
 
