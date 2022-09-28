@@ -4,7 +4,7 @@ date: "Created: 13 September 2022; Compiled: `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('imcdatasets')`"
 author:
 - name: Nicolas Damond
-  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  affiliation: [Department for Quantitative Biomedicine; University of Zurich, Institute of Molecular Health Sciences; ETH Zurich]
   email: nicolas.damond@dqbm.uzh.ch
 output:
     BiocStyle::html_document:
@@ -39,24 +39,24 @@ The first step is to create a new branch at the `imcdatasets` [GitHub page](http
 
 Then, create an R markdown (`.Rmd`) script in `.inst/scripts/` to generate the data objects:
 
-* Download single cell data, IMC images and cell segmentation masks.
+* Download single cell data, multiplexed images and cell segmentation masks.
 * Format the single cell data into a [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment) object.
 * Format the images and masks into [CytoImageList](https://bioconductor.org/packages/CytoImageList) objects.
 * Save the three data objects so that they can be uploaded to `ExperimentHub`.
-* The three data objects must contain matching information so that they can be associated by the [cytomapper](https://bioconductor.org/packages/cytomapper) package, as described in the [imcdatset vignette](https://www.bioconductor.org/packages/release/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html#5_Usage).
+* The three data objects must contain matching information so that they can be associated by the [cytomapper](https://bioconductor.org/packages/cytomapper) package, as described in the [imcdataset vignette](https://www.bioconductor.org/packages/release/data/experiment/vignettes/imcdatasets/inst/doc/imcdatasets.html#5_Usage).
 
 The `.Rmd` script must be formatted in the same way as pre-existing scripts. Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/inst/scripts/make-Damond-2019-Pancreas.Rmd) and [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/inst/scripts/make-JacksonFischer-2020-BreastCancer.Rmd). Each step should be clearly and comprehensively documented.
 
-**For usability of the package and consistency across datasets, the data objects must be formatted as described in the guidelines described in the `Dataset format` section below.**
+**For usability of the package and consistency across datasets, the data objects must be formatted as described in the `Dataset format` section below.**
 
 
 ## Update the documentation
 
-Other files the `imcdatasets` package should be updated to include the new dataset:
+Other files in the `imcdatasets` package should be updated to include the new dataset:
 
-* Make a new `./R/DatasetData.R` file with a function to load the new dataset and extensive documentation. Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/DamondPancreas2019Data.R) and [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/JacksonFischer2020Data.R).
-* Run roxygenize to generate `man` documentation files (go to the `imcdatasets` directory and run `roxygen2::roxygenise(".")`).
-* Update the `./inst/scripts/make-metadata.R` R script and run it. This will update the  `./inst/extdata/metadata.csv` file that contains information about datasets for `ExperimentHub`.
+* Make a new `./R/Lastname_Year_Type.R` file with a function to load the new dataset and extensive documentation. Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/Damond_2019_Pancreas.R) and [here](https://github.com/BodenmillerGroup/imcdatasets/blob/master/R/JacksonFischer_2020_BreastCancer.R).
+* Run roxygenize to generate `man` documentation files (go to the `imcdatasets` directory and run `roxygen2::roxygenize(".")`).
+* Update the `./inst/scripts/make-metadata.R` R script and run it. This will update the  `./inst/extdata/metadata.csv` file that is used by `ExperimentHub` to provide metadata information about datasets.
 * Add the reference of the paper that describes the dataset to the `./inst/scripts/ref.bib` file.
 * Add the new dataset to the `./inst/extdata/alldatasets.csv` file.
 * Add the new dataset to the dataset list in `./tests/testthat/test_loading.R`.
@@ -108,14 +108,16 @@ Single cell data should be formatted into a [SingleCellExperiment](https://bioco
 
 ### colData
 
-The `colData` entry of the `SingleCellExperiment` object is a `DataFrame` that contains observation metadata; i.e., cells, slides, tissue, patients, .... All column names must have a prefix that indicates the level of observation (e.g. `cell_`, `slide_` , `tissue_`, `patient_`, `tumor_`).
+The `colData` entry of the `SingleCellExperiment` object is a `DataFrame` that contains observation metadata; i.e., cells, slides, tissue, patients, .... It is recommended that all column names have a prefix that indicates the level of observation (e.g. `cell_`, `slide_` , `tissue_`, `patient_`, `tumor_`).
 
 The following columns are required:
 
-- `image_name`: unique image (ablated ROI) name. Should map to the `image_name` column in the metadata of the `images` and `masks` objects.
+- `image_name` and/or `image_number`: unique image (ablated ROI) name, respectively number. Should map to the `image_name`/`image_number` column(s) in the metadata of the `images` and `masks` objects.
 - `cell_number`: integer representing cell numbers. Should map to the values of cell segmentation masks.
-- `cell_id`: a unique cell identifier defined as {`image_name` `_` `cell_number`} (e.g., `E02_188`).
+- `cell_id`: a unique cell identifier defined as {`image_number` `_` `cell_number`} (e.g., `7_138`).
 - `cell_x` and `cell_y`: position of the cell centroid on the image. These columns are used as `SpatialCoords` when converting to a [SpatialExperiment](https://bioconductor.org/packages/SpatialExperiment) object.
+
+In addition, `colnames(sce)` should be set as `colData(sce)$cell_id`.
 
 ### rowData
 
@@ -124,20 +126,21 @@ The `rowData` entry of the `SingleCellExperiment` is a `DataFrame` that contains
 The following columns are required in the `rowData` entry:
 
 - `channel`: a unique integer that maps to the channels of the associated multichannel images.
-- `metal`: the metal isotope used for detection, formatted as { `ChemicalSymbol``IsotopeMass`} (e.g., `Y89`, `In115`, `Yb176`, `Bi209`).
-- `name`: full name of the marker.
+- `metal`: the metal isotope used for detection, formatted as { `ChemicalSymbol` `IsotopeMass`} (e.g., `Y89`, `In115`, `Yb176`, `Bi209`).
+- `name`: marker name used in the publication that describes the dataset.
+- `full_name`: full marker name.
 - `short_name`: abbreviated marker name, preferably following the official [UniProt](https://www.uniprot.org) nomenclature.
 
-For the `name` and `short_name` columns, the following guidelines apply:
+For the `full_name` and `short_name` columns, the following guidelines apply:
 
 * In `short_name`, all dashes, dots and spaces should removed or replaced with underscores.
 * For post-translationally modified proteins:
-  * Prefix the `name` with the modification type (e.g., `phospho-`, `methyl-`) and suffix it with the modified aminoacids (e.g., `[S28]`).
+  * Prefix the `full_name` with the modification type (e.g., `phospho-`, `methyl-`) and suffix it with the modified aminoacids (e.g., `[S28]`).
   * Prefix the `short_name` with an abbreviation of the modification type (e.g., `p_`, `me_`) and do not indicate the modified aminoacids, unless there is a possible confusion with another target in the dataset.
 
 ```{r echo=FALSE, results='hide'}
 marker_names <- data.frame(
-  name = c(
+  full_name = c(
     "Carbonic anhydrase IX",
     "CD3 epsilon",
     "CD8 alpha",
@@ -155,8 +158,8 @@ marker_names <- data.frame(
     "phospho-Rb [S807/S811]",
     "Smooth muscle actin",
     "Vimentin",
-    "Ir191",
-    "Ir193"
+    "Iridium 191",
+    "Iridium 193"
   ),
   short_name = c(
     "CA9",
@@ -185,28 +188,24 @@ marker_names <- data.frame(
 ```{r echo=FALSE, results='asis'}
 knitr::kable(
   marker_names,
-  caption = "'name' and 'short_name' examples for some commonly used markers"
+  caption = "'full_name' and 'short_name' examples for some commonly used markers"
 )
 ```
 
-Finally, the `short_name` column should be used to name the rows of the `rowData` entry and as `rownames(sce)`.
+In addition, `rownames(sce)` should be set as `rowData(sce)$short_name`.
 
 ### assays
 
 The `assays` slot of the `SingleCellExperiment` contains counts matrices representing marker expression levels per cell and channel.
 
-It should at least contain a `counts` matrix with raw ion counts. The `assays` slot can also contain additional matrices with commonly used counts transformations, or counts transformations that were used in the article describing the dataset. For instance:  
+It should at least contain a `counts` matrix with raw ion counts. The `assays` slot can also contain additional matrices with commonly used counts transformations, or counts transformations that were used in the publication that describes the dataset. All counts transformations must be documented in the `.R` function used to load the dataset. Common examples include:
 
-* `exprs`: asinh-transformed counts, with a cofactor of 1.
-* `quant_norm`: counts censored at the 99th percentile and scaled from 0 to 1.
-
-Counts transformation should be documented in `man` pages (`.R` file containing the function call used to load the dataset).
+* `exprs`: asinh-transformed counts. For IMC, a cofactor of 1 is typically used.
+* `quant_norm`: counts censored (e.g., at the 99th percentile) and scaled from 0 to 1.
 
 ### colPairs
 
 Neighborhood information, such as a list of cells that are localized next to each other, can be stored as a [SelfHits](https://bioconductor.org/packages/devel/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html#6_Storing_row_or_column_pairings) object in the `colPair` slot of the `SingleCellExperiment` object.
-
-Cell numbers in the `SelfHits` object are unique integers ranging from 1 to the number of cells in the dataset. These numbers should map to `cell_number_absolute` in `colData(sce)`.
 
 
 ## Images and masks
