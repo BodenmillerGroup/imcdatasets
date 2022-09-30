@@ -40,7 +40,8 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
-cat("Dataset version: v1")
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
 ```
 
 Set the working and output directories
@@ -51,9 +52,11 @@ workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-outdir <- file.path(".", "Zanotelli_2020_Spheroids")
-if(!(dir.exists(outdir)))
-    dir.create(outdir)
+dataset_dir <- file.path(".", "Zanotelli_2020_Spheroids")
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
 
 # Increase timeout period so that large files can be downloaded
 timeout <- getOption('timeout')
@@ -198,6 +201,7 @@ image_meta <- image_meta[, .(
 ```
 
 We then merge the cell and image metadata data frames.
+For consistency with other datasets, we define `cell_id` as {`image_number` `_` `cell_number`}.
 
 ```{r merge-metadata}
 # Merge cell and image metadata
@@ -241,8 +245,6 @@ cell_meta$cell_number_absolute <- 1:nrow(cell_meta)
 
 Here, we collect all cell neighborhood relationships. This information will be added to the `colPairs` slot of the `SingleCellExperiment` object.
 
-We map the object ids in the `cell_neighbors` data frame to `cell_number_absolute` integers in the `cell_meta` data frame.
-
 ```{r prepare-neighbors}
 # Subset cell neighbors to cells present in cell_meta
 cell_neighbors <- cell_neighbors[
@@ -277,6 +279,7 @@ panel <- panel[, .(
   channel = panel$ref_plane_number,
   metal = panel$metal,
   name = panel$goodname,
+  full_name = panel$goodname,
   short_name = panel$goodname,
   antibody_clone = panel$`Antibody Clone`,
   antibody_working = panel$working,
@@ -293,63 +296,63 @@ barcoding_channels <- c(
   "In113", "In115", "Pt194", "Pt195", "Bi209", "Y89")
 panel[metal %in% barcoding_channels, `:=` (short_name = paste0("BC_", metal),
                                            antibody_clone = NA)]
-panel[metal == "Te125", `:=` (name = "Telox2 probe", antibody_clone = NA)]
-panel[metal == "La139", `:=` (name = "methylated-Histone H3 [K27]",
+panel[metal == "Te125", `:=` (full_name = "Telox2 probe", antibody_clone = NA)]
+panel[metal == "La139", `:=` (full_name = "methylated-Histone H3 [K27]",
                               short_name = "me_H3")]
-panel[metal == "Pr141", `:=` (name = "Histone H3", short_name = "H3")]
-panel[metal == "Nd142", `:=` (name = "Epidermal growth factor receptor")]
-panel[metal == "Nd143", `:=` (name = "phospho-FAK [Y397]",
+panel[metal == "Pr141", `:=` (full_name = "Histone H3", short_name = "H3")]
+panel[metal == "Nd142", `:=` (full_name = "Epidermal growth factor receptor")]
+panel[metal == "Nd143", `:=` (full_name = "phospho-FAK [Y397]",
                               short_name = "p_FAK")]
-panel[metal == "Nd144", `:=` (name = "phospho-MEK1/2 [S217/S221]",
+panel[metal == "Nd144", `:=` (full_name = "phospho-MEK1/2 [S217/S221]",
                               short_name = "p_MEK1_2")]
-panel[metal == "Nd145", `:=` (name = "phospho-MAPKAPK2 [T334]",
+panel[metal == "Nd145", `:=` (full_name = "phospho-MAPKAPK2 [T334]",
                               short_name = "p_MAPKAPK2")]
-panel[metal == "Nd146", `:=` (name = "phospho-p70S6K [T389]",
+panel[metal == "Nd146", `:=` (full_name = "phospho-p70S6K [T389]",
                               short_name = "p_p70S6K")]
-panel[metal == "Sm147", `:=` (name = "phospho-Aurora kinase B [T232]",
+panel[metal == "Sm147", `:=` (full_name = "phospho-Aurora kinase B [T232]",
                               short_name = "p_AURKB")]
-panel[metal == "Nd148", `:=` (name = "phospho-STAT1 [S727]",
+panel[metal == "Nd148", `:=` (full_name = "phospho-STAT1 [S727]",
                               short_name = "p_STAT1")]
-panel[metal == "Sm149", `:=` (name = "phospho-p53 [S15]",
+panel[metal == "Sm149", `:=` (full_name = "phospho-p53 [S15]",
                               short_name = "p_p53")]
-panel[metal == "Eu151", `:=` (name = "phospho-EGFR [Tyr1173]",
+panel[metal == "Eu151", `:=` (full_name = "phospho-EGFR [Tyr1173]",
                               short_name = "p_EGFR")]
-panel[metal == "Sm152", `:=` (name = "phospho-AMPK alpha [T172]",
+panel[metal == "Sm152", `:=` (full_name = "phospho-AMPK alpha [T172]",
                               short_name = "p_AMPKa")]
-panel[metal == "Eu153", `:=` (name = "phospho-Histone H3 [S28]",
+panel[metal == "Eu153", `:=` (full_name = "phospho-Histone H3 [S28]",
                               short_name = "p_H3")]
-panel[metal == "Sm154", `:=` (name = "phospho-ERK1/2 [T202/Y204]",
+panel[metal == "Sm154", `:=` (full_name = "phospho-ERK1/2 [T202/Y204]",
                               short_name = "p_ERK1_2")]
-panel[metal == "Gd155", `:=` (name = "phospho-HER2 [Y1196]",
+panel[metal == "Gd155", `:=` (full_name = "phospho-HER2 [Y1196]",
                               short_name = "p_HER2")]
-panel[metal == "Gd156", `:=` (name = "phospho-p38 [T180/Y182]",
+panel[metal == "Gd156", `:=` (full_name = "phospho-p38 [T180/Y182]",
                               short_name = "p_p38")]
-panel[metal == "Gd158", `:=` (name = "phospho-GSK3 [S9]",
+panel[metal == "Gd158", `:=` (full_name = "phospho-GSK3 [S9]",
                               short_name = "p_GSK3")]
 panel[metal == "Gd160", `:=` (short_name = "BIRC5")]
-panel[metal == "Dy161", `:=` (name = "Cyclin B1",
+panel[metal == "Dy161", `:=` (full_name = "Cyclin B1",
                               short_name = "CCNB1")]
 panel[metal == "Dy162", `:=` (short_name = "VIM")]
-panel[metal == "Dy163", `:=` (name = "phospho-AKT [S473]",
+panel[metal == "Dy163", `:=` (full_name = "phospho-AKT [S473]",
                               short_name = "p_AKT")]
-panel[metal == "Ho165", `:=` (name = "phospho-CDK1 [Y15]",
+panel[metal == "Ho165", `:=` (full_name = "phospho-CDK1 [Y15]",
                               short_name = "p_CDK1")]
-panel[metal == "Er166", `:=` (name = "Carbonic anhydrase IX",
+panel[metal == "Er166", `:=` (full_name = "Carbonic anhydrase IX",
                               short_name = "CA9")]
 panel[metal == "Er168", `:=` (short_name = "Ki67")]
-panel[metal == "Er170", `:=` (name = "phospho-JNK [T183/Y185]",
+panel[metal == "Er170", `:=` (full_name = "phospho-JNK [T183/Y185]",
                               short_name = "p_JNK")]
-panel[metal == "Yb171", `:=` (name = "phospho-S6 [S235/S236]",
+panel[metal == "Yb171", `:=` (full_name = "phospho-S6 [S235/S236]",
                               short_name = "p_S6")]
-panel[metal == "Yb172", `:=` (name = "cleaved-Caspase 3",
+panel[metal == "Yb172", `:=` (full_name = "cleaved-Caspase 3",
                               short_name = "c_CASP3")]
-panel[metal == "Yb173", `:=` (name = "phospho-STAT3 [Y705]",
+panel[metal == "Yb173", `:=` (full_name = "phospho-STAT3 [Y705]",
                               short_name = "p_STAT3")]
 panel[metal == "Yb174", `:=` (short_name = "c_PARP")]
-panel[metal == "Lu175", `:=` (name = "phopsho-Rb [S807/S811]",
+panel[metal == "Lu175", `:=` (full_name = "phopsho-Rb [S807/S811]",
                               short_name = "p_Rb")]
-panel[metal == "Yb176", `:=` (name = "DYKDDDDK tag")]
-panel[metal == "Ir193", `:=` (antibody_clone = NA)]
+panel[metal == "Yb176", `:=` (full_name = "DYKDDDDK tag")]
+panel[metal == "Ir193", `:=` (full_name = "Iridium 193", antibody_clone = NA)]
 ```
 
 Finally, we convert the panel table to a `DataFrame` and add target short_names as row names.
@@ -405,19 +408,18 @@ panel_neighb <- merge(panel_neighb, panel[, c("metal", "short_name")],
 
 # Make sure the panels and counts matrices are in the same order
 counts_X <- counts_X[, order(match(colnames(counts_X), panel$measurement_id))]
-counts_X <- counts_X[order(match(rownames(counts_X), cell_meta$object_id)), ]
+counts_X <- counts_X[order(match(rownames(counts_X), cell_meta$cell_obj_id)), ]
 
 counts_neighb_X <- counts_neighb_X[, order(match(colnames(counts_neighb_X),
                                                  panel_neighb$measurement_id))]
 counts_neighb_X <- counts_neighb_X[order(match(rownames(counts_neighb_X),
-                                               cell_meta$object_id)), ]
+                                               cell_meta$cell_obj_id)), ]
 
 # Rename the rows and columns of the count matrices
 colnames(counts_X) <- panel$short_name
 rownames(counts_X) <- cell_meta$cell_id
 colnames(counts_neighb_X) <- panel_neighb$short_name
 rownames(counts_neighb_X) <- cell_meta$cell_id
-cell_meta$object_id <- NULL
 
 # Remove original counts matrix
 remove(cell_X)
@@ -481,8 +483,6 @@ altExp(sce, "neighboring_cells") <- sce_neighb
 
 We generate a [SelfHits](https://bioconductor.org/packages/devel/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html#6_Storing_row_or_column_pairings) object containing pairings of neighboring cells and store it in the `colPairs` slot of the `SingleCellExperiment` object.
 
-Integers in the `colPairs(sce, "neighborhood")` object are unique cell numbers that map to `colData(sce)$cell_number_absolute`.
-
 ```{r add-colpairs}
 colPair(sce, "neighborhood") <- SelfHits(from = cell_neighbors$cell_from,
                                          to = cell_neighbors$cell_to,
@@ -495,6 +495,7 @@ We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHu
 
 ```{r save-sce}
 saveRDS(sce, file.path(outdir, "sce.rds"))
+print(sce)
 ```
 
 ### Clean up
@@ -579,7 +580,10 @@ Next, we add image names to the images and masks objects, these names correspond
 ```{r add-image-names}
 mcols(images)$image_name <- gsub("_comp", "", names(images))
 mcols(masks)$image_name <- gsub("_cell", "", names(masks))
-identical(mcols(images)$image_name, mcols(masks)$image_name)
+
+print(identical(mcols(images)$image_name, mcols(masks)$image_name))
+names(images) <- mcols(images)$image_name
+names(masks) <- mcols(masks)$image_name
 ```
 
 We will also add `image_numbers` to the metadata columns of the `images` and `masks` objects.
@@ -588,7 +592,7 @@ We will also add `image_numbers` to the metadata columns of the `images` and `ma
 ref_images <- unique(colData(sce)[, c("image_name", "image_number")])
 mcols(images) <- merge(mcols(images), ref_images, by = "image_name")
 mcols(masks) <- merge(mcols(masks), ref_images, by = "image_name")
-identical(mcols(images)$image_number, mcols(masks)$image_number)
+print(identical(mcols(images)$image_number, mcols(masks)$image_number))
 ```
 
 ### Add channel names
@@ -609,10 +613,12 @@ gc()
 
 ```{r save-masks}
 saveRDS(masks, file.path(outdir, "masks.rds"))
+print(head(masks))
 ```
 
 ```{r save-images}
 saveRDS(images, file.path(outdir, "images.rds"))
+print(head(images))
 ```
 
 ### Clean up

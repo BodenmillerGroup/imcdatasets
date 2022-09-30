@@ -40,7 +40,8 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
-cat("Dataset version: v1")
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
 ```
 
 Set the working and output directories
@@ -51,9 +52,11 @@ workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-outdir <- file.path(".", "Damond_2019_Pancreas")
-if(!(dir.exists(outdir)))
-    dir.create(outdir)
+dataset_dir <- file.path(".", "Damond_2019_Pancreas")
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
 
 # Increase timeout period so that large files can be downloaded
 timeout <- getOption('timeout')
@@ -223,7 +226,8 @@ We merge the cell and image metadata data frames.
 cell_metadata <- merge(cell_metadata, image_metadata, by = "image_number")
 ```
 
-We add cell-type information to the metadata object. For this, we create a unique `cell_id`, which is combination of `image_name` and `cell_number`.
+We add cell-type information to the metadata object. For this, we create a unique `cell_id` with the same format as in the `celltypes` dataset.
+We then convert `cell_id` to the {`image_number` `_` `cell_number`} format for consistency with other datasets.
 
 ```{r import-cell-types}
 # Add unique cell ids to cell metadata
@@ -236,6 +240,9 @@ celltypes <- celltypes[, .(cell_id = id,
                            cell_type = CellType,
                            cell_category = CellCat)]
 cell_metadata <- merge(cell_metadata, celltypes, by = "cell_id")
+
+cell_metadata$cell_id <- paste(cell_metadata$image_number,
+                               cell_metadata$cell_number, sep = "_")
 ```
 
 We add clinical (organ donor) information to the metadata object.
@@ -306,8 +313,10 @@ image_map <- as.data.frame(unique(
 neighbors <- merge.data.table(neighbors, image_map, by = "image_number")
 
 # Add unique cell ids
-neighbors[, cell_id_from := paste(image_name, `First Object Number`, sep = "_")]
-neighbors[, cell_id_to := paste(image_name, `Second Object Number`, sep = "_")]
+neighbors[, cell_id_from := paste(
+  image_number, `First Object Number`, sep = "_")]
+neighbors[, cell_id_to := paste(
+  image_number, `Second Object Number`, sep = "_")]
 
 # Map to absolute cell numbers (one unique number per cell)
 cell_map <- as.data.frame(unique(
@@ -355,45 +364,54 @@ panel <- panel[, .(
 panel <- panel[keep == 1,]
 panel <- panel[order(match(panel$metal, channel_mass$V1)), ]
 panel[, keep := NULL]
+
+# Add consistent full names
+panel$full_name <- panel$name
 ```
 
 We will also rename markers for consistency with other datasets.
 
 ```{r rename-markers}
-panel[metal == "In115", `:=` (name = "Smooth muscle actin")]
-panel[metal == "Pr141", `:=` (name = "Insulin")]
-panel[metal == "Nd144", `:=` (name = "Prohormone convertase 2",
+panel[metal == "In115", `:=` (full_name = "Smooth muscle actin")]
+panel[metal == "Pr141", `:=` (full_name = "Insulin")]
+panel[metal == "Nd144", `:=` (full_name = "Prohormone convertase 2",
                               antibody_clone = "polyclonal_PC2")]
-panel[metal == "Sm147", `:=` (name = "Myeloperoxidase",
+panel[metal == "Sm147", `:=` (full_name = "Myeloperoxidase",
                               antibody_clone = "polyclonal_MPO")]
-panel[metal == "Nd148", `:=` (name = "Glucose transporter 1")]
-panel[metal == "Nd150", `:=` (name = "Pancreatic amylase",
-                              antibody_clone = "polyclonal_pancreatic_amylase")]
-panel[metal == "Eu153", `:=` (name = "Pancreatic polypeptide")]
-panel[metal == "Gd155", `:=` (name = "Programmed cell death protein 1",
+panel[metal == "Nd148", `:=` (full_name = "Glucose transporter 1")]
+panel[metal == "Nd150", `:=` (
+  full_name = "Pancreatic amylase",
+  antibody_clone = "polyclonal_pancreatic_amylase")]
+panel[metal == "Eu153", `:=` (full_name = "Pancreatic polypeptide")]
+panel[metal == "Gd155", `:=` (full_name = "Programmed cell death protein 1",
                               short_name = "PD_1")]
-panel[metal == "Gd158", `:=` (name = "Pancreatic and duodenal homeobox 1",
-                              antibody_clone = "polyclonal_Pdx1")]
-panel[metal == "Dy163", `:=` (name = "Forkhead box P3")]
-panel[metal == "Ho165", `:=` (name = "CD8 alpha")]
-panel[metal == "Er166", `:=` (name = "Carbonic anhydrase IX")]
-panel[metal == "Er167", `:=` (name = "Islet amyloid polypeptide",
+panel[metal == "Gd158", `:=` (
+  full_name = "Pancreatic and duodenal homeobox 1",
+  antibody_clone = "polyclonal_Pdx1")]
+panel[metal == "Dy163", `:=` (full_name = "Forkhead box P3")]
+panel[metal == "Ho165", `:=` (full_name = "CD8 alpha")]
+panel[metal == "Er166", `:=` (full_name = "Carbonic anhydrase IX")]
+panel[metal == "Er167", `:=` (full_name = "Islet amyloid polypeptide",
                               antibody_clone = "polyclonal_IAPP")]
-panel[metal == "Er168", `:=` (name = "Ki-67", short_name = "Ki67")]
-panel[metal == "Tm169", `:=` (name = "Homeobox protein Nkx-6.1",
+panel[metal == "Er168", `:=` (full_name = "Ki-67", short_name = "Ki67")]
+panel[metal == "Tm169", `:=` (full_name = "Homeobox protein Nkx-6.1",
                               short_name = "NKX6_1",
                               antibody_clone = "D8O4R")]
-panel[metal == "Er170", `:=` (name = "p-Histone H3 [S28]",
+panel[metal == "Er170", `:=` (full_name = "p-Histone H3 [S28]",
                               short_name = "p_HH3")]
 panel[metal == "Yb171", `:=` (antibody_clone = "polyclonal_CD4")]
-panel[metal == "Yb173", `:=` (name = "E-Cadherin", short_name = "CDH1")]
-panel[metal == "Yb174", `:=` (name = "IA-2", short_name = "PTPRN")]
-panel[metal == "Lu175", `:=` (name = "phopsho-Rb [S807/S811]",
+panel[metal == "Yb173", `:=` (full_name = "E-Cadherin", short_name = "CDH1")]
+panel[metal == "Yb174", `:=` (
+  name = "PTPRN / IA-2",
+  full_name = "Receptor-type tyrosine-protein phosphatase-like N",
+  short_name = "PTPRN",
+  antibody_clone = "polyclonal_PTPRN")]
+panel[metal == "Lu175", `:=` (full_name = "phopsho-Rb [S807/S811]",
                               short_name = "p_Rb")]
-panel[metal == "Yb176", `:=` (name = "cleaved-PARP + cleaved-Caspase3",
+panel[metal == "Yb176", `:=` (full_name = "cleaved-PARP + cleaved-Caspase3",
                               short_name = "cPARP_cCASP3")]
-panel[metal == "Ir191", `:=` (name = "Ir191", short_name = "DNA1")]
-panel[metal == "Ir193", `:=` (name = "Ir193", short_name = "DNA2")]
+panel[metal == "Ir191", `:=` (full_name = "Iridium 191", short_name = "DNA1")]
+panel[metal == "Ir193", `:=` (full_name = "Iridium 193", short_name = "DNA2")]
 ```
 
 Finally, we convert the panel table to a `DataFrame` and add target short_names as row names.
@@ -474,6 +492,7 @@ We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHu
 
 ```{r save-sce}
 saveRDS(sce, file.path(outdir, "sce.rds"))
+print(sce)
 ```
 
 ### Clean up
@@ -512,7 +531,6 @@ We use the `loadImages` function of the `cytomapper` package to read the images 
 
 ```{r read-in-images}
 images <- loadImages(workdir, pattern = "_full_clean.tiff")
-images
 ```
 
 ### Cell segmentation masks
@@ -527,7 +545,6 @@ importData(url_masks, workdir, "Masks.zip")
 
 ```{r read-in-masks}
 masks <- loadImages(workdir, pattern = "_full_mask.tiff")
-masks
 ```
 
 ### Clean-up
@@ -577,7 +594,10 @@ We downloaded the full set of segmentation masks, so we will subset them to reta
 
 ```{r subset-masks}
 masks <- masks[mcols(masks)$image_name %in% mcols(images)$image_name]
-identical(mcols(images)$image_name, mcols(masks)$image_name)
+print(identical(mcols(images)$image_name, mcols(masks)$image_name))
+
+names(images) <- mcols(images)$image_name
+names(masks) <- mcols(masks)$image_name
 ```
 
 We will also add `image_numbers` to the metadata columns of the `images` and `masks` objects.
@@ -586,7 +606,8 @@ We will also add `image_numbers` to the metadata columns of the `images` and `ma
 ref_images <- unique(colData(sce)[, c("image_name", "image_number")])
 mcols(images) <- merge(mcols(images), ref_images, by = "image_name")
 mcols(masks) <- merge(mcols(masks), ref_images, by = "image_name")
-identical(mcols(images)$image_number, mcols(masks)$image_number)
+
+print(identical(mcols(images)$image_number, mcols(masks)$image_number))
 ```
 
 ### Add channel names
@@ -608,10 +629,12 @@ Finally, we will save the generated `CytoImageList` images and masks objects for
 
 ```{r save-masks}
 saveRDS(masks, file.path(outdir, "masks.rds"))
+print(masks)
 ```
 
 ```{r save-images}
 saveRDS(images, file.path(outdir, "images.rds"))
+print(images)
 ```
 
 ### Clean up
