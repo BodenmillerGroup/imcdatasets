@@ -1,11 +1,9 @@
-#' Obtain the jackson-fischer-2020 dataset
+#' Obtain the JacksonFischer-2020-BreastCancer dataset
 #'
-#' This function is provided for compatibility with older versions but is 
-#' deprecated. As a replacement, please use 
-#' \code{JacksonFischer_2020_BreastCancer}.
-#' Obtain the jackson-fischer-2020 dataset, which consists of three data
-#' objects: single cell data, multichannel images and cell segmentation masks.
-#' The data was obtained by imaging mass cytometry of tumour tissue from
+#' Obtain the JacksonFischer-2020-BreastCancer dataset, which consists of three 
+#' data objects: single cell data, multichannel images and cell segmentation 
+#' masks.
+#' The data was obtained by imaging mass cytometry (IMC) of tumour tissue from
 #' patients with breast cancer.
 #'
 #' @param data_type type of object to load, should be `sce` for single cell
@@ -21,14 +19,12 @@
 #' @param h5FilesPath path to where the .h5 files for on disk representation
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
-#' \code{h5FilesPath = getHDF5DumpDir()}
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function is provided for compatibility with older versions but is 
-#' deprecated. As a replacement, please use 
-#' \code{JacksonFischer_2020_BreastCancer}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 #' (2020), consisting of three data objects:
 #' \itemize{
@@ -39,8 +35,9 @@
 #'     \linkS4class{CytoImageList} class object.
 #'     \item \code{sce} contains the single cell data extracted from the 
 #'     multichannel images using the cell segmentation masks, as well as the 
-#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-#'      This represents a total of 285,851 cells x 42 channels.
+#'     associated metadata, in the form of a 
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 285,851 
+#'     cells x 42 channels.
 #' }
 #'
 #' All data are downloaded from ExperimentHub and cached for local re-use.
@@ -49,11 +46,11 @@
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
 #' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
 #' object. Mapping at the image level can be performed with the
-#' \code{ImageNb} variable. Mapping between cell segmentation masks and single
-#' cell data is performed with the \code{CellNb} variable, the values of which
-#' correspond to the intensity values of the \code{JacksonFischer2020_masks}
-#' object. For practical examples, please refer to the "Accessing IMC datasets"
-#' vignette.
+#' \code{image_name} variable. Mapping between cell segmentation masks and
+#' single cell data is performed with the \code{cell_number} variable, the 
+#' values of which correspond to the intensity values of the 
+#' \code{masks} object. For practical examples, please refer 
+#' to the "Accessing IMC datasets" vignette.
 #'
 #' This dataset is a subset of the complete Jackson, Fischer et al. (2020)
 #' dataset comprising the data from tumour tissue from 100 patients with breast
@@ -68,19 +65,26 @@
 #'     99th percentile).
 #' }
 #'
-#' The marker-associated metadata, including antibody information and metal tags
-#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-#' object.
+#' The marker-associated metadata, including antibody information and metal 
+#' tags are stored in the \code{rowData} of the 
+#' \linkS4class{SingleCellExperiment} object.
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. These metadata include clusters
-#' (in \code{colData(sce)$PhenoGraphBasel}) and metaclusters (in
-#' \code{colData(sce)$metacluster}), as well as spatial information (e.g., cell
-#' areas are stored in \code{colData(sce)$Area}).
+#' (in \code{colData(sce)$cell_cluster_phenograph}) and metaclusters (in
+#' \code{colData(sce)$cell_metacluster}), as well as spatial information (e.g., 
+#' cell areas are stored in \code{colData(sce)$cell_area}).
 #'
-#' The patient-associated clinical data are also stored in the \code{colData} of
-#' the \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
-#' can be retrieved with \code{colData(sce)$grade}.
+#' The clinical data are also stored in the \code{colData} of the 
+#' \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
+#' can be retrieved with \code{colData(sce)$tumor_grade}.
+#' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved.
+#' \itemize{
+#'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
+#'     \item \code{`v1`}: consistent object formatting across datasets.
+#' }
 #'
 #' File sizes:
 #' \itemize{
@@ -113,16 +117,16 @@
 #'
 #' @examples
 #' # Load single cell data
-#' sce <- JacksonFischer2020Data(data_type = "sce")
+#' sce <- JacksonFischer_2020_BreastCancer(data_type = "sce")
 #' print(sce)
 #' 
 #' # Display metadata
-#' JacksonFischer2020Data(data_type = "sce", metadata = TRUE)
+#' JacksonFischer_2020_BreastCancer(data_type = "sce", metadata = TRUE)
 #' 
 #' # Load masks on disk
 #' library(HDF5Array)
-#' masks <- JacksonFischer2020Data(data_type = "masks", on_disk = TRUE,
-#' h5FilesPath = getHDF5DumpDir())
+#' masks <- JacksonFischer_2020_BreastCancer(data_type = "masks", on_disk = 
+#' TRUE, h5FilesPath = getHDF5DumpDir())
 #' print(head(masks))
 #' 
 #'
@@ -136,23 +140,24 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-JacksonFischer2020Data <- function (
+JacksonFischer_2020_BreastCancer <- function (
     data_type = c("sce", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
+    version = "latest",
     force = FALSE
 ) {
-    .Deprecated("JacksonFischer_2020_BreastCancer()")
-
-    available_versions <- dataset_version <- "v0"
+    available_versions <- c("v0", "v1")
     dataset_name <- "JacksonFischer_2020_BreastCancer"
-
+    dataset_version <- ifelse(version == "latest",
+        utils::tail(available_versions, n=1), version)
+    
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
     
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
         dataset_version, on_disk, h5FilesPath, force)
-
+    
     return(cur_dat)
 }

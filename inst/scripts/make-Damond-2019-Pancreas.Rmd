@@ -1,0 +1,661 @@
+---
+title: "Preparation of the Damond et al dataset"
+author: "Nicolas Damond and Nils Eling"
+date: "Created: 02 November 2020; Compiled: `r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
+```
+
+
+# **Introduction**
+
+This script downloads a hundred example images, as well as the associated single-cell data and cell segmentation masks from the pancreas Imaging Mass Cytometry (IMC) dataset described in the following publication:  
+
+[Damond et al. A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry. Cell Metabolism. 2019 Mar 5;29(3):755-768](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6821395).  
+
+All data are openly available from [Mendeley data](http://dx.doi.org/10.17632/cydmwsfztj.2). The images and masks were created using the [imctools](https://github.com/BodenmillerGroup/imctools) package and the [IMC segmentation pipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline).
+
+Here, we will download single cell data and metadata, and process them to create a [SingleCellExperiment](https://bioconductor.org/packages//SingleCellExperiment.html) object. We will then download the corresponding multichannel IMC images and cell segmentation masks and format them into `CytoImageList` objects using the [cytomapper](https://bioconductor.org/packages/cytomapper) package.
+
+
+# **Settings**
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(S4Vectors)
+library(SingleCellExperiment)
+library(cytomapper)
+```
+
+```{r dataset-version, echo=FALSE}
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
+```
+
+Set the working and output directories
+
+```{r directories}
+# Temporary directory to unzip files
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+# Output directory
+dataset_dir <- file.path(".", "Damond_2019_Pancreas")
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
+
+# Increase timeout period so that large files can be downloaded
+timeout <- getOption('timeout')
+options(timeout = 1000)
+```
+
+
+# **Single cell data**
+
+We will download a subset of single-cell data corresponding to 100 images from [@Damond-2019-Pancreas] from [Mendeley data](http://dx.doi.org/10.17632/cydmwsfztj.2).
+
+## Download single cell data
+
+### Import function
+
+Function to download and unzip files.
+
+```{r import-function}
+importData <- function(url, output_dir, filename) {
+  # Download
+  download.file(url, destfile = file.path(output_dir, filename))
+  
+  # Unzip
+  system2("unzip", args = c("-o",
+                            file.path(output_dir, filename),
+                            "-d", output_dir),
+          stdout = TRUE)
+  
+  # Remove zipped folder
+  file.remove(file.path(output_dir, filename))
+}
+```
+
+### Single cell data
+
+The `CellSubset` file contains all single cell data and metadata, including marker expression levels, spatial information, and neighborhood information.
+
+```{r import-cell-data, results='hide'}
+url_cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
+
+importData(url_cells, workdir, "CellSubset.zip")
+```
+
+### Image metadata
+
+The `Image` file contains all image metadata, such as image width and height, or the number of cells per image.
+
+```{r import-image-metadata, results='hide'}
+# Download the zipped folder image and unzip it
+url_image_meta <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/0b236273-d21b-4566-84a2-f1c56324a900/file_downloaded")
+
+importData(url_image_meta, workdir, "Image.zip")
+```
+
+### Cell type information
+
+In the original publication, cells were phenotyped based on informative marker expression.
+We also import these phenotype labels from the online repository.
+
+```{r import-celltypes, results='hide'}
+url_celltypes <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/59e8da72-5bfe-4289-b95b-28348a6e1222/file_downloaded")
+
+importData(url_celltypes, workdir, "CellTypes.zip")
+```
+
+### Neighbors information
+
+The `Object relationship` file contains information about cell neighborhoods.
+
+```{r import-neighbors, results='hide'}
+url_neigbhors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/ecd72f68-4cf5-4121-9d3d-ebb3c608220f/file_downloaded")
+
+importData(url_neigbhors, workdir, "ObjectRelationships.zip")
+```
+
+### Clinical information
+
+Last, the `Donors` file contains clinical information about organ donors.
+
+```{r download-donor-info, results='hide'}
+url_donors <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/9074990e-1b93-4c79-8c49-1db01a66398b/file_downloaded")
+
+importData(url_donors, workdir, "Donors.zip")
+```
+
+
+## Read in single-cell data
+
+We  first read in the `.csv` file containing cell data and metadata, and order it by image and object (cell) number. Then, we read in the other files that contain image metadata, cell types, neighboring cells, and clinical data.
+
+```{r read-in-cell-data}
+# Single cell data and metadata
+cells <- fread(file.path(workdir, "CellSubset.csv"), stringsAsFactors = FALSE)
+cells <- cells[order(cells$ImageNumber, cells$ObjectNumber), ]
+
+# Image metadata
+image_metadata <- fread(file.path(workdir, "All_Image.csv"),
+                        stringsAsFactors = FALSE)
+
+# Cell types
+celltypes <- fread(file.path(workdir, "CellTypes.csv"),
+                   stringsAsFactors = FALSE)
+
+# Neighbors
+neighbors <- fread(file.path(workdir, "All_Object relationships.csv"),
+                   stringsAsFactors = FALSE)
+
+# Clinical data
+donors <- fread(file.path(workdir, "Donors.csv"),
+                stringsAsFactors = FALSE)
+```
+
+
+## Prepare data
+
+### Cell-level metadata
+
+Here, we will collect all cell, image and clinical metadata to generate the `colData` entry of the final `SingleCellExperiment` object.  
+
+First, we collect all cell metadata. Columns are renamed for consistency with the other datasets.
+
+```{r cell-metadata}
+cell_metadata <- DataFrame(
+  cell_number = cells$ObjectNumber,
+  image_number = cells$ImageNumber,
+  cell_x = cells$Location_Center_X,
+  cell_y = cells$Location_Center_Y,
+  cell_area = cells$AreaShape_Area,
+  cell_perimeter = cells$AreaShape_Perimeter,
+  cell_compactness = cells$AreaShape_Compactness,
+  cell_eccentricity = cells$AreaShape_Eccentricity,
+  cell_euler_number = cells$AreaShape_EulerNumber,
+  cell_extent = cells$AreaShape_Extent,
+  cell_major_axis_length = cells$AreaShape_MajorAxisLength,
+  cell_minor_axis_length = cells$AreaShape_MinorAxisLength,
+  cell_orientation = cells$AreaShape_Orientation,
+  cell_solidity = cells$AreaShape_Solidity,
+  neighbors_number = cells$Neighbors_NumberOfNeighbors_3,
+  neighbors_percent_touching = cells$Neighbors_PercentTouching_3,
+  islet_parent = cells$Parent_Islets,
+  islet_closest = cells$Parent_ExpandedIslets,
+  distance_to_islet = cells$Intensity_MedianIntensity_IsletDistance_c100,
+  distance_to_bloodvessel = cells$Intensity_MedianIntensity_BVDistance_c101
+)
+cell_metadata$cell_number_absolute <- 1:nrow(cell_metadata)
+```
+
+We do the same with image metadata.
+
+```{r image-metadata}
+image_metadata <- image_metadata[, .(
+  image_number = ImageNumber,
+  image_name = Metadata_Core,
+  image_filename = FileName_CleanStack,
+  image_width = Width_CleanStack,
+  image_height = Height_CleanStack,
+  image_area = Width_CleanStack * Height_CleanStack,
+  image_cells_per_image = Count_Cells,
+  image_islets_per_image = Count_Islets,
+  tissue_slide = Metadata_Slide
+)]
+```
+
+We merge the cell and image metadata data frames.
+
+```{r merge-metadata}
+cell_metadata <- merge(cell_metadata, image_metadata, by = "image_number")
+```
+
+We add cell-type information to the metadata object. For this, we create a unique `cell_id` with the same format as in the `celltypes` dataset.
+We then convert `cell_id` to the {`image_number` `_` `cell_number`} format for consistency with other datasets.
+
+```{r import-cell-types}
+# Add unique cell ids to cell metadata
+cell_metadata$cell_id <- paste(cell_metadata$image_name,
+                               cell_metadata$cell_number,
+                               sep = "_")
+
+# Merge cell metadata and cell type information
+celltypes <- celltypes[, .(cell_id = id,
+                           cell_type = CellType,
+                           cell_category = CellCat)]
+cell_metadata <- merge(cell_metadata, celltypes, by = "cell_id")
+
+cell_metadata$cell_id <- paste(cell_metadata$image_number,
+                               cell_metadata$cell_number, sep = "_")
+```
+
+We add clinical (organ donor) information to the metadata object.
+
+```{r import-donors-info}
+# Rename columns
+donors <- donors[, .(
+  tissue_slide = slide,
+  tissue_region = part,
+  patient_id = case,
+  patient_batch = group,
+  patient_stage = stage,
+  patient_disease_duration = duration,
+  patient_age = Age,
+  patient_gender = Gender,
+  patient_ethnicity = Ethnicity,
+  patient_BMI = BMI
+)]
+
+# Merge
+cell_metadata <- merge(cell_metadata, donors, by = "tissue_slide")
+```
+
+We re-order the columns for consistency.
+
+```{r reorder-columns}
+col_order <- c(
+  "cell_id", "image_name", "image_number", "cell_number",
+  "cell_type", "cell_category", "cell_x", "cell_y", "cell_area",
+  "cell_number_absolute", "neighbors_number", "islet_parent", "islet_closest",
+  "distance_to_islet", "distance_to_bloodvessel",
+  "image_width", "image_height", "image_filename",
+  "tissue_slide", "tissue_region",
+  colnames(cell_metadata)[grepl("patient_", colnames(cell_metadata))]
+)
+
+cell_metadata <- cell_metadata[, col_order]
+```
+
+Finally, we order the cell metadata object based on `image_number` and `cell_number` and add unique cell ids as row names.
+
+```{r cell-rownames}
+# Rows are ordered by image and cell numbers
+cell_metadata <- cell_metadata[order(cell_metadata$image_number,
+                                     cell_metadata$cell_number), ]
+
+# Cell ids are used as row names
+rownames(cell_metadata) <- cell_metadata$cell_id
+```
+
+### Neighbors
+
+Here, we collect all cell neighborhood relationships. This information will be added to the `colPairs` slot of the `SingleCellExperiment` object. In the original publication, neighboring cells were defined by mask expansion.    
+
+First, we subset object relationships to keep only cell neighborhood relationships for images in the current dataset. Then, we add a `cell_number_absolute` column that contains a unique interger per cell. This number will be used to generate cell pairings.
+
+```{r prepare-neighbors}
+# Keep only neighborhood relationships
+neighbors <- neighbors[Relationship == "Neighbors", ]
+
+# Subset to the 100 images in the dataset
+setnames(neighbors, "First Image Number", "image_number")
+neighbors <- neighbors[image_number %in% cell_metadata$image_number, ]
+
+# Add image names
+image_map <- as.data.frame(unique(
+  cell_metadata[, c("image_number", "image_name")]))
+neighbors <- merge.data.table(neighbors, image_map, by = "image_number")
+
+# Add unique cell ids
+neighbors[, cell_id_from := paste(
+  image_number, `First Object Number`, sep = "_")]
+neighbors[, cell_id_to := paste(
+  image_number, `Second Object Number`, sep = "_")]
+
+# Map to absolute cell numbers (one unique number per cell)
+cell_map <- as.data.frame(unique(
+  cell_metadata[, c("cell_id", "cell_number_absolute")]))
+
+neighbors$cell_from <- cell_map$cell_number_absolute[
+  match(neighbors$cell_id_from, cell_map$cell_id)]
+
+neighbors$cell_to <- cell_map$cell_number_absolute[
+  match(neighbors$cell_id_to, cell_map$cell_id)]
+```
+
+### Marker metadata
+
+Here, we will collect all marker-related information and collect it in a `DataFrame` that will constitute the `rowData` slot of the `SingleCellExperiment` object.
+
+We first download the panel file, which contains antibody-related metadata. For some datasets, however, the channel-order and the panel order do not match. For this reason, the channel-mass file is used to match panel information and image stack slices.
+
+```{r import-panel}
+# Import panel
+url_panel <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/2f9fecfc-b98f-4937-bc38-ae1b959bd74d/file_downloaded")
+download.file(url_panel, destfile = file.path(workdir, "panel.csv"))
+panel <- fread(file.path(workdir, "panel.csv"))
+
+# Import channel-mass file
+url_channelmass <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/704312eb-377c-42e2-8227-44bb9aca0fb3/file_downloaded")
+download.file(url_channelmass, destfile = file.path(workdir, "ChannelMass.csv"))
+channel_mass <- fread(file.path(workdir, "ChannelMass.csv"), header = FALSE)
+```
+
+Then, we subset the channels that are relevant to data analysis (defined by the `keep` column in the panel file). Then, we order these channels based on isotope mass. Columns are renamed for consistency with the other datasets.
+
+```{r load-panel}
+# Read-in the panel
+panel <- panel[, .(
+  channel,
+  metal = MetalTag,
+  name = Target,
+  short_name = clean_Target,
+  antibody_clone = Clone,
+  keep = full
+)]
+
+# Match panel and stack slice information
+panel <- panel[keep == 1,]
+panel <- panel[order(match(panel$metal, channel_mass$V1)), ]
+panel[, keep := NULL]
+
+# Add consistent full names
+panel$full_name <- panel$name
+```
+
+We will also rename markers for consistency with other datasets.
+
+```{r rename-markers}
+panel[metal == "In115", `:=` (full_name = "Smooth muscle actin")]
+panel[metal == "Pr141", `:=` (full_name = "Insulin")]
+panel[metal == "Nd144", `:=` (full_name = "Prohormone convertase 2",
+                              antibody_clone = "polyclonal_PC2")]
+panel[metal == "Sm147", `:=` (full_name = "Myeloperoxidase",
+                              antibody_clone = "polyclonal_MPO")]
+panel[metal == "Nd148", `:=` (full_name = "Glucose transporter 1")]
+panel[metal == "Nd150", `:=` (
+  full_name = "Pancreatic amylase",
+  antibody_clone = "polyclonal_pancreatic_amylase")]
+panel[metal == "Eu153", `:=` (full_name = "Pancreatic polypeptide")]
+panel[metal == "Gd155", `:=` (full_name = "Programmed cell death protein 1",
+                              short_name = "PD_1")]
+panel[metal == "Gd158", `:=` (
+  full_name = "Pancreatic and duodenal homeobox 1",
+  antibody_clone = "polyclonal_Pdx1")]
+panel[metal == "Dy163", `:=` (full_name = "Forkhead box P3")]
+panel[metal == "Ho165", `:=` (full_name = "CD8 alpha")]
+panel[metal == "Er166", `:=` (full_name = "Carbonic anhydrase IX")]
+panel[metal == "Er167", `:=` (full_name = "Islet amyloid polypeptide",
+                              antibody_clone = "polyclonal_IAPP")]
+panel[metal == "Er168", `:=` (full_name = "Ki-67", short_name = "Ki67")]
+panel[metal == "Tm169", `:=` (full_name = "Homeobox protein Nkx-6.1",
+                              short_name = "NKX6_1",
+                              antibody_clone = "D8O4R")]
+panel[metal == "Er170", `:=` (full_name = "p-Histone H3 [S28]",
+                              short_name = "p_HH3")]
+panel[metal == "Yb171", `:=` (antibody_clone = "polyclonal_CD4")]
+panel[metal == "Yb173", `:=` (full_name = "E-Cadherin", short_name = "CDH1")]
+panel[metal == "Yb174", `:=` (
+  name = "PTPRN / IA-2",
+  full_name = "Receptor-type tyrosine-protein phosphatase-like N",
+  short_name = "PTPRN",
+  antibody_clone = "polyclonal_PTPRN")]
+panel[metal == "Lu175", `:=` (full_name = "phopsho-Rb [S807/S811]",
+                              short_name = "p_Rb")]
+panel[metal == "Yb176", `:=` (full_name = "cleaved-PARP + cleaved-Caspase3",
+                              short_name = "cPARP_cCASP3")]
+panel[metal == "Ir191", `:=` (full_name = "Iridium 191", short_name = "DNA1")]
+panel[metal == "Ir193", `:=` (full_name = "Iridium 193", short_name = "DNA2")]
+```
+
+Finally, we convert the panel table to a `DataFrame` and add target short_names as row names.
+
+```{r prepare-panel}
+panel <- as(panel, "DataFrame")
+rownames(panel) <- panel$short_name
+```
+
+### Counts matrix
+
+Here, we will prepare the counts matrix that will be stored in the `assay` slot of the `SingleCellExperiment` object.  
+
+CellProfiler measures a number of different statistics per marker and cell. We select the mean intensity per channel and per cell to obtain single-cell expression counts.
+
+```{r select-counts}
+counts_columns <- grepl("Intensity_MeanIntensity_CleanStack", colnames(cells))
+counts <- cells[, ..counts_columns]
+```
+
+Finally, we reorder the channels based on channel number and convert the counts to a `matrix`.
+
+```{r reorder-counts}
+channel_number <- as.numeric(sub("^.*_c", "", colnames(counts)))
+column_order <- order(channel_number, decreasing = FALSE)
+counts <- counts[, ..column_order]
+colnames(counts) <- NULL
+counts <- as.matrix(counts, rownames = NULL)
+```
+
+
+## Create SingleCellExperiment object
+
+### Create the object
+
+We have now obtained all data and metadata required to create the `SingleCellExperiment` object.
+
+```{r create-SCE}
+sce <- SingleCellExperiment(
+  assays = list(counts = t(counts)),
+  rowData = panel,
+  colData = cell_metadata
+)
+mainExpName(sce) <- "Damond_2019_Pancreas"
+```
+
+### Counts transformations
+
+We apply two different counts transformations:
+- `exprs`: arcsinh-transformed counts (cofactor = 1).
+- `quant_norm`: censored + quantile-normalized counts.
+
+```{r transform-counts}
+assay(sce, "exprs") <- asinh(counts(sce) / 1)
+
+quant <- apply(assay(sce, "counts"), 1, quantile, probs = 0.99)
+assay(sce, "quant_norm") <- apply(assay(sce, "counts"), 2,
+                                  function(x) x / quant)
+assay(sce, "quant_norm")[assay(sce, "quant_norm") > 1] <- 1
+assay(sce, "quant_norm")[assay(sce, "quant_norm") < 0] <- 0
+```
+
+### Add neighborhood information
+
+We generate a [SelfHits](https://bioconductor.org/packages/devel/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html#6_Storing_row_or_column_pairings) object containing pairings of neighboring cells and store it in the `colPairs` slot of the `SingleCellExperiment` object.
+
+Integers in the `colPairs(sce, "neighborhood")` object are unique cell numbers that map to `colData(sce)$cell_number_absolute`.
+
+```{r add-colpairs}
+colPair(sce, "neighborhood") <- SelfHits(from = neighbors$cell_from,
+                                         to = neighbors$cell_to,
+                                         nnode = ncol(sce))
+```
+
+### Save on disk
+
+We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-sce}
+saveRDS(sce, file.path(outdir, "sce.rds"))
+print(sce)
+```
+
+### Clean up
+
+Finally, we remove the downloaded files and generated objects to save storage space.
+
+```{r clean-up-cell-data, results='hide'}
+remove(counts, cells, celltypes, cell_metadata, neighbors, image_metadata)
+
+file.remove(file.path(workdir, "All_Image.csv"),
+            file.path(workdir, "CellSubset.csv"),
+            file.path(workdir, "CellTypes.csv"),
+            file.path(workdir, "All_Object relationships.csv"),
+            file.path(workdir, "Donors.csv"))
+```
+
+
+# **Images and cell masks**
+
+Here, we will download a subset of a hundred images from [@Damond-2019-Pancreas], as well as the corresponding cell segmentation masks. Images and masks correspond to the data in the `SingleCellExperiment` object and will be formatted into `CytoImageList` objects.
+
+
+## Import images and masks
+
+### Multichannel images
+
+We first download the image subset.
+
+```{r import-images, results='hide'}
+url_images <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/b37054d2-d5d0-4c48-a001-81ff77136f41/file_downloaded")
+
+importData(url_images, workdir, "ImageSubset.zip")
+```
+
+We use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
+
+```{r read-in-images}
+images <- loadImages(workdir, pattern = "_full_clean.tiff")
+```
+
+### Cell segmentation masks
+
+We also download the associated cell segmentation masks and read them into a `CytoImageList` object.
+
+```{r import-masks, results='hide'}
+url_masks <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/13679a61-e9b4-4820-9f09-a5bbc697647c/file_downloaded")
+
+importData(url_masks, workdir, "Masks.zip")
+```
+
+```{r read-in-masks}
+masks <- loadImages(workdir, pattern = "_full_mask.tiff")
+```
+
+### Clean-up
+
+We remove the downloaded image and mask `tiff` files to save storage space.
+
+```{r clean-up-images-masks, results='hide'}
+images_to_delete <- list.files(workdir, pattern = "_full_clean.tiff",
+                               full.names = TRUE)
+file.remove(images_to_delete)
+
+# Remove masks
+masks_to_delete <- list.files(workdir, pattern = "_full_mask.tiff",
+                              full.names = TRUE)
+file.remove(masks_to_delete)
+```
+
+
+## Prepare images and masks
+
+We will now process the images and masks to make them compatible with the `cytomapper` package.
+
+### Rescale masks
+
+The masks are 16-bit images and need to be re-scaled in order to obtain integer cell ids.
+
+```{r scale-masks}
+# Before scaling
+masks[[1]]
+
+masks <- scaleImages(masks, value = (2 ^ 16) - 1)
+
+# After scaling
+masks[[1]]
+```
+
+### Add image names and numbers
+
+Next, we add image names to the images and masks objects, these names correspond to the `image_name` column in `colData(sce)`. This information is stored in the metadata columns of the `CytoImageList` objects and is used by `cytomapper` to match single cell data, images and masks.
+
+```{r add-image-names}
+mcols(images)$image_name <- gsub("_a0_full_clean", "", names(images))
+mcols(masks)$image_name <- gsub("_a0_full_mask", "", names(masks))
+```
+
+We downloaded the full set of segmentation masks, so we will subset them to retain only the masks corresponding to the image subset. As a sanity check, we will make sure that the `image_name` slots of the `masks` and `images` objects are identical.
+
+```{r subset-masks}
+masks <- masks[mcols(masks)$image_name %in% mcols(images)$image_name]
+print(identical(mcols(images)$image_name, mcols(masks)$image_name))
+
+names(images) <- mcols(images)$image_name
+names(masks) <- mcols(masks)$image_name
+```
+
+We will also add `image_numbers` to the metadata columns of the `images` and `masks` objects.
+
+```{r add-image-numbers}
+ref_images <- unique(colData(sce)[, c("image_name", "image_number")])
+mcols(images) <- merge(mcols(images), ref_images, by = "image_name")
+mcols(masks) <- merge(mcols(masks), ref_images, by = "image_name")
+
+print(identical(mcols(images)$image_number, mcols(masks)$image_number))
+```
+
+### Add channel names
+
+Finally, we will add protein short names as channel names of the `images` object with , corresponding to the row names of the `SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names}
+# Match panel and stack slice information
+panel <- rowData(sce)
+panel <- panel[order(match(panel$metal, channel_mass$V1)), ]
+
+# Add channel names to the "images" object
+channelNames(images) <- panel$short_name
+```
+
+### Save on disk
+
+Finally, we will save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-masks}
+saveRDS(masks, file.path(outdir, "masks.rds"))
+print(masks)
+```
+
+```{r save-images}
+saveRDS(images, file.path(outdir, "images.rds"))
+print(images)
+```
+
+### Clean up
+
+Remove all files from the temporary working directory.
+
+```{r clean-up, results='hide'}
+downloaded_files <- list.files(workdir)
+downloaded_files <- downloaded_files[!downloaded_files %in% "BiocStyle"]
+unlink(file.path(workdir, downloaded_files), recursive = TRUE)
+
+# Reset original timeout value
+options(timeout = timeout)
+```
+
+
+# **Session information**
+
+```{r session-info}
+sessionInfo()
+```
+
+
+# **References**

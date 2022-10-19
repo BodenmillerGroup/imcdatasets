@@ -40,12 +40,16 @@ A \linkS4class{SingleCellExperiment} object with single cell data, a
 \linkS4class{CytoImageList} object containing cell segmentation masks.
 }
 \description{
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 Obtain the zanotelli-spheroids-2020 dataset, which consists of three data
 objects: single cell data, multichannel images and cell segmentation masks.
 The data were obtained by imaging mass cytometry of sections of 3D spheroids
 generated from different cell lines.
 }
 \details{
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 consisting of three data objects:
 \itemize{
