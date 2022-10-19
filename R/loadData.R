@@ -1,6 +1,6 @@
 # Argument check for wrapper functions
-.checkArguments <- function(data_type, metadata, version, available_versions,
-    on_disk, h5FilesPath, force
+.checkArguments <- function(data_type, metadata, dataset_version,
+    available_versions, on_disk, h5FilesPath, force
 ) {
     if (length(data_type) != 1) {
         stop('The data_type argument should be of length 1.')
@@ -14,11 +14,11 @@
         stop('"metadata" should be either TRUE or FALSE')
     }
     
-    if (length(version) != 1) {
+    if (length(dataset_version) != 1) {
         stop('The version argument should be of length 1.')
     }
     
-    if (!(version %in% available_versions)) {
+    if (!(dataset_version %in% available_versions)) {
         stop('"version" should be "latest" or one of the available dataset
             versions, e.g., "v1".')
     }
@@ -33,23 +33,23 @@
         }
         if (is.null(h5FilesPath)) {
             stop(
-              "When storing the images on disk, please specify a 'h5FilesPath'.
-              \n", "You can use 'h5FilesPath = getHDF5DumpDir()' to temporarily 
-              store the images.\n", "If doing so, .h5 files will be deleted
-              once the R session ends.")
+                "When storing the images on disk, please specify a 
+                'h5FilesPath'.\n", "You can use 'h5FilesPath = getHDF5DumpDir()'
+                to temporarily store the images.\n", "If doing so, .h5 files 
+                will be deleted once the R session ends.")
         }
     }
 }
 
 # Load data objects
-.loadDataObject <- function(data_type, metadata, dataset_name, version, host,
+.loadDataObject <- function(data_type, metadata, dataset_name, dataset_version,
     on_disk, h5FilesPath, force
 ) {
     ## Load queried dataset
     eh <- ExperimentHub()
-    title <- paste(dataset_name, data_type, version, sep = " - ")
+    title <- paste(dataset_name, data_type, dataset_version, sep = " - ")
     object_id <- eh[eh$title == title]$ah_id
-  
+
     if (metadata) {
         cur_dat <- eh[object_id]
         return(cur_dat)

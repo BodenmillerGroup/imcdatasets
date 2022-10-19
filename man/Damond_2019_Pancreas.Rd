@@ -59,8 +59,9 @@ consisting of three data objects:
     \linkS4class{CytoImageList} class object.
     \item \code{sce} contains the single cell data extracted from the 
     multichannel images using the cell segmentation masks, as well as the 
-    associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-     This represents a total of 252,059 cells x 38 channels.
+    associated metadata, in the form of a 
+    \linkS4class{SingleCellExperiment}. This represents a total of 252,059 
+    cells x 38 channels.
 }
 
 All data are downloaded from ExperimentHub and cached for local re-use.
@@ -77,9 +78,10 @@ examples, please refer to the "Accessing IMC datasets" vignette.
 
 This dataset is a subset of the complete Damond et al. (2019) dataset
 comprising the data from three pancreas donors at different stages of type 1
-diabetes (T1D). The three donors present clearly diverging characteristics in
-terms of cell type composition and cell-cell interactions, which makes this
-dataset ideal for benchmarking spatial and neighborhood analysis algorithms.
+diabetes (T1D). The three donors present clearly diverging characteristics 
+in terms of cell type composition and cell-cell interactions, which makes 
+this dataset ideal for benchmarking spatial and neighborhood analysis 
+algorithms.
 
 The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
 contains three assays:
@@ -90,18 +92,18 @@ contains three assays:
     and scaled 0-1.
 }
 
-The marker-associated metadata, including antibody information and metal tags
-are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-object.
+The marker-associated metadata, including antibody information and metal 
+tags are stored in the \code{rowData} of the 
+\linkS4class{SingleCellExperiment} object.
 
 The cell-associated metadata are stored in the \code{colData} of the
 \linkS4class{SingleCellExperiment} object. These metadata include cell types
 (in \code{colData(sce)$cell_type}) and broader cell categories, such  as
-"immune" or "islet" cells (in \code{colData(sce)$cell_category}). In addition,
-for cells located inside pancreatic islets, the islet they belong to is
-indicated in \code{colData(sce)$islet_parent}. For cells not located in
-islets, the "islet_parent" value is set to 0 but the spatially closest islet
-can be identified with \code{colData(sce)$islet_closest}.
+"immune" or "islet" cells (in \code{colData(sce)$cell_category}). In
+addition, for cells located inside pancreatic islets, the islet they belong 
+to is indicated in \code{colData(sce)$islet_parent}. For cells not located 
+in islets, the "islet_parent" value is set to 0 but the spatially closest 
+islet can be identified with \code{colData(sce)$islet_closest}.
 
 The donor-associated metadata are also stored in the \code{colData} of the
 \linkS4class{SingleCellExperiment} object. For instance, the donors' IDs can
@@ -120,19 +122,18 @@ The three donors present the following characteristics:
     many beta cells, severe infiltration of the exocrine pancreas with
     myeloid cells but limited infiltration of islets.
     \item \code{6414} is a donor with recent T1D onset (shortly after
-    diagnosis) showing partial beta cell destruction and mild infiltration of
-    islets with T cells.
+    diagnosis) showing partial beta cell destruction and mild infiltration 
+    of islets with T cells.
     \item \code{6180} is a donor with long-duration T1D (11 years after
     diagnosis), showing near-total beta cell destruction and limited immune
     cell infiltration in both the islets and the pancreas.
 }
 
 Dataset versions: a \code{version} argument can be passed to the function to 
-specify which dataset version should be retrieved. The original version 
-("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
-\code{DamondPancreas2019Data} function.
+specify which dataset version should be retrieved.
 \itemize{
-    \item \code{`v1`}: first version of the dataset.
+    \item \code{`v0`}: original version (Bioconductor <= 3.15).
+    \item \code{`v1`}: consistent object formatting across datasets.
 }
 
 File sizes:

@@ -152,14 +152,12 @@ JacksonFischer_2020_BreastCancer <- function (
     dataset_name <- "JacksonFischer_2020_BreastCancer"
     dataset_version <- ifelse(version == "latest",
         utils::tail(available_versions, n=1), version)
-    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
-    host <- file.path("imcdatasets", dataset_path)
-
+    
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
-
+    
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
-        dataset_version, host, on_disk, h5FilesPath, force)
-
+        dataset_version, on_disk, h5FilesPath, force)
+    
     return(cur_dat)
 }

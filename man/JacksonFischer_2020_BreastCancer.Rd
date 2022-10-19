@@ -60,8 +60,9 @@ This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
     \linkS4class{CytoImageList} class object.
     \item \code{sce} contains the single cell data extracted from the 
     multichannel images using the cell segmentation masks, as well as the 
-    associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-     This represents a total of 285,851 cells x 42 channels.
+    associated metadata, in the form of a 
+    \linkS4class{SingleCellExperiment}. This represents a total of 285,851 
+    cells x 42 channels.
 }
 
 All data are downloaded from ExperimentHub and cached for local re-use.
@@ -89,9 +90,9 @@ contains three assays:
     99th percentile).
 }
 
-The marker-associated metadata, including antibody information and metal tags
-are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-object.
+The marker-associated metadata, including antibody information and metal 
+tags are stored in the \code{rowData} of the 
+\linkS4class{SingleCellExperiment} object.
 
 The cell-associated metadata are stored in the \code{colData} of the
 \linkS4class{SingleCellExperiment} object. These metadata include clusters
@@ -104,11 +105,10 @@ The clinical data are also stored in the \code{colData} of the
 can be retrieved with \code{colData(sce)$tumor_grade}.
 
 Dataset versions: a \code{version} argument can be passed to the function to 
-specify which dataset version should be retrieved. The original version 
-("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
-\code{JacksonFischer2020Data} function.
+specify which dataset version should be retrieved.
 \itemize{
-    \item \code{`v1`}: first version of the dataset.
+    \item \code{`v0`}: original version (Bioconductor <= 3.15).
+    \item \code{`v1`}: consistent object formatting across datasets.
 }
 
 File sizes:
