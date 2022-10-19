@@ -9,6 +9,7 @@ JacksonFischer_2020_BreastCancer(
   metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
+  version = "latest",
   force = FALSE
 )
 }
@@ -29,7 +30,9 @@ and \code{masks}.}
 \item{h5FilesPath}{path to where the .h5 files for on disk representation
 are stored. This path needs to be defined when \code{on_disk = TRUE}.
 When files should only temporarily be stored on disk, please set
-\code{h5FilesPath = getHDF5DumpDir()}}
+\code{h5FilesPath = getHDF5DumpDir()}.}
+
+\item{version}{dataset version. By default, the latest version is returned.}
 
 \item{force}{logical indicating if images should be overwritten when files
 with the same name already exist on disk.}
@@ -99,6 +102,14 @@ cell areas are stored in \code{colData(sce)$cell_area}).
 The clinical data are also stored in the \code{colData} of the 
 \linkS4class{SingleCellExperiment} object. For instance, the tumor grades
 can be retrieved with \code{colData(sce)$tumor_grade}.
+
+Dataset versions: a \code{version} argument can be passed to the function to 
+specify which dataset version should be retrieved. The original version 
+("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
+\code{JacksonFischer2020Data} function.
+\itemize{
+    \item \code{`v1`}: first version of the dataset.
+}
 
 File sizes:
 \itemize{
