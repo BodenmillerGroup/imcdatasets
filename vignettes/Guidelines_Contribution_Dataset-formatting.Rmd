@@ -62,7 +62,8 @@ Examples can be found [here](https://github.com/BodenmillerGroup/imcdatasets/blo
 documented.
 
 **For usability of the package and consistency across datasets, the data **
-**objects must be formatted as described in the `Dataset format` section below.**
+**objects must be formatted as described in the** `Dataset format` **section **
+**below.**
 
 
 ## Update the documentation
@@ -184,11 +185,11 @@ For the `full_name` and `short_name` columns, the following guidelines apply:
 * In `short_name`, all dashes, dots and spaces should removed or replaced with 
 underscores.
 * For post-translationally modified proteins:
-  * Prefix the `full_name` with the modification type (e.g., `phospho-`, 
-  `methyl-`) and suffix it with the modified aminoacids (e.g., `[S28]`).
-  * Prefix the `short_name` with an abbreviation of the modification type 
-  (e.g., `p_`, `me_`) and do not indicate the modified aminoacids, unless there
-  is a possible confusion with another target in the dataset.
+* Prefix the `full_name` with the modification type (e.g., `phospho-`, 
+`methyl-`) and suffix it with the modified aminoacids (e.g., `[S28]`).
+* Prefix the `short_name` with an abbreviation of the modification type 
+(e.g., `p_`, `me_`) and do not indicate the modified aminoacids, unless there
+is a possible confusion with another target in the dataset.
 
 ```{r echo=FALSE, results='hide'}
 marker_names <- data.frame(
@@ -212,28 +213,28 @@ marker_names <- data.frame(
         "Vimentin",
         "Iridium 191",
         "Iridium 193"
-  ),
-  short_name = c(
-      "CA9",
-      "CD3e",
-      "CD8a",
-      "CDH1",
-      "cCASP3_cPARP",
-      "KRT5",
-      "FOXP3",
-      "SLC2A1",
-      "H3",
-      "p_H3",
-      "Ki67",
-      "MPO",
-      "PD_1",
-      "PD_L1",
-      "p_Rb",
-      "SMA",
-      "VIM",
-      "DNA1",
-      "DNA2"
-  )
+    ),
+    short_name = c(
+        "CA9",
+        "CD3e",
+        "CD8a",
+        "CDH1",
+        "cCASP3_cPARP",
+        "KRT5",
+        "FOXP3",
+        "SLC2A1",
+        "H3",
+        "p_H3",
+        "Ki67",
+        "MPO",
+        "PD_1",
+        "PD_L1",
+        "p_Rb",
+        "SMA",
+        "VIM",
+        "DNA1",
+        "DNA2"
+    )
 )
 ```
 
