@@ -173,11 +173,11 @@ ZanotelliSpheroids2020Data <- function (
 ) {
     .Deprecated("Zanotelli_2020_Spheroids()")
     .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
+        on_disk, h5FilesPath, force)
+
     dataset_name <- "ZanotelliSpheroids2020"
     host <- file.path("imcdatasets", "zanotelli-spheroids-2020")
-  
+
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+        on_disk, h5FilesPath, force)
 }

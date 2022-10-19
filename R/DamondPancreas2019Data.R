@@ -161,12 +161,12 @@ DamondPancreas2019Data <- function (
 ) {
     .Deprecated("Damond_2019_Pancreas()")
     .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
+        on_disk, h5FilesPath, force)
+
     dataset_name <- "DamondPancreas2019"
     host <- file.path("imcdatasets", "damond-pancreas-2019")
-  
+
     cur_dat <- .loadDataObject(
-      dataset_name, host, data_type, metadata,
-      on_disk, h5FilesPath, force)
+        dataset_name, host, data_type, metadata,
+        on_disk, h5FilesPath, force)
 }

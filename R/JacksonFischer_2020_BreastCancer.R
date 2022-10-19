@@ -35,8 +35,9 @@
 #'     \linkS4class{CytoImageList} class object.
 #'     \item \code{sce} contains the single cell data extracted from the 
 #'     multichannel images using the cell segmentation masks, as well as the 
-#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-#'      This represents a total of 285,851 cells x 42 channels.
+#'     associated metadata, in the form of a 
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 285,851 
+#'     cells x 42 channels.
 #' }
 #'
 #' All data are downloaded from ExperimentHub and cached for local re-use.
@@ -64,9 +65,9 @@
 #'     99th percentile).
 #' }
 #'
-#' The marker-associated metadata, including antibody information and metal tags
-#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-#' object.
+#' The marker-associated metadata, including antibody information and metal 
+#' tags are stored in the \code{rowData} of the 
+#' \linkS4class{SingleCellExperiment} object.
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object. These metadata include clusters
@@ -79,11 +80,10 @@
 #' can be retrieved with \code{colData(sce)$tumor_grade}.
 #' 
 #' Dataset versions: a \code{version} argument can be passed to the function to 
-#' specify which dataset version should be retrieved. The original version 
-#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
-#' \code{JacksonFischer2020Data} function.
+#' specify which dataset version should be retrieved.
 #' \itemize{
-#'     \item \code{`v1`}: first version of the dataset.
+#'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
+#'     \item \code{`v1`}: consistent object formatting across datasets.
 #' }
 #'
 #' File sizes:
@@ -148,18 +148,18 @@ JacksonFischer_2020_BreastCancer <- function (
     version = "latest",
     force = FALSE
 ) {
-    available_versions <- c("v1")
+    available_versions <- c("v0", "v1")
     dataset_name <- "JacksonFischer_2020_BreastCancer"
-    dataset_version = ifelse(version == "latest",
-        tail(available_versions, n=1), version)
+    dataset_version <- ifelse(version == "latest",
+        utils::tail(available_versions, n=1), version)
     dataset_path <- paste(dataset_name, dataset_version, sep = "_")
     host <- file.path("imcdatasets", dataset_path)
-    
+
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
-    
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-        on_disk, h5FilesPath, force)
-    
+
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, host, on_disk, h5FilesPath, force)
+
     return(cur_dat)
 }

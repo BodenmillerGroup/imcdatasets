@@ -24,8 +24,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
-#' consisting of three data objects:
+#' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. 
+#' (2020), consisting of three data objects:
 #' \itemize{
 #'     \item \code{images} contains 517 multichannel images, each containing 51 
 #'     channels, in the form of a \linkS4class{CytoImageList} class object.
@@ -34,8 +34,9 @@
 #'     \linkS4class{CytoImageList} class object.
 #'     \item \code{sce} contains the single cell data extracted from the 
 #'     multichannel images using the cell segmentation masks, as well as the 
-#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-#'      This represents a total of 229,047 cells x 51 channels.
+#'     associated metadata, in the form of a
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 229,047 
+#'     cells x 51 channels.
 #' }
 #'
 #' All data are downloaded from ExperimentHub and cached for local re-use.
@@ -53,18 +54,18 @@
 #' This dataset was obtained as following (the names of the experimental
 #' variables, located in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} object, are indicated in parentheses):
-#' \emph{i)} Cells from four different cell lines (\code{cell_line}) were seeded 
-#' at three different densities (\code{treatment_concentration}, relative
-#' densities) and grown for either 72 or 96 hours (\code{treatment_time_point}, 
-#' duration in hours). In the appropriate experimental conditions (see the paper
-#'  for details), the cells aggregate into 3D spheroids. \emph{ii)} Cells were 
-#' harvested and pooled into 60-well barcoding plates. \emph{iii)} A pellet of 
-#' each spheroid pool was generated and cut into several 6 um-thick sections. 
-#' \emph{iv)} A subset of these sections (\code{site_id}) were stained with an 
-#' IMC panel and acquired as one or more acquisitions (\code{acquisition_id}) 
-#' containing multiple spheres each. \emph{v)} Spheres in these acquisitions 
-#' were identified by computer vision and cropped into individual images 
-#' (\code{image_number}).
+#' \emph{i)} Cells from four different cell lines (\code{cell_line}) were 
+#' seeded at three different densities (\code{treatment_concentration}, 
+#' relative densities) and grown for either 72 or 96 hours 
+#' (\code{treatment_time_point}, duration in hours). In the appropriate 
+#' experimental conditions (see the paper for details), the cells aggregate 
+#' into 3D spheroids. \emph{ii)} Cells were harvested and pooled into 60-well 
+#' barcoding plates. \emph{iii)} A pellet of each spheroid pool was generated 
+#' and cut into several 6 um-thick sections. \emph{iv)} A subset of these 
+#' sections (\code{site_id}) were stained with an IMC panel and acquired as one
+#'  or more acquisitions (\code{acquisition_id}) containing multiple spheres 
+#' each. \emph{v)} Spheres in these acquisitions were identified by computer 
+#' vision and cropped into individual images (\code{image_number}).
 #'
 #' Other relevant cell metadata include:
 #' \itemize{
@@ -82,11 +83,11 @@
 #' the publication (https://doi.org/10.15252/msb.20209798) and to the
 #' original dataset repository (https://doi.org/10.5281/zenodo.4271910).
 #'
-#' The marker-associated metadata, including antibody information and metal tags
-#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-#' object. The channels with names starting with "BC_" are the channels used for
-#'  barcoding. Post-transcriptional modification of the protein targets are
-#' indicated in brackets.
+#' The marker-associated metadata, including antibody information and metal 
+#' tags are stored in the \code{rowData} of the 
+#' \linkS4class{SingleCellExperiment} object. The channels with names starting 
+#' with "BC_" are the channels used for barcoding. Post-transcriptional 
+#' modification of the protein targets are indicated in brackets.
 #'
 #' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
 #' contains three assays:
@@ -97,10 +98,10 @@
 #'     and scaled 0-1.
 #' }
 #' 
-#' In addition, the \code{altExp} slot of the \linkS4class{SingleCellExperiment}
-#' object contains another \linkS4class{SingleCellExperiment} object where the 
-#' counts matrix represents raw mean ion counts for cells neighboring the
-#' current cell.
+#' In addition, the \code{altExp} slot of the 
+#' \linkS4class{SingleCellExperiment} object contains another 
+#' \linkS4class{SingleCellExperiment} object where the counts matrix represents
+#'  raw mean ion counts for cells neighboring the current cell.
 #'
 #' Neighborhood information, defined here as cells that are localized next to 
 #' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
@@ -109,11 +110,10 @@
 #' \code{cell_number_absolute} column of \code{colData(sce)}.
 #' 
 #' Dataset versions: a \code{version} argument can be passed to the function to 
-#' specify which dataset version should be retrieved. The original version 
-#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
-#' \code{ZanotelliSpheroids2020Data} function.
+#' specify which dataset version should be retrieved.
 #' \itemize{
-#'     \item \code{`v1`}: first version of the dataset.
+#'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
+#'     \item \code{`v1`}: consistent object formatting across datasets.
 #' }
 #' 
 #' File sizes:
@@ -178,18 +178,18 @@ Zanotelli_2020_Spheroids <- function (
     version = "latest",
     force = FALSE
 ) {
-    available_versions <- c("v1")
+    available_versions <- c("v0", "v1")
     dataset_name <- "Zanotelli_2020_Spheroids"
-    dataset_version = ifelse(version == "latest",
-        tail(available_versions, n=1), version)
+    dataset_version <- ifelse(version == "latest",
+        utils::tail(available_versions, n=1), version)
     dataset_path <- paste(dataset_name, dataset_version, sep = "_")
     host <- file.path("imcdatasets", dataset_path)
-    
+
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
-  
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-        on_disk, h5FilesPath, force)
-    
+
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, host, on_disk, h5FilesPath, force)
+
     return(cur_dat)
 }

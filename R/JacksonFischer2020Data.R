@@ -145,11 +145,11 @@ JacksonFischer2020Data <- function (
 ) {
     .Deprecated("JacksonFischer_2020_BreastCancer()")
     .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
+        on_disk, h5FilesPath, force)
+
     dataset_name <- "JacksonFischer2020"
     host <- file.path("imcdatasets", "jacksonfischer-breastcancer-2020")
-  
+
     cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+        on_disk, h5FilesPath, force)
 }
