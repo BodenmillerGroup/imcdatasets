@@ -40,8 +40,8 @@ A \linkS4class{SingleCellExperiment} object with single cell data, a
 \linkS4class{CytoImageList} object containing cell masks.
 }
 \description{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use 
 \code{JacksonFischer_2020_BreastCancer}.
 Obtain the jackson-fischer-2020 dataset, which consists of three data
 objects: single cell data, multichannel images and cell segmentation masks.
@@ -49,8 +49,8 @@ The data was obtained by imaging mass cytometry of tumour tissue from
 patients with breast cancer.
 }
 \details{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use 
 \code{JacksonFischer_2020_BreastCancer}.
 This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 (2020), consisting of three data objects:

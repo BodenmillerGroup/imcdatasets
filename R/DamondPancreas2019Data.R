@@ -1,8 +1,7 @@
 #' Obtain the damond-pancreas-2019 dataset
 #' 
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 #' Obtain the damond-pancreas-2019 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
 #' The data was obtained by imaging mass cytometry of human pancreas sections
@@ -26,9 +25,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 #' consisting of three data objects:
 #' \itemize{
@@ -160,13 +158,15 @@ DamondPancreas2019Data <- function (
     force = FALSE
 ) {
     .Deprecated("Damond_2019_Pancreas()")
-    .checkArguments(data_type, metadata,
+    
+    available_versions <- dataset_version <- "v0"
+    dataset_name <- "Damond_2019_Pancreas"
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
 
-    dataset_name <- "DamondPancreas2019"
-    host <- file.path("imcdatasets", "damond-pancreas-2019")
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
 
-    cur_dat <- .loadDataObject(
-        dataset_name, host, data_type, metadata,
-        on_disk, h5FilesPath, force)
+    return(cur_dat)
 }

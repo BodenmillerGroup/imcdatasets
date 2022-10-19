@@ -1,7 +1,7 @@
 #' Obtain the jackson-fischer-2020 dataset
 #'
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use 
 #' \code{JacksonFischer_2020_BreastCancer}.
 #' Obtain the jackson-fischer-2020 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
@@ -26,8 +26,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use 
 #' \code{JacksonFischer_2020_BreastCancer}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 #' (2020), consisting of three data objects:
@@ -144,12 +144,15 @@ JacksonFischer2020Data <- function (
     force = FALSE
 ) {
     .Deprecated("JacksonFischer_2020_BreastCancer()")
-    .checkArguments(data_type, metadata,
-        on_disk, h5FilesPath, force)
 
-    dataset_name <- "JacksonFischer2020"
-    host <- file.path("imcdatasets", "jacksonfischer-breastcancer-2020")
+    available_versions <- dataset_version <- "v0"
+    dataset_name <- "JacksonFischer_2020_BreastCancer"
 
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
+    
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
+
+    return(cur_dat)
 }

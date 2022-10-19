@@ -1,8 +1,7 @@
 #' Obtain the zanotelli-spheroids-2020 dataset
 #'
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Zanotelli_2020_Spheroids}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 #' Obtain the zanotelli-spheroids-2020 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
 #' The data were obtained by imaging mass cytometry of sections of 3D spheroids
@@ -26,9 +25,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Zanotelli_2020_Spheroids}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 #' consisting of three data objects:
 #' \itemize{
@@ -172,12 +170,15 @@ ZanotelliSpheroids2020Data <- function (
     force = FALSE
 ) {
     .Deprecated("Zanotelli_2020_Spheroids()")
-    .checkArguments(data_type, metadata,
-        on_disk, h5FilesPath, force)
 
-    dataset_name <- "ZanotelliSpheroids2020"
-    host <- file.path("imcdatasets", "zanotelli-spheroids-2020")
-
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
+    available_versions <- dataset_version <- "v0"
+    dataset_name <- "Zanotelli_2020_Spheroids"
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
+    
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
+    
+    return(cur_dat)
 }

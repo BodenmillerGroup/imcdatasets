@@ -40,18 +40,16 @@ A \linkS4class{SingleCellExperiment} object with single cell data, a
 \linkS4class{CytoImageList} object containing cell masks.
 }
 \description{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
-\code{Damond_2019_Pancreas}.
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 Obtain the damond-pancreas-2019 dataset, which consists of three data
 objects: single cell data, multichannel images and cell segmentation masks.
 The data was obtained by imaging mass cytometry of human pancreas sections
 from donors with type 1 diabetes.
 }
 \details{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
-\code{Damond_2019_Pancreas}.
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 consisting of three data objects:
 \itemize{
