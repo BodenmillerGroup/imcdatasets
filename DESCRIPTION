@@ -1,6 +1,6 @@
 Package: imcdatasets
 Version: 1.5.3
-Date: 2022-09-27
+Date: 2022-10-19
 Title: Collection of publicly available imaging mass cytometry (IMC) datasets
 Description:
     The imcdatasets package provides access to publicly available IMC datasets.
