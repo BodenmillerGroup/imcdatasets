@@ -122,9 +122,9 @@ The three donors present the following characteristics:
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.78 Gb.
-    \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.6 Mb.
-    \item \code{`sce`}: size in memory = 248 Mb, size on disk = 145 Mb.
+    \item \code{`images`}: size in memory = 7.4 Gb, size on disk = 1.7 Gb.
+    \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.2 Mb.
+    \item \code{`sce`}: size in memory = 352 Mb, size on disk = 212 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory

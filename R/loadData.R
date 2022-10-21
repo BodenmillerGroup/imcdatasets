@@ -6,8 +6,8 @@
         stop('The data_type argument should be of length 1.')
     }
     
-    if (!(data_type %in% c("sce", "images", "masks"))) {
-        stop('The data_type argument should be "sce", "images" or "masks".')
+    if (!(data_type %in% c("sce", "spe", "images", "masks"))) {
+        stop('The data_type argument should be "sce", "spe", "images", or "masks".')
     }
     
     if (!(isTRUE(metadata) | isFALSE(metadata))) {
@@ -19,8 +19,11 @@
     }
     
     if (!(dataset_version %in% available_versions)) {
-        stop('"version" should be "latest" or one of the available dataset
-            versions, e.g., "v1".')
+        stop('"version" should be "latest" or one of the available dataset versions, e.g., "v1".')
+    }
+    
+    if (data_type == "spe" & dataset_version == "v0") {
+        stop('It is only possible to retrieve SPE objects with dataset versions >= v1.')
     }
     
     if (!(isTRUE(on_disk) | isFALSE(on_disk))) {
@@ -47,7 +50,11 @@
 ) {
     ## Load queried dataset
     eh <- ExperimentHub()
-    title <- paste(dataset_name, data_type, dataset_version, sep = " - ")
+    if (data_type == "spe")
+        title <- paste(dataset_name, "sce", dataset_version, sep = " - ")
+    else
+        title <- paste(dataset_name, data_type, dataset_version, sep = " - ")
+        
     object_id <- eh[eh$title == title]$ah_id
 
     if (metadata) {
@@ -56,6 +63,9 @@
     } else {
         cur_dat <- eh[[object_id]]
     }
+    
+    if (data_type == "spe")
+        cur_dat <- .SCEtoSPE(cur_dat)
     
     if (on_disk) {
         ## Check if files exist
@@ -71,21 +81,21 @@
     return(cur_dat)
 }
 
-# # Convert SCE to SPE
-# .SCEtoSPE <- function(sce, dataset_name) {
-#     # Load the SCE object
-#     eh <- ExperimentHub()
-#     title <- paste(dataset_name, "sce", sep = "_")
-#     object_id <- eh[eh$title == title]$ah_id
-#     spe <- eh[[object_id]]
-# 
-#     # Convert to SPE
-#     spe$sample_id <- spe$image_name
-#     spe <- as(spe, "SpatialExperiment")
-#     spatialCoords(spe) <- as.matrix(
-#         colData(spe)[, c("cell_x", "cell_y")])
-#     spe$cell_x <- NULL
-#     spe$cell_y <- NULL
-# 
-#     return(spe)
-# }
+# Convert SCE to SPE
+.SCEtoSPE <- function(exp_object) {
+    if (is(exp_object,  "SingleCellExperiment")) {
+        exp_object <- SpatialExperiment::toSpatialExperiment(
+            exp_object,
+            sample_id = "image_name",
+            spatialCoordsNames = c("cell_x", "cell_y")
+        )
+    }
+    
+    if (length(altExpNames(exp_object)) > 0) {
+        alt_exps <- altExps(exp_object)
+        alt_exps_spe <- lapply(alt_exps, .SCEtoSPE)
+        altExps(exp_object) <- alt_exps_spe
+    }
+
+    return(exp_object)
+}

@@ -2,10 +2,10 @@
 % Please edit documentation in R/JacksonFischer_2020_BreastCancer.R
 \name{JacksonFischer_2020_BreastCancer}
 \alias{JacksonFischer_2020_BreastCancer}
-\title{Obtain the JacksonFischer-2020-BreastCancer dataset}
+\title{Obtain the JacksonFischer_2020_BreastCancer dataset}
 \usage{
 JacksonFischer_2020_BreastCancer(
-  data_type = c("sce", "images", "masks"),
+  data_type = c("sce", "spe", "images", "masks"),
   metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
@@ -14,9 +14,10 @@ JacksonFischer_2020_BreastCancer(
 )
 }
 \arguments{
-\item{data_type}{type of object to load, should be `sce` for single cell
-data, `images` for multichannel images or `masks` for cell segmentation
-masks.}
+\item{data_type}{type of object to load, `images` for multichannel images or
+`masks` for cell segmentation masks. Single cell data are retrieved using 
+either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
+\code{SpatialExperiment} format.}
 
 \item{metadata}{if FALSE (default), the data object selected in 
 \code{data_type} is returned. If TRUE, only the metadata associated to this
@@ -39,11 +40,12 @@ with the same name already exist on disk.}
 }
 \value{
 A \linkS4class{SingleCellExperiment} object with single cell data, a
+\linkS4class{SpatialExperiment} object with single cell data, a 
 \linkS4class{CytoImageList} object containing multichannel images, or a
-\linkS4class{CytoImageList} object containing cell masks.
+\linkS4class{CytoImageList} object containing cell segmentation masks.
 }
 \description{
-Obtain the JacksonFischer-2020-BreastCancer dataset, which consists of three 
+Obtain the JacksonFischer_2020_BreastCancer dataset, which consists of three 
 data objects: single cell data, multichannel images and cell segmentation 
 masks.
 The data was obtained by imaging mass cytometry (IMC) of tumour tissue from
@@ -63,18 +65,20 @@ This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
     associated metadata, in the form of a 
     \linkS4class{SingleCellExperiment}. This represents a total of 285,851 
     cells x 42 channels.
+    \item \code{spe} same single cell data as for \code{sce}, but in the
+    \linkS4class{SpatialExperiment} format.
 }
 
 All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables located in
 their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
-objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
-object. Mapping at the image level can be performed with the
-\code{image_name} variable. Mapping between cell segmentation masks and
-single cell data is performed with the \code{cell_number} variable, the 
-values of which correspond to the intensity values of the 
-\code{masks} object. For practical examples, please refer 
+objects and \code{ColData()} for the \linkS4class{SingleCellExperiment} and 
+\linkS4class{SpatialExperiment} objects. Mapping at the image level can be 
+performed with the \code{image_name} variable. Mapping between cell 
+segmentation masks and single cell data is performed with the 
+\code{cell_number} variable, the values of which correspond to the intensity
+values of the \code{masks} object. For practical examples, please refer 
 to the "Accessing IMC datasets" vignette.
 
 This dataset is a subset of the complete Jackson, Fischer et al. (2020)
@@ -92,17 +96,20 @@ contains three assays:
 
 The marker-associated metadata, including antibody information and metal 
 tags are stored in the \code{rowData} of the 
-\linkS4class{SingleCellExperiment} object.
+\linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+objects.
 
 The cell-associated metadata are stored in the \code{colData} of the
-\linkS4class{SingleCellExperiment} object. These metadata include clusters
-(in \code{colData(sce)$cell_cluster_phenograph}) and metaclusters (in
+\linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+objects. These metadata include clusters (in 
+\code{colData(sce)$cell_cluster_phenograph}) and metaclusters (in
 \code{colData(sce)$cell_metacluster}), as well as spatial information (e.g., 
 cell areas are stored in \code{colData(sce)$cell_area}).
 
 The clinical data are also stored in the \code{colData} of the 
-\linkS4class{SingleCellExperiment} object. For instance, the tumor grades
-can be retrieved with \code{colData(sce)$tumor_grade}.
+\linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+objects. For instance, the tumor grades can be retrieved with 
+\code{colData(sce)$tumor_grade}.
 
 Dataset versions: a \code{version} argument can be passed to the function to 
 specify which dataset version should be retrieved.
@@ -113,9 +120,10 @@ specify which dataset version should be retrieved.
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1.99 Gb.
-    \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
-    \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
+    \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 2.0 Gb.
+    \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10 Mb.
+    \item \code{`sce`}: size in memory = 477 Mb, size on disk = 266 Mb.
+    \item \code{`spe`}: size in memory = 496 Mb, size on disk = 267 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory

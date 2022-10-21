@@ -133,9 +133,9 @@ contains a graph of cell neighbors, generated with the
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
-    \item \code{`masks`}: size in memory = 426 Mb,  size on disk = 11.6 Mb.
-    \item \code{`sce`}: size in memory = 584 Mb, size on disk = 340 Mb.
+    \item \code{`images`}: size in memory = 21.2 Gb, size on disk = 860 Mb.
+    \item \code{`masks`}: size in memory = 426 Mb, size on disk = 12 Mb.
+    \item \code{`sce`}: size in memory = 564 Mb, size on disk = 319 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory

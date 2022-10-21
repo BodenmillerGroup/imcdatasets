@@ -1,13 +1,14 @@
-#' Obtain the Damond-2019-Pancreas dataset
+#' Obtain the Damond_2019_Pancreas dataset
 #'
-#' Obtain the Damond-2019-Pancreas dataset, which consists of three data
+#' Obtain the Damond_2019_Pancreas dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
 #' The data was obtained by imaging mass cytometry (IMC) of human pancreas 
 #' sections from donors with type 1 diabetes.
 #'
-#' @param data_type type of object to load, should be `sce` for single cell
-#' data, `images` for multichannel images or `masks` for cell segmentation
-#' masks.
+#' @param data_type type of object to load, `images` for multichannel images or
+#' `masks` for cell segmentation masks. Single cell data are retrieved using 
+#' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
+#' \code{SpatialExperiment} format.
 #' @param metadata if FALSE (default), the data object selected in 
 #' \code{data_type} is returned. If TRUE, only the metadata associated to this
 #' object is returned.
@@ -37,18 +38,20 @@
 #'     associated metadata, in the form of a 
 #'     \linkS4class{SingleCellExperiment}. This represents a total of 252,059 
 #'     cells x 38 channels.
+#'     \item \code{spe} same single cell data as for \code{sce}, but in the
+#'     \linkS4class{SpatialExperiment} format.
 #' }
 #'
 #' All data are downloaded from ExperimentHub and cached for local re-use.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
-#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
-#' object. Mapping at the image level can be performed with the
-#' \code{image_name} or \code{image_number} variables. Mapping between cell
-#' segmentation masks and single cell data is performed with the
-#' \code{cell_number} variable, the values of which correspond to the intensity
-#' values of the \code{masks} object. For practical
+#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects. Mapping at the image level can be 
+#' performed with the \code{image_name} or \code{image_number} variables. 
+#' Mapping between cell segmentation masks and single cell data is performed 
+#' with the \code{cell_number} variable, the values of which correspond to the 
+#' intensity values of the \code{masks} object. For practical
 #' examples, please refer to the "Accessing IMC datasets" vignette.
 #'
 #' This dataset is a subset of the complete Damond et al. (2019) dataset
@@ -58,8 +61,8 @@
 #' this dataset ideal for benchmarking spatial and neighborhood analysis 
 #' algorithms.
 #'
-#' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
-#' contains three assays:
+#' The \code{assay} slots of the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects contain three assays:
 #' \itemize{
 #'     \item \code{counts} contains raw mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
@@ -69,11 +72,13 @@
 #'
 #' The marker-associated metadata, including antibody information and metal 
 #' tags are stored in the \code{rowData} of the 
-#' \linkS4class{SingleCellExperiment} object.
+#' \linkS4class{SingleCellExperiment} / \linkS4class{SpatialExperiment} 
+#' objects.
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
-#' \linkS4class{SingleCellExperiment} object. These metadata include cell types
-#' (in \code{colData(sce)$cell_type}) and broader cell categories, such  as
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. These metadata include cell types (in 
+#' \code{colData(sce)$cell_type}) and broader cell categories, such  as
 #' "immune" or "islet" cells (in \code{colData(sce)$cell_category}). In
 #' addition, for cells located inside pancreatic islets, the islet they belong 
 #' to is indicated in \code{colData(sce)$islet_parent}. For cells not located 
@@ -81,15 +86,15 @@
 #' islet can be identified with \code{colData(sce)$islet_closest}.
 #'
 #' The donor-associated metadata are also stored in the \code{colData} of the
-#' \linkS4class{SingleCellExperiment} object. For instance, the donors' IDs can
-#' be retrieved with \code{colData(sce)$patient_id} and the donors' disease 
-#' stage can be obtained with \code{colData(sce)$patient_stage}.
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. For instance, the donors' IDs can be retrieved with 
+#' \code{colData(sce)$patient_id} and the donors' disease stage can be obtained
+#' with \code{colData(sce)$patient_stage}.
 #' 
 #' Neighborhood information, defined here as cells that are localized next to 
 #' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
-#' slot of the \code{SingleCellExperiment} object. Cells in the \code{SelfHits} 
-#' object are represented by unique integers that map to the 
-#' \code{cell_number_absolute} column of \code{colData(sce)}.
+#' slot of the \code{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects.
 #'
 #' The three donors present the following characteristics:
 #' \itemize{
@@ -113,9 +118,10 @@
 #' 
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.71 Gb.
-#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.4 Mb.
-#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 216 Mb.
+#'     \item \code{`images`}: size in memory = 7.4 Gb, size on disk = 1.7 Gb.
+#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.2 Mb.
+#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 212 Mb.
+#'     \item \code{`spe`}: size in memory = 371 Mb, size on disk = 212 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -130,6 +136,7 @@
 #' https://data.mendeley.com/datasets/cydmwsfztj/2
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
+#' \linkS4class{SpatialExperiment} object with single cell data, a 
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
 #' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
@@ -155,17 +162,18 @@
 #' print(head(masks))
 #'
 #' @import cytomapper
+#' @import SingleCellExperiment
 #' @import methods
 #' @importFrom utils download.file
 #' @importFrom utils read.csv
 #' @importFrom ExperimentHub ExperimentHub
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom HDF5Array writeHDF5Array
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
 Damond_2019_Pancreas <- function (
-    data_type = c("sce", "images", "masks"),
+    data_type = c("sce", "spe", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,

@@ -49,13 +49,12 @@ used to extract single cell features from the multichannel images.
 
 Each dataset in `imcdatasets` is composed of three elements that can be
 retrieved separately:  
-1. Single-cell data in the form of a `SingleCellExperiment` class object (named
-`XYZ_sce.rds`).  
+1. Single-cell data in the form of a `SingleCellExperiment` or 
+`SpatialExperiment` class object (named `sce.rds`).  
 2. Multichannel images in the form of a `CytoImageList` class object (named
-`XYZ_images.rds`).  
+`images.rds`).  
 3. Cell segmentation masks in the form of a `CytoImageList` class object (named
-`XYZ_masks.rds`).  
-Here, `XYZ` refers to the name of the dataset.
+`masks.rds`).  
 
 # Available datasets
 

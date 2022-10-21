@@ -84,9 +84,9 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1.99 Gb.
-#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
-#'     \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
+#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 2.0 Gb.
+#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10 Mb.
+#'     \item \code{`sce`}: size in memory = 477 Mb, size on disk = 266 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory

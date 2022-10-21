@@ -37,18 +37,21 @@ suggested by opening an issue at the `imcdatasets`
 requirements are that the new dataset *(i)* is publicly available and *(ii)* 
 has been described in a published scientific article.
 
-Details about creating Bioconductor's `ExperimentHub` packages [are available here](https://bioconductor.org/packages/HubPub).
+Details about creating Bioconductor's `ExperimentHub` packages 
+[are available here](https://bioconductor.org/packages/HubPub).
 
 
 ## Create a data generation script
 
-The first step is to create a new branch at the `imcdatasets` [GitHub page](https://github.com/BodenmillerGroup/imcdatasets/branches).
+The first step is to create a new branch at the `imcdatasets` 
+[GitHub page](https://github.com/BodenmillerGroup/imcdatasets/branches).
 
 Then, create an R markdown (`.Rmd`) script in `.inst/scripts/` to generate the 
 data objects:
 
 * Download single cell data, multiplexed images and cell segmentation masks.
-* Format the single cell data into a [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment) 
+* Format the single cell data into a 
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment) 
 object.
 * Format the images and masks into 
 [CytoImageList](https://bioconductor.org/packages/CytoImageList) objects.
