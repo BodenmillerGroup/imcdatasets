@@ -1,7 +1,8 @@
-pandoc: '2.13'
-pkgdown: 1.6.1
+pandoc: 2.17.1.1
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
+  Guidelines_Contribution_Dataset-formatting: Guidelines_Contribution_Dataset-formatting.html
   imcdatasets: imcdatasets.html
-last_built: 2021-05-25T16:46Z
+last_built: 2022-10-21T14:09Z
 
