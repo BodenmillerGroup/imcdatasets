@@ -48,7 +48,8 @@ Set the working and output directories
 
 ```{r directories}
 # Temporary directory to unzip files
-workdir <- tempdir()
+# workdir <- tempdir()
+workdir <- "/home/ubuntu/Data2/imcdatasets/"
 Sys.setenv(workdir = workdir)
 
 # Output directory
@@ -95,9 +96,9 @@ importData <- function(url, output_dir, filename) {
 The `CellSubset` file contains all single cell data and metadata, including marker expression levels, spatial information, and neighborhood information.
 
 ```{r import-cell-data, results='hide'}
-url_cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/f1e3b8dc-56be-4172-bbc4-3a6f9de97563/file_downloaded")
+url_cells <- ("https://data.mendeley.com/public-files/datasets/cydmwsfztj/files/4473bd0c-b617-4c79-8253-8d61fbe4e8e8/file_downloaded")
 
-importData(url_cells, workdir, "CellSubset.zip")
+importData(url_cells, workdir, "Cells.zip")
 ```
 
 ### Image metadata
@@ -149,7 +150,7 @@ We  first read in the `.csv` file containing cell data and metadata, and order i
 
 ```{r read-in-cell-data}
 # Single cell data and metadata
-cells <- fread(file.path(workdir, "CellSubset.csv"), stringsAsFactors = FALSE)
+cells <- fread(file.path(workdir, "All_Cells.csv"), stringsAsFactors = FALSE)
 cells <- cells[order(cells$ImageNumber, cells$ObjectNumber), ]
 
 # Image metadata
@@ -455,7 +456,7 @@ sce <- SingleCellExperiment(
   rowData = panel,
   colData = cell_metadata
 )
-mainExpName(sce) <- "Damond_2019_Pancreas"
+mainExpName(sce) <- "Damond_2019_Pancreas_FULL"
 ```
 
 ### Counts transformations
@@ -486,13 +487,49 @@ colPair(sce, "neighborhood") <- SelfHits(from = neighbors$cell_from,
                                          nnode = ncol(sce))
 ```
 
+### Create an SCE subset
+
+Because all the images corresponding to the single cell data would not fit in memory, we create a subset of the `SingleCellExperiment` object we just created. This subset can be matched with the image and mask objects that we will created below. The subset corresponds to 100 images from three patients. The subset images were randomly selected from these three patients in the first `imcdatasets` version. Here, we keep the same images for consistency.
+
+The full `SingleCellExperiment` object is also available from `imcdatasets`, but it only can be matched with cell segmentation masks, not with multi-channel images.
+
+```{r subset-sce}
+# Subset
+image_list <- c("E02", "E03", "E04", "E05", "E06", "E07", "E08", "E09", "E10", 
+                "E11", "E12", "E13", "E14", "E15", "E16", "E17", "E18", "E19", 
+                "E20", "E21", "E22", "E23", "E24", "E25", "E26", "E27", "E28", 
+                "E29", "E30", "E31", "E32", "E33", "E34", "G01", "G02", "G03", 
+                "G04", "G05", "G06", "G07", "G08", "G09", "G10", "G11", "G12", 
+                "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", 
+                "G22", "G23", "G24", "G25", "G26", "G27", "G28", "G29", "G30", 
+                "G31", "G32", "G33", "J01", "J02", "J03", "J04", "J05", "J06", 
+                "J07", "J08", "J09", "J10", "J11", "J12", "J13", "J14", "J15", 
+                "J16", "J17", "J18", "J19", "J20", "J21", "J22", "J23", "J24", 
+                "J25", "J26", "J27", "J28", "J29", "J30", "J31", "J32", "J33", 
+                "J34")
+
+sce_sub <- sce[, sce$image_name %in% image_list]
+sce_sub$cell_number_absolute <- 1:ncol(sce_sub)
+mainExpName(sce_sub) <- "Damond_2019_Pancreas"
+
+# Re-calculate quantile normalization for the subset images
+quant <- apply(assay(sce_sub, "counts"), 1, quantile, probs = 0.99)
+assay(sce_sub, "quant_norm") <- apply(assay(sce_sub, "counts"), 2,
+                                      function(x) x / quant)
+assay(sce_sub, "quant_norm")[assay(sce_sub, "quant_norm") > 1] <- 1
+assay(sce_sub, "quant_norm")[assay(sce_sub, "quant_norm") < 0] <- 0
+```
+
 ### Save on disk
 
-We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+We save the `SingleCellExperiment` objects for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-sce}
-saveRDS(sce, file.path(outdir, "sce.rds"))
+saveRDS(sce, file.path(outdir, "sce_full.rds"))
 print(sce)
+
+saveRDS(sce_sub, file.path(outdir, "sce.rds"))
+print(sce_sub)
 ```
 
 ### Clean up
@@ -503,7 +540,7 @@ Finally, we remove the downloaded files and generated objects to save storage sp
 remove(counts, cells, celltypes, cell_metadata, neighbors, image_metadata)
 
 file.remove(file.path(workdir, "All_Image.csv"),
-            file.path(workdir, "CellSubset.csv"),
+            file.path(workdir, "All_Cells.csv"),
             file.path(workdir, "CellTypes.csv"),
             file.path(workdir, "All_Object relationships.csv"),
             file.path(workdir, "Donors.csv"))
@@ -567,6 +604,19 @@ file.remove(masks_to_delete)
 
 We will now process the images and masks to make them compatible with the `cytomapper` package.
 
+### Add channel names
+
+We add protein short names as channel names of the `images` object with , corresponding to the row names of the `SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names}
+# Match panel and stack slice information
+panel <- rowData(sce)
+panel <- panel[order(match(panel$metal, channel_mass$V1)), ]
+
+# Add channel names to the "images" object
+channelNames(images) <- panel$short_name
+```
+
 ### Rescale masks
 
 The masks are 16-bit images and need to be re-scaled in order to obtain integer cell ids.
@@ -587,40 +637,31 @@ Next, we add image names to the images and masks objects, these names correspond
 
 ```{r add-image-names}
 mcols(images)$image_name <- gsub("_a0_full_clean", "", names(images))
+names(images) <- mcols(images)$image_name
+
 mcols(masks)$image_name <- gsub("_a0_full_mask", "", names(masks))
+names(masks) <- mcols(masks)$image_name
 ```
 
 We downloaded the full set of segmentation masks, so we will subset them to retain only the masks corresponding to the image subset. As a sanity check, we will make sure that the `image_name` slots of the `masks` and `images` objects are identical.
 
 ```{r subset-masks}
-masks <- masks[mcols(masks)$image_name %in% mcols(images)$image_name]
-print(identical(mcols(images)$image_name, mcols(masks)$image_name))
-
-names(images) <- mcols(images)$image_name
-names(masks) <- mcols(masks)$image_name
+masks_sub <- masks[mcols(masks)$image_name %in% mcols(images)$image_name]
+print(identical(mcols(images)$image_name, mcols(masks_sub)$image_name))
 ```
 
 We will also add `image_numbers` to the metadata columns of the `images` and `masks` objects.
 
 ```{r add-image-numbers}
 ref_images <- unique(colData(sce)[, c("image_name", "image_number")])
-mcols(images) <- merge(mcols(images), ref_images, by = "image_name")
+ref_images_sub <- ref_images[
+    ref_images$image_name %in% unique(sce_sub$image_name), ]
+
 mcols(masks) <- merge(mcols(masks), ref_images, by = "image_name")
+mcols(masks_sub) <- merge(mcols(masks_sub), ref_images, by = "image_name")
+mcols(images) <- merge(mcols(images), ref_images_sub, by = "image_name")
 
-print(identical(mcols(images)$image_number, mcols(masks)$image_number))
-```
-
-### Add channel names
-
-Finally, we will add protein short names as channel names of the `images` object with , corresponding to the row names of the `SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
-
-```{r add-channel-names}
-# Match panel and stack slice information
-panel <- rowData(sce)
-panel <- panel[order(match(panel$metal, channel_mass$V1)), ]
-
-# Add channel names to the "images" object
-channelNames(images) <- panel$short_name
+print(identical(mcols(images)$image_number, mcols(masks_sub)$image_number))
 ```
 
 ### Save on disk
@@ -628,7 +669,10 @@ channelNames(images) <- panel$short_name
 Finally, we will save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-masks}
-saveRDS(masks, file.path(outdir, "masks.rds"))
+saveRDS(masks_sub, file.path(outdir, "masks.rds"))
+print(masks_sub)
+
+saveRDS(masks, file.path(outdir, "masks_full.rds"))
 print(masks)
 ```
 
