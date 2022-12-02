@@ -103,7 +103,6 @@ sce$cell_id <- paste(sce$image_number, sce$cell_number, sep = "_")
 # cell_minor_axis_length <- minor_axis_length
 # cell_eccentricity <- eccentricity
 
-
 # Add cell ids as row names
 rownames(colData(sce)) <- colData(sce)$cell_id
 ```
@@ -259,13 +258,17 @@ We will now process the images and masks to make them consistent with other data
 Next, we add image names and numbers to the images and masks objects, these names correspond to the `image_name` (respectively, `image_number`) column in `colData(sce)`. This information is stored in the metadata columns of the `CytoImageList` objects and is used by `cytomapper` to match single cell data, images and masks.
 
 ```{r add-image-names}
+# Add image names
 mcols(images)$image_name <- mcols(images)$sample_id
 mcols(masks)$image_name <- mcols(masks)$sample_id
-```
 
-```{r add-image-numbers}
+# Add image numbers
 mcols(images)$image_number <- image_numbers[mcols(images)$image_name]
 mcols(masks)$image_number <- image_numbers[mcols(masks)$image_name]
+
+# Fix patient_id column name
+names(mcols(images))[names(mcols(images)) == "patient_id.V1"] <- "patient_id"
+names(mcols(masks))[names(mcols(masks)) == "patient_id.V1"] <- "patient_id"
 ```
 
 ### Add channel names
