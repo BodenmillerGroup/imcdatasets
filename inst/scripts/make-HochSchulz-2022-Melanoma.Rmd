@@ -1,0 +1,778 @@
+---
+title: "Preparation of the Hoch, Schulz et al dataset"
+author: "Tobias Hoch and Nicolas Damond"
+date: "Created: 17 June 2022; Compiled: `r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
+```
+
+
+# **Introduction**
+
+This script downloads two example Imaging Mass Cytometry (IMC) datasets (RNA and protein), each comprising fifty corresponding images and the associated cell segmentation masks and single cell data. The datasets are described in the following publication:
+
+[Hoch, Schulz et al. Multiplexed imaging mass cytometry of the chemokine milieus in melanoma characterizes features of the response to immunotherapy. Sci immunol. 2022 Apr;7(70):eabk1692](http://doi.org/10.1126/sciimmunol.abk1692)
+
+All data are available [from zenodo](https://zenodo.org/record/5994136). After obtaining the raw data, we will further process them to create a [SingleCellExperiment](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) object. We will then use the [cytomapper](https://www.bioconductor.org/packages/release/bioc/html/cytomapper.html) package to read in the images and masks and create `CytoImageList` objects.
+
+
+# **Settings**
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(dplyr)
+library(S4Vectors)
+library(SingleCellExperiment)
+library(cytomapper)
+```
+
+```{r dataset-version, echo=FALSE}
+dataset_name <- "HochSchulz_2022_Melanoma"
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
+```
+
+Set the working and output directories
+
+```{r directories}
+# Temporary directory to unzip files
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+# Output directory
+dataset_dir <- file.path(".", dataset_name)
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
+
+# Increase timeout period so that large files can be downloaded
+timeout <- getOption('timeout')
+options(timeout = 1000)
+```
+
+
+# **Single cell data**
+
+## Download single cell data
+
+Here, a subset of single-cell data corresponding to two datasets (protein and RNA) from [@HochSchulz-2022-Melanoma] is downloaded.
+
+```{r import-cell-data, results='hide'}
+# Download the zipped folder
+url_data <- "https://zenodo.org/record/5994136/files/data_for_analysis.zip"
+zip_name <- "sceFiles"
+
+system2("curl", args = c(
+  "-o", 
+  file.path(workdir, paste0(zip_name, ".zip")), 
+  url_data,
+  "--max-time 1000"))
+
+# Unzip SCE files
+system2("unzip", args = c(
+  "-o", file.path(workdir, paste0(zip_name, ".zip")),
+  "*sce_*.rds",
+  "-d", workdir))
+
+file.remove(file.path(workdir, paste0(zip_name, ".zip")))
+```
+
+
+## Read in single-cell data
+
+We read in the `SingleCellExperiment` objects from both datasets and subset 50 (corresponding) images based on the highest fraction of B cells.
+
+```{r read-in-cell-data}
+# RNA dataset
+sce_rna <- readRDS(
+  file.path(workdir, "data_for_analysis_zenodo/sce_RNA.rds"))
+
+# Protein dataset
+sce_protein <- readRDS(
+  file.path(workdir, "data_for_analysis_zenodo/sce_protein.rds"))
+```
+
+### Subset images
+
+Select the top 50 images with the most B cells.
+
+```{r select-images}
+images_to_keep <- as.data.frame(colData(sce_protein)) %>%
+  group_by(Description, celltype) %>%
+  summarise(numberOfcells = n(), .groups = "keep") %>%
+  filter(celltype == "B cell") %>%
+  ungroup() %>%
+  slice_max(numberOfcells, n = 50) %>%
+  pull(Description)
+```
+
+
+## Prepare data
+
+### Cell-level metadata
+
+Here, we rename the columns of the `colData` entry for consistency with the other datasets.
+
+```{r rename-cell-metadata}
+renaming_vector <- c(
+  cell_id = "cellID",
+  cell_number = "CellNumber",
+  image_number = "ImageNumber",
+  cell_x = "Center_X",
+  cell_y = "Center_Y",
+  cell_type = "celltype",
+  cell_cluster = "celltype_clustered",
+  cell_area = "Area",
+  cell_major_axis_length = "MajorAxisLength",
+  cell_minor_axis_length = "MinorAxisLength",
+  cell_in_tumour = "in_tumor",
+  milieu_Bcell_patch_score = "bcell_patch_score",
+  milieu_Tcell_density_score = "Tcell_density_score_image",
+  milieu_dysfunction_score = "dysfunction_score",
+  milieu_dysfunction_density = "dysfunction_density",
+  neighbors_number = "NumberOfNeighbors",
+  sample_block_id = "BlockID",
+  sample_location = "Location",
+  sample_description = "Description",
+  sample_tissue_type = "TissueType",
+  sample_MM_location = "MM_location",
+  sample_MM_location_short = "MM_location_simplified",
+  patient_id = "PatientID",
+  patient_age = "Age",
+  patient_gender = "Gender",
+  patient_cancer_stage = "Cancer_Stage",
+  patient_adjuvant_therapy = "Adjuvant",
+  patient_E_I_D = "E_I_D",
+  patient_mutation = "Mutation",
+  patient_status_at_3months = "Status_at_3m",
+  patient_relapse = "relapse",
+  patient_treatment_status_before_surgery = "treatment_status_before_surgery",
+  patient_treatment_group_before_surgery = "treatment_group_before_surgery",
+  patient_treatment_group_after_surgery = "treatment_group_after_surgery",
+  patient_death = "Death",
+  patient_death_date = "Date_death"
+)
+
+renaming_vector_protein = c(
+  cell_parent_nucleus = "Parent_nuclei",
+  milieu_Bcell_patch = "bcell_patch",
+  milieu_Bcell_milieu = "bcell_milieu",
+  milieu_TCF7 = "TCF7",
+  milieu_PD1 = "PD1"
+)
+
+renaming_vector_rna = c(
+  cell_type_rf = "celltype_rf",
+  cell_annotation = "cellAnnotation",
+  chemokine_expressor = "expressor"
+)
+
+# Rename protein dataset
+protein_coldata <- as_tibble(colData(sce_protein))
+protein_coldata <- protein_coldata %>%
+  dplyr::rename(all_of(renaming_vector)) %>%
+  dplyr::rename(all_of(renaming_vector_protein)) %>%
+  as("DataFrame")
+
+protein_coldata$cell_id <- gsub("protein_", "", protein_coldata$cell_id)
+protein_coldata$image_name <- as.character(protein_coldata$image_number)
+rownames(protein_coldata) <- protein_coldata$cell_id
+
+# Rename RNA dataset
+rna_coldata <- as_tibble(colData(sce_rna))
+rna_coldata <- rna_coldata %>%
+  dplyr::rename(all_of(renaming_vector)) %>%
+  dplyr::rename(all_of(renaming_vector_rna)) %>%
+  as("DataFrame")
+
+rna_coldata$cell_id <- gsub("RNA_", "", rna_coldata$cell_id)
+rna_coldata$image_name <- as.character(rna_coldata$image_number)
+rownames(rna_coldata) <- rna_coldata$cell_id
+```
+
+### Marker metadata
+
+Here, we rename the columns of the `rowData` entry for consistency with the other datasets.
+
+```{r rename-marker-metadata}
+renaming_vector <- c(
+  channel = "channel",
+  metal = "Metal.Tag",
+  name = "Target",
+  short_name = "clean_target",
+  marker_class = "marker_class",
+  antibody_clone = "Antibody.Clone",
+  antibody_tube_number = "Tube.Number",
+  antibody_stock_conc = "Stock.Concentration",
+  antibody_final_conc_or_dilution = "Final.Concentration...Dilution",
+  antibody_ul_to_add = "uL.to.add",
+  full = "full",
+  keep = "good_marker",
+  ilastik = "ilastik"
+)
+
+# Rename protein dataset
+protein_rowdata <- as_tibble(rowData(sce_protein))
+protein_rowdata <- protein_rowdata %>%
+  dplyr::rename(all_of(renaming_vector)) %>%
+  dplyr::rename(c(tumor_mask = "tumorMask")) %>%
+  as.data.table()
+protein_rowdata$full_name <- protein_rowdata$name
+
+# Rename RNA dataset
+rna_rowdata <- as_tibble(rowData(sce_rna))
+rna_rowdata <- rna_rowdata %>%
+  dplyr::rename(all_of(renaming_vector)) %>%
+  dplyr::rename(c(marker_no_RNA = "noRNA_marker")) %>%
+  as.data.table()
+rna_rowdata$full_name <- rna_rowdata$name
+```
+
+We also rename markers for consistency with other datasets.
+
+```{r rename-markers}
+# Protein dataset
+protein_rowdata[metal == "Cd111", `:=` (full_name = "Vimentin",
+                                         short_name = "VIM")]
+protein_rowdata[metal == "Cd112", `:=` (short_name = "CAV1")]
+protein_rowdata[metal == "In113", `:=` (short_name = "H3")]
+protein_rowdata[metal == "In115", `:=` (full_name = "Smooth muscle actin")]
+protein_rowdata[metal == "Nd142", `:=` (full_name = "CXCR2 IL-8 RB")]
+protein_rowdata[metal == "Nd143", `:=` (short_name = "HLA_DR")]
+protein_rowdata[metal == "Sm147", `:=` (full_name = "SOX-9",
+                                        short_name = "SOX9")]
+protein_rowdata[metal == "Eu151", `:=` (
+  full_name = "phospho-ERK1/2 [T202/Y204]",
+  short_name = "p_ERK1_2")]
+protein_rowdata[metal == "Sm152", `:=` (full_name = "CD3 epsilon",
+                                        short_name = "CD3e")]
+protein_rowdata[metal == "Gd155", `:=` (
+  full_name = "Programmed cell death protein 1",
+  short_name = "PD_1")]
+protein_rowdata[metal == "Gd156", `:=` (short_name = "MITF")]
+protein_rowdata[metal == "Tb159", `:=` (short_name = "GZMB")]
+protein_rowdata[metal == "Gd160", `:=` (full_name = "Programmed death-ligand 1",
+                                        short_name = "PD_L1")]
+protein_rowdata[metal == "Dy163", `:=` (full_name = "Forkhead box P3")]
+protein_rowdata[metal == "Dy164", `:=` (
+  full_name = "Inducible T-cell costimulator",
+  short_name = "ICOS")]
+protein_rowdata[metal == "Ho165", `:=` (full_name = "Beta-catenin",
+                                        short_name = "CTNNB1")]
+protein_rowdata[metal == "Er166", `:=` (full_name = "CD8 alpha",
+                                        short_name = "CD8a")]
+protein_rowdata[metal == "Er167", `:=` (
+  short_name = "COL1A1",
+  antibody_clone = "polyclonal_Collagen I")]
+protein_rowdata[metal == "Er168", `:=` (full_name = "Ki-67_Er168",
+                                        short_name = "Ki67_Er168")]
+protein_rowdata[metal == "Er170", `:=` (full_name = "phospho-S6 [S235/S236]",
+                                        short_name = "p_S6")]
+protein_rowdata[metal == "Yb172", `:=` (
+  full_name = "Indoleamine 2,3-dioxygenase 1")]
+protein_rowdata[metal == "Yb173", `:=` (full_name = "SOX-10",
+                                        short_name = "SOX10")]
+protein_rowdata[metal == "Yb174", `:=` (
+  antibody_clone = "polyclonal_DLEC_CLEC4C_BDCA-2")]
+protein_rowdata[metal == "Lu175", `:=` (full_name = "CD206")]
+protein_rowdata[metal == "Yb176", `:=` (full_name = "cleaved-PARP",
+                                        short_name = "c_PARP")]
+protein_rowdata[metal == "Ir191", `:=` (full_name = "Iridum 191",
+                                        antibody_clone = NA)]
+protein_rowdata[metal == "Ir193", `:=` (full_name = "Iridium 193",
+                                        antibody_clone = NA)]
+protein_rowdata[metal == "Pt198", `:=` (full_name = "Ki-67_Pt198",
+                                        short_name = "Ki67_Pt198")]
+protein_rowdata[metal == "Y89", `:=` (full_name = "Myeloperoxidase",
+                                      antibody_clone = "polyclonal_MPO")]
+
+# RNA dataset
+rna_rowdata[metal == "Cd111", `:=` (full_name = "Vimentin",
+                                    short_name = "VIM")]
+rna_rowdata[metal == "In113", `:=` (short_name = "H3")]
+rna_rowdata[metal == "In115", `:=` (full_name = "Smooth muscle actin")]
+rna_rowdata[metal == "Pr141", `:=` (full_name = "Cytokeratin 5",
+                                    short_name = "KRT5")]
+rna_rowdata[metal == "Nd143", `:=` (short_name = "HLA_DR")]
+rna_rowdata[metal == "Nd145", `:=` (full_name = "Cadherin-11",
+                                    short_name = "CDH11")]
+rna_rowdata[metal == "Nd146", `:=` (
+  full_name = "Fibroblast activation protein alpha",
+  short_name = "FAP")]
+rna_rowdata[metal == "Nd148", `:=` (full_name = "Beta-2-microglobulin")]
+rna_rowdata[metal == "Eu151", `:=` (full_name = "Glucose transporter 1",
+                                    short_name = "SLC2A12")]
+rna_rowdata[metal == "Sm152", `:=` (full_name = "CD3 epsilon",
+                                    short_name = "CD3e")]
+rna_rowdata[metal == "Eu153", `:=` (
+  full_name = "Lymphocyte activation gene 3 protein",
+  short_name = "LAG3")]
+rna_rowdata[metal == "Gd155", `:=` (
+  full_name = "Programmed cell death protein 1",
+  short_name = "PD_1")]
+rna_rowdata[metal == "Gd156", `:=` (short_name = "CCL4_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Gd158", `:=` (short_name = "CCL18_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Tb159", `:=` (full_name = "C-C chemokine receptor type 2",
+                                    short_name = "CCR2")]
+rna_rowdata[metal == "Gd160", `:=` (full_name = "Programmed death-ligand 1",
+                                    short_name = "PD_L1")]
+rna_rowdata[metal == "Dy161", `:=` (short_name = "CXCL8_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Dy162", `:=` (short_name = "CXCL10_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Dy163", `:=` (short_name = "CXCL12_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Dy164", `:=` (short_name = "CXCL13_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Ho165", `:=` (full_name = "CD8 alpha",
+                                    short_name = "CD8a")]
+rna_rowdata[metal == "Er166", `:=` (short_name = "CCL2_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Er167", `:=` (short_name = "CCL22_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Er168", `:=` (short_name = "CXCL9_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Tm169", `:=` (short_name = "DapB_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Er170", `:=` (full_name = "SOX-10",
+                                    short_name = "SOX10")]
+rna_rowdata[metal == "Yb171", `:=` (short_name = "CCL8_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Yb173", `:=` (short_name = "CCL19_mRNA",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Yb174", `:=` (full_name = "MelanA / MART1",
+                                    short_name = "MLANA")]
+rna_rowdata[metal == "Lu175", `:=` (full_name = "phopsho-Rb [S807/S811]",
+                                    short_name = "p_Rb")]
+rna_rowdata[metal == "Yb176", `:=` (full_name = "cleaved-PARP",
+                                    short_name = "c_PARP")]
+rna_rowdata[metal == "Ir191", `:=` (full_name = "Iridium 191",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Ir193", `:=` (full_name = "Iridium 193",
+                                    antibody_clone = NA)]
+rna_rowdata[metal == "Y89", `:=` (full_name = "Myeloperoxidase",
+                                  antibody_clone = "polyclonal_MPO")]
+```
+
+We convert the panel table to a `DataFrame` and add target short_names as row names.
+
+```{r prepare-panel}
+protein_rowdata <- as(protein_rowdata, "DataFrame")
+rownames(protein_rowdata) <- protein_rowdata$short_name
+
+rna_rowdata <- as(rna_rowdata, "DataFrame")
+rownames(rna_rowdata) <- rna_rowdata$short_name
+```
+
+
+## Update SingleCellExperiment object
+
+We now update the `SingleCellExperiment` objects with new `rowData` and `colData` entries.
+
+```{r update-colData}
+# Protein dataset
+colData(sce_protein) <- protein_coldata
+rowData(sce_protein) <- protein_rowdata
+
+# RNA dataset
+colData(sce_rna) <- rna_coldata
+rowData(sce_rna) <- rna_rowdata
+```
+
+Finally, we rename the row and column names of the `SingleCellExperiment` objects.
+
+```{r rename-count-matrices}
+# Protein dataset
+rownames(sce_protein) <- rownames(protein_rowdata)
+colnames(sce_protein) <- rownames(protein_coldata)
+
+# RNA dataset
+rownames(sce_rna) <- rownames(rna_rowdata)
+colnames(sce_rna) <- rownames(rna_coldata)
+
+# MainExpName
+mainExpName(sce_protein) <- paste(
+    dataset_name, "protein", "FULL", dataset_version, sep = "_")
+mainExpName(sce_rna) <- paste(
+    dataset_name, "RNA", "FULL", dataset_version, sep = "_")
+```
+
+We also rename the assays for consistency with other datasets.
+
+```{r rename-assays}
+assayNames(sce_protein) <- c("counts", "exprs", "scaled_counts", "scaled_exprs")
+assayNames(sce_rna) <- c("counts", "exprs", "scaled_counts", "scaled_exprs")
+```
+
+### Save on disk
+
+We save the `SingleCellExperiment` objects for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-sce}
+saveRDS(sce_protein, file.path(outdir, "sce_full_protein.rds"))
+print(sce_protein)
+
+saveRDS(sce_rna, file.path(outdir, "sce_full_rna.rds"))
+print(sce_rna)
+```
+
+### Subset
+
+We also save subsets of the `SingleCellExperiment` objects, so they can be
+matched with the multichannel image objects we are going to generate below.
+The subset corresponds to the top 50 image with most B cells.
+
+```{r subset-save-cell-data}
+# Subset
+sce_protein_sub <- sce_protein[
+    , sce_protein$sample_description %in% images_to_keep]
+sce_rna_sub <- sce_rna[
+    , sce_rna$sample_description %in% images_to_keep]
+
+# Rename
+mainExpName(sce_protein_sub) <- paste(
+    dataset_name, "protein", dataset_version, sep = "_")
+mainExpName(sce_rna_sub) <- paste(
+    dataset_name, "RNA", dataset_version, sep = "_")
+
+# Save
+saveRDS(sce_protein_sub, file.path(outdir, "sce_protein.rds"))
+print(sce_protein_sub)
+
+saveRDS(sce_rna_sub, file.path(outdir, "sce_rna.rds"))
+print(sce_rna_sub)
+```
+
+### Clean up
+
+Finally, we remove the downloaded files and generated objects to save storage space.
+
+```{r clean-up-cell-data, results='hide'}
+remove(protein_coldata, protein_rowdata, rna_coldata, rna_rowdata)
+
+unlink(file.path(workdir, "data_for_analysis_zenodo"), recursive = TRUE)
+```
+
+
+# **Images and cell masks**
+
+## Import images and masks - Protein dataset
+
+### Download the dataset
+
+Here, we download a subset of 50 images from the [zenodo repository](https://zenodo.org/record/5994136#.YyLNv7RBz-h).
+
+```{r download-images-protein, message=FALSE}
+# Download the zipped folder image and unzip it
+system2("curl", args = c(
+  "-o", 
+  file.path(workdir, "ImageSubset.zip"), 
+  "https://zenodo.org/record/6004986/files/full_data.zip?download=1",
+  "--max-time 900"))
+
+# Unzip selected files
+system2("unzip", args = c(
+  "-o", file.path(workdir, "ImageSubset.zip"),
+  "full_data/protein/cpout/*.tiff",
+  "-d", workdir))
+
+system2("unzip", args = c(
+  "-o", file.path(workdir, "ImageSubset.zip"),
+  "full_data/protein/cpout/Image.csv",
+  "-d", workdir))
+```
+
+We select the fifty images that correspond to the dat in the `SingleCellExperiment` objects.
+
+```{r select-images-protein}
+protein_directory = file.path(
+  workdir, file.path("full_data", "protein", "cpout"))
+protein_info <- fread(file.path(protein_directory, "Image.csv"))
+protein_info_sub <- protein_info[
+    protein_info$Metadata_Description %in% images_to_keep, ]
+```
+
+### Multichannel images
+
+We use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
+
+```{r read-in-images-protein}
+images_protein <- loadImages(
+  protein_directory, pattern = protein_info_sub$FileName_SpillCorrected)
+```
+
+### Cell segmentation masks
+
+We also read the masks into a `CytoImageList` object.
+
+```{r read-in-masks-protein, results='hide'}
+masks_protein <- loadImages(
+  protein_directory, pattern = protein_info$FileName_cellmask)
+```
+
+### Clean-up
+
+We remove the downloaded image and mask `tiff` files to save storage space.
+
+```{r clean-up-images-mask-proteins, results='hide'}
+files_to_delete <- list.files(protein_directory, full.names = TRUE)
+file.remove(files_to_delete)
+```
+
+
+## Import images and masks - RNA dataset
+
+### Unzip the dataset
+
+The dataset has been already been downloaded from zenodo, together with the protein dataset.
+
+```{r load-images-rna, results='hide'}
+system2("unzip", args = c(
+  "-o", file.path(workdir, "ImageSubset.zip"),
+  "full_data/rna/cpout/*.tiff",
+  "-d", workdir)) 
+
+system2("unzip", args = c(
+  "-o", file.path(workdir, "ImageSubset.zip"),
+  "full_data/rna/cpout/Image.csv",
+  "-d", workdir))
+
+# Clean-up
+file.remove(file.path(workdir, "ImageSubset.zip"))
+```
+
+We select the fifty images that correspond to the dat in the `SingleCellExperiment` objects.
+
+```{r select-images-rna}
+rna_directory <- file.path(workdir, file.path("full_data", "rna", "cpout"))
+rna_info <- fread(file.path(rna_directory, "Image.csv"))
+rna_info_sub <- rna_info[rna_info$Metadata_Description %in% images_to_keep, ]
+```
+
+### Multichannel images
+
+We use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
+
+```{r read-in-images-rna}
+images_rna <- loadImages(
+  rna_directory, pattern = rna_info_sub$FileName_SpillCorrected)
+```
+
+### Cell segmentation masks
+
+We also read the masks into a `CytoImageList` object.
+
+```{r read-in-masks-rna, results='hide'}
+masks_rna <- loadImages(
+  rna_directory, pattern = rna_info$FileName_cellmask)
+```
+
+### Clean-up
+
+We remove the downloaded image and mask `tiff` files to save storage space.
+
+```{r clean-up-images-masks-rna, results='hide'}
+files_to_delete <- list.files(rna_directory, full.names = TRUE)
+file.remove(files_to_delete)
+```
+
+
+## Prepare images and masks
+
+We will now process the images and masks to make them compatible with the `cytomapper` package.
+
+### Rescale masks
+
+The masks are 16-bit images and need to be re-scaled in order to obtain integer cell ids.
+
+```{r scale-masks}
+masks_protein <- scaleImages(masks_protein,
+                             value = protein_info$Scaling_cellmask[[1]])
+masks_rna <- scaleImages(masks_rna,
+                         value = rna_info$Scaling_cellmask[[1]])
+```
+
+### Add image names and numbers
+
+Next, we add image names to the images and masks objects, these names correspond to the `image_name` column in `colData(sce_*)`. This information is stored in the metadata columns of the `CytoImageList` objects and is used by `cytomapper` to match single cell data, images and masks.
+
+```{r add-image-names-protein}
+# We extract the file names of the masks into data frames
+df_masks_protein <- data.frame(
+  cell_mask = protein_info$FileName_cellmask,
+  image_number = protein_info$ImageNumber,
+  description = protein_info$Metadata_Description)
+
+df_images_protein <- data.frame(
+  cell_mask = protein_info_sub$FileName_SpillCorrected,
+  image_number = protein_info_sub$ImageNumber,
+  description = protein_info_sub$Metadata_Description)
+
+# We match the data frames row names with the names of the 'masks' object
+rownames(df_masks_protein) <- gsub(".tiff", "",
+                                   protein_info$FileName_cellmask)
+rownames(df_images_protein) <- gsub(".tiff", "", 
+                                    protein_info_sub$FileName_SpillCorrected)
+
+# We add the extracted information to the metadata of the 'masks' object
+mcols(masks_protein) <- df_masks_protein[names(masks_protein), ]
+mcols(images_protein) <- df_images_protein[names(images_protein), ]
+
+# Add image names
+mcols(masks_protein)$image_name <- as.character(
+  mcols(masks_protein)$image_number)
+mcols(images_protein)$image_name <- as.character(
+  mcols(images_protein)$image_number)
+names(masks_protein) <- mcols(masks_protein)$image_name
+names(images_protein) <- mcols(images_protein)$image_name
+
+# Add dataset specification
+mcols(images_protein)$dataset <- rep("protein", nrow(mcols(images_protein)))
+mcols(masks_protein)$dataset <- rep("protein", nrow(mcols(masks_protein)))
+```
+
+```{r add-image-names-rna}
+# We extract the file names of the masks into data frames
+df_masks_rna <- data.frame(
+  cell_mask = rna_info$FileName_cellmask,
+  image_number = rna_info$ImageNumber,
+  description = rna_info$Metadata_Description)
+
+df_images_rna <- data.frame(
+  cell_mask = rna_info_sub$FileName_SpillCorrected,
+  image_number = rna_info_sub$ImageNumber,
+  description = rna_info_sub$Metadata_Description)
+
+# We match the data frames row names with the names of the 'masks' object
+rownames(df_masks_rna) <- gsub(".tiff", "", rna_info$FileName_cellmask)
+rownames(df_images_rna) <- gsub(".tiff", "",
+                                rna_info_sub$FileName_SpillCorrected)
+
+# We add the extracted information to the metadata of the 'masks' object
+mcols(masks_rna) <- df_masks_rna[names(masks_rna), ]
+mcols(images_rna) <- df_images_rna[names(images_rna), ]
+
+# Add image names
+mcols(masks_rna)$image_name <- as.character(
+  mcols(masks_rna)$image_number)
+mcols(images_rna)$image_name <- as.character(
+  mcols(images_rna)$image_number)
+names(masks_rna) <- mcols(masks_rna)$image_name
+names(images_rna) <- mcols(images_rna)$image_name
+
+# Add dataset specification
+mcols(images_rna)$dataset <- rep("RNA", nrow(mcols(images_rna)))
+mcols(masks_rna)$dataset <- rep("RNA", nrow(mcols(masks_rna)))
+```
+
+Sanity check
+
+```{r sanity-check}
+identical(mcols(masks_rna)$Description, mcols(images_rna)$Description)
+identical(mcols(masks_protein)$Description, mcols(images_protein)$Description)
+```
+
+### Add channel names
+
+Finally, we will add protein short names as channel names of the `images` objects with , corresponding to the row names of the `SingleCellExperiment` objects and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names}
+# Protein dataset
+panel_protein <- rowData(sce_protein)
+panel_protein <- panel_protein[order(panel_protein$channel), ]
+channelNames(images_protein) <- rownames(panel_protein)
+
+# RNA dataset
+panel_rna <- rowData(sce_rna)
+panel_rna <- panel_rna[order(panel_rna$channel), ]
+channelNames(images_rna) <- rownames(panel_rna)
+```
+
+### Save masks on disk
+
+Finally, we will save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-masks}
+saveRDS(masks_protein, file.path(outdir, "masks_full_protein.rds"))
+print(masks_protein)
+
+saveRDS(masks_rna, file.path(outdir, "masks_full_rna.rds"))
+print(masks_rna)
+```
+
+We also subset the mask objects to match the multichannel image objects.
+
+```{r subset-save-masks}
+# Subset
+masks_protein_sub <- masks_protein[
+    mcols(masks_protein)$image_name %in% mcols(images_protein)$image_name, ]
+
+masks_rna_sub <- masks_rna[
+    mcols(masks_rna)$image_name %in% mcols(images_rna)$image_name, ]
+
+# Save
+saveRDS(masks_protein_sub, file.path(outdir, "masks_protein.rds"))
+print(masks_protein_sub)
+
+saveRDS(masks_rna_sub, file.path(outdir, "masks_rna.rds"))
+print(masks_rna_sub)
+```
+
+```{r remove-objects}
+remove(sce_protein, sce_protein_sub, sce_rna, sce_rna_sub,
+       masks_protein, masks_protein_sub, masks_rna, masks_rna_sub)
+gc()
+```
+
+### Save images on disk
+
+```{r save-images}
+# RNA dataset
+saveRDS(images_rna, file.path(outdir, "images_rna.rds"))
+print(images_rna)
+
+remove(images_rna)
+gc()
+
+# Protein dataset
+saveRDS(images_protein, file.path(outdir, "images_protein.rds"))
+print(images_protein)
+```
+
+### Clean up
+
+Remove all files from the temporary working directory.
+
+```{r clean-up, results='hide'}
+downloaded_files <- list.files(workdir)
+downloaded_files <- downloaded_files[!downloaded_files %in% "BiocStyle"]
+unlink(file.path(workdir, downloaded_files), recursive = TRUE)
+
+# Reset original timeout value
+options(timeout = timeout)
+```
+
+
+# **Session information**
+
+```{r session-info}
+sessionInfo()
+```
+
+
+# **References**
