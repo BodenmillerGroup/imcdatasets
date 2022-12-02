@@ -10,6 +10,14 @@
 #' `masks` for cell segmentation masks. Single cell data are retrieved using 
 #' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
 #' \code{SpatialExperiment} format.
+#' @param full_dataset if FALSE (default), a subset corresponding to 100 images
+#' is returned. If TRUE, the full dataset is returned, including both "Basel" 
+#' and "Zurich" cohorts. Due to memory space limitations, this option is only 
+#' available for single cell data and masks, not for 
+#' \code{data_type = "images"}.
+#' @param cohort which patient cohort should be returned? Can be set to "Basel"
+#' (default) or "Zurich". Ignored if \code{full_dataset} is set to TRUE.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param metadata if FALSE (default), the data object selected in 
 #' \code{data_type} is returned. If TRUE, only the metadata associated to this
 #' object is returned.
@@ -21,13 +29,12 @@
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
 #' \code{h5FilesPath = getHDF5DumpDir()}.
-#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
 #' @details
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
-#' (2020), consisting of three data objects:
+#' (2020):
 #' \itemize{
 #'     \item \code{images} contains a hundred 42-channel
 #'     images in the form of a \linkS4class{CytoImageList} class object.
@@ -57,7 +64,13 @@
 #'
 #' This dataset is a subset of the complete Jackson, Fischer et al. (2020)
 #' dataset comprising the data from tumour tissue from 100 patients with breast
-#' cancer (one image per patient).
+#' cancer (one image per patient). By default, data from the "Basel" cohort are
+#' returned. By setting \code{cohort = "Zurich"}, data from the "Zurich" 
+#' cohort, corresponding to images and associated data from 72 patients, are 
+#' returned. For details about the patient cohorts, refer to the publication. 
+#' If \code{full_dataset = TRUE}, the full dataset is returned (including both 
+#' "Basel" and "Zurich" patient cohorts). This option is not available for 
+#' multichannel images.
 #'
 #' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
 #' contains three assays:
@@ -94,10 +107,22 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 2.0 Gb.
-#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10 Mb.
-#'     \item \code{`sce`}: size in memory = 477 Mb, size on disk = 266 Mb.
-#'     \item \code{`spe`}: size in memory = 496 Mb, size on disk = 267 Mb.
+#'     \item \code{`images_basel`}: size in memory = 19 Gb, 
+#'     size on disk = 2.0 Gb.
+#'     \item \code{`masks_basel`}: size in memory = 433 Mb, 
+#'     size on disk = 10 Mb.
+#'     \item \code{`sce_basel`}: size in memory = 513 Mb, 
+#'     size on disk = 270 Mb.
+#'     \item \code{`images_zurich`}: size in memory = 6.0 Gb, 
+#'     size on disk = 724 Mb.
+#'     \item \code{`masks_zurich`}: size in memory = 137 Mb, 
+#'     size on disk = 3.4 Mb.
+#'     \item \code{`sce_zurich`}: size in memory = 188 Mb, 
+#'     size on disk = 105 Mb.
+#'     \item \code{`masks_full`}: size in memory = 2.1 Gb, 
+#'     size on disk = 10 Mb.
+#'     \item \code{`sce_full`}: size in memory = 2.2 Gb, 
+#'     size on disk = 1.2 Gb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -151,10 +176,12 @@
 #' @export
 JacksonFischer_2020_BreastCancer <- function (
     data_type = c("sce", "spe", "images", "masks"),
+    full_dataset = FALSE,
+    cohort = "Basel",
+    version = "latest",
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
-    version = "latest",
     force = FALSE
 ) {
     available_versions <- c("v0", "v1")
@@ -162,11 +189,17 @@ JacksonFischer_2020_BreastCancer <- function (
     dataset_version <- ifelse(version == "latest",
         utils::tail(available_versions, n=1), version)
     
+    if (!cohort %in% c("Basel", "Zurich"))
+        stop('"cohort" should be either "Basel" or "Zurich"')
+    
     .checkArguments(data_type, metadata, dataset_version, available_versions,
-        on_disk, h5FilesPath, force)
+        full_dataset, on_disk, h5FilesPath, force)
+    
+    if (cohort == "Zurich" & isFALSE(full_dataset))
+        dataset_name <- paste(dataset_name, cohort, sep = "_")
     
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
-        dataset_version, on_disk, h5FilesPath, force)
+        dataset_version, full_dataset, on_disk, h5FilesPath, force)
     
     return(cur_dat)
 }
