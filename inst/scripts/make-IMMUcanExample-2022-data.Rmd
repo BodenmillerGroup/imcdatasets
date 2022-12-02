@@ -1,7 +1,7 @@
 ---
-title: "Prepare single-cell data, images and masks from the IMMUcan example dataset"
-author: "Nils Eling"
-date: "Created: Sep 14, 2022; Compiled: `r BiocStyle::doc_date()`"
+title: "Preparation of the IMMUcan example dataset"
+author: "Nils Eling and Nicolas Damond"
+date: "Created: 14 September 2022; Compiled: `r BiocStyle::doc_date()`"
 output:
   BiocStyle::html_document:
     titlecaps: false
@@ -13,59 +13,298 @@ editor_options:
 ```{r style, echo=FALSE, results='hide', message=FALSE}
 library(BiocStyle)
 knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
 ```
 
-This script loads example data acquired by the [IMMUcan](https://immucan.eu/) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/6810879](https://zenodo.org/record/6810879).   
+
+# **Introduction**
+
+This script loads example data acquired by the [IMMUcan](https://immucan.eu) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/6810879](https://zenodo.org/record/6810879).   
+
+
+# **Settings**
 
 Loading required R packages
 
-```{r libraries}
+```{r libraries, include = FALSE}
+library(data.table)
+library(dplyr)
 library(SpatialExperiment)
 library(cytomapper)
+```
+
+```{r dataset-version, echo=FALSE}
+dataset_name <- "IMMUcan_2022_CancerExample"
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
 ```
 
 Setting the working and output directories
 
 ```{r directories}
+# Temporary directory to unzip files
 workdir <- tempdir()
+Sys.setenv(workdir = workdir)
 
-outdir <- file.path("..", "..", "inst", "extdata", "IMMUcanExample2022")
-if (!(dir.exists(outdir))) dir.create(outdir)
+# Output directory
+dataset_dir <- file.path(".", dataset_name)
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
+
+# Increase timeout period so that large files can be downloaded
+timeout <- getOption('timeout')
+options(timeout = 1000)
 ```
 
-# Single-cell and imaging data
 
-Here, we will only download the already processed data and convert the spe into a sce object.
+# **Single cell data**
 
-```{r download data}
-options(timeout = 10000)
+## Import single cell data
+
+We will download the already processed data and convert the SpatialExperiment into a SingleCellExperiment object.
+
+```{r download-cell-data}
 download.file("https://zenodo.org/record/7079294/files/spe.rds", 
-              destfile = paste0(workdir, "/spe.rds"))
-download.file("https://zenodo.org/record/7079294/files/images.rds", 
-              destfile = paste0(outdir, "/images.rds"))
-download.file("https://zenodo.org/record/7079294/files/masks.rds", 
-              destfile = paste0(outdir, "/masks.rds"))
+              destfile = file.path(workdir, "spe.rds"))
+```
 
-# Modify SCE object
-spe <- readRDS(paste0(workdir, "spe.rds"))
+```{r convert-SPE-to-SCE}
+spe <- readRDS(file.path(workdir, "spe.rds"))
 sce <- as(spe, "SingleCellExperiment")
-colData(sce)$cell_x <- spatialCoords(spe)[,"Pos_X"]
-colData(sce)$cell_y <- spatialCoords(spe)[,"Pos_Y"]
+```
 
+## Prepare data
+
+Here, we modify the SingleCellExperiment object for consistency with other datasets.
+
+### Cell-level metadata
+
+```{r cell-metadata}
 sce$image_name <- sce$sample_id
 sce$cell_number <- sce$ObjectNumber
-sce$cell_id <- paste0(sce$image_name, "_", sce$cell_number)
 
-# Fix rowData
-marker_df <- data.frame(row.names = rownames(sce),
-                        full_name = c("Myeloperoxidase", ),
-                        short_name = c())
+# Add image numbers and cell ids
+image_names <- unique(colData(sce)$image_name)
+image_numbers <- 1:length(image_names)
+names(image_numbers) = image_names
+sce$image_number <- image_numbers[colData(sce)$image_name]
 
-# Add image_name to images and masks
+sce$cell_id <- paste(sce$image_number, sce$cell_number, sep = "_")
 
-saveRDS(sce, paste0(outdir, "/sce.rds"))
+# CAN THE FOLLOWING COLNAMES BE MODIFIED ?
+# cell_type <- celltype
+# image_width <- width_px
+# image_height <- height_px
+# 
+# cell_area <- area
+# cell_major_axis_length <- major_axis_length
+# cell_minor_axis_length <- minor_axis_length
+# cell_eccentricity <- eccentricity
 
-unlink(paste0(workdir, "spe.rds"))
+
+# Add cell ids as row names
+rownames(colData(sce)) <- colData(sce)$cell_id
+```
+
+Store cell coordinates in `colData(sce)`
+
+```{r cell-coords}
+colData(sce)$cell_x <- spatialCoords(spe)[, "Pos_X"]
+colData(sce)$cell_y <- spatialCoords(spe)[, "Pos_Y"]
+```
+
+### Marker metadata
+
+Here, we will make the marker metadata (`rowData(sce)`) consistent with other datasets.
+
+First, add `short_name` and `full_name` columns and rename other columns.
+
+```{r marker-metadata}
+# Add short names, metal and channel numbers
+rowData(sce)$short_name <- rowData(sce)$name
+rowData(sce)$metal <- rowData(sce)$channel
+rowData(sce)$channel <- 1:nrow(rowData(sce))
+
+# Rename columns
+renaming_vector <- c(
+  channel = "channel",
+  metal = "metal",
+  short_name = "short_name",
+  full_name = "Target",
+  name = "name",
+  marker_class = "marker_class",
+  antibody_clone = "Antibody.Clone",
+  antibody_tube_number = "Tube.Number",
+  antibody_stock_conc = "Stock.Concentration",
+  antibody_final_conc_or_dilution = "Final.Concentration...Dilution",
+  antibody_ul_to_add = "uL.to.add",
+  use_channel = "use_channel",
+  used_for_clustering = "used_for_clustering",
+  channel_name = "channel_name",
+  keep = "keep",
+  ilastik = "ilastik",
+  deepcell = "deepcell"
+)
+
+panel <- rowData(sce) %>%
+  as_tibble() %>%
+  dplyr::rename(all_of(renaming_vector)) %>%
+  as.data.table()
+
+# Re-order columns
+setcolorder(panel, names(renaming_vector))
+```
+
+We then modify marker short names and full names for consistency.
+
+```{r rename-markers}
+panel[metal == "Y89", `:=` (full_name = "Myeloperoxidase")]
+panel[metal == "In113", `:=` (short_name = "H3")]
+panel[metal == "In115", `:=` (full_name = "Smooth muscle actin")]
+panel[metal == "Nd143", `:=` (full_name = "HLA_DR", short_name = "HLA_DR")]
+panel[metal == "Nd144", `:=` (antibody_clone = "polyclonal_CD27",
+                              antibody_ul_to_add = 1.5)]
+panel[metal == "Nd148", `:=` (full_name = "Beta-2-microglobulin")]
+panel[metal == "Eu151", `:=` (full_name = "Indoleamine 2,3-dioxygenase 1",
+                              short_name = "IDO1")]
+panel[metal == "Sm152", `:=` (full_name = "CD3 epsilon", short_name = "CD3e")]
+panel[metal == "Eu153", `:=` (
+  full_name = "Lymphocyte activation gene 3 protein",
+  short_name = "LAG3",
+  antibody_ul_to_add = 1.4)]
+panel[metal == "Gd155", `:=` (
+  full_name = "Programmed cell death protein 1",
+  short_name = "PD_1")]
+panel[metal == "Gd156", `:=` (
+  full_name = "Platelet-derived growth factor receptor beta",
+  short_name = "PDGFRB")]
+panel[metal == "Tb159", `:=` (full_name = "Granzyme B", short_name = "GZMB")]
+panel[metal == "Gd160", `:=` (full_name = "Programmed death-ligand 1",
+                              short_name = "PD_L1")]
+panel[metal == "Dy163", `:=` (full_name = "Forkhead box P3")]
+panel[metal == "Dy164", `:=` (full_name = "Inducible T-cell costimulator",
+                              short_name = "ICOS")]
+panel[metal == "Ho165", `:=` (full_name = "CD8 alpha")]
+panel[metal == "Er166", `:=` (full_name = "Carbonic anhydrase IX",
+                              short_name = "CA9")]
+panel[metal == "Er168", `:=` (full_name = "Ki-67", short_name = "Ki67")]
+panel[metal == "Tm169", `:=` (
+  full_name = "V-type Ig domain-containing suppressor of T-cell activation")]
+panel[metal == "Yb173", `:=` (full_name = "E-Cadherin", short_name = "CDH1")]
+panel[metal == "Yb174", `:=` (antibody_clone = "polyclonal_CD303")]
+panel[metal == "Lu175", `:=` (full_name = "CD206")]
+panel[metal == "Yb176", `:=` (full_name = "cleaved-PARP",
+                              short_name = "c_PARP")]
+panel[metal == "Ir191", `:=` (full_name = "Iridium 191", short_name = "DNA1",
+                              antibody_clone = NA,
+                              antibody_tube_number = NA)]
+panel[metal == "Ir193", `:=` (full_name = "Iridium 193", short_name = "DNA2",
+                              antibody_clone = NA,
+                              antibody_tube_number = NA)]
+```
+
+Finally, we convert the panel table to a `DataFrame` and add target short_names as row names.
+
+```{r prepare-panel}
+panel <- as(panel, "DataFrame")
+panel$antibody_ul_to_add <- as.numeric(panel$antibody_ul_to_add)
+rownames(panel) <- panel$short_name
+rowData(sce) <- panel
+```
+
+## SingleCellExperiment object
+
+### Finalize the object
+
+```{r finalize-sce}
+mainExpName(sce) <- paste(dataset_name, dataset_version, sep = "_")
+```
+
+### Save on disk
+
+We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-sce}
+saveRDS(sce, file.path(outdir, "sce.rds"))
+print(sce)
+```
+
+
+# **Images and cell masks**
+
+## Import images and masks
+
+```{r import-images}
+download.file("https://zenodo.org/record/7079294/files/images.rds", 
+              destfile = file.path(workdir, "images.rds"))
+
+images <- readRDS(file.path(workdir, "images.rds"))
+```
+
+```{r import-masks}
+download.file("https://zenodo.org/record/7079294/files/masks.rds", 
+              destfile = file.path(workdir, "masks.rds"))
+
+masks <- readRDS(file.path(workdir, "masks.rds"))
+```
+
+## Prepare images and masks
+
+We will now process the images and masks to make them consistent with other datasets.
+
+### Add image names and numbers
+
+Next, we add image names and numbers to the images and masks objects, these names correspond to the `image_name` (respectively, `image_number`) column in `colData(sce)`. This information is stored in the metadata columns of the `CytoImageList` objects and is used by `cytomapper` to match single cell data, images and masks.
+
+```{r add-image-names}
+mcols(images)$image_name <- mcols(images)$sample_id
+mcols(masks)$image_name <- mcols(masks)$sample_id
+```
+
+```{r add-image-numbers}
+mcols(images)$image_number <- image_numbers[mcols(images)$image_name]
+mcols(masks)$image_number <- image_numbers[mcols(masks)$image_name]
+```
+
+### Add channel names
+
+Finally, we will add protein short names as channel names of the `images` object with , corresponding to the row names of the `SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names}
+if (! identical(rowData(sce)$name, channelNames(images)))
+  stop("image names in 'sce' and 'images' objects are different")
+
+# Add channel names to the "images" object
+channelNames(images) <- rowData(sce)$short_name
+```
+
+### Save on disk
+
+Finally, we will save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-masks}
+saveRDS(masks, file.path(outdir, "masks.rds"))
+print(head(masks))
+```
+
+```{r save-images}
+saveRDS(images, file.path(outdir, "images.rds"))
+print(head(images))
+```
+
+### Clean up
+
+Remove all files from the temporary working directory.
+
+```{r clean-up, results='hide'}
+downloaded_files <- list.files(workdir)
+downloaded_files <- downloaded_files[!downloaded_files %in% "BiocStyle"]
+unlink(file.path(workdir, downloaded_files), recursive = TRUE)
+
+# Reset original timeout value
+options(timeout = timeout)
 ```
 
 # Session information
