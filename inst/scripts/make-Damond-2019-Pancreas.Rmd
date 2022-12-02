@@ -40,6 +40,7 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
+dataset_name <- "Damond_2019_Pancreas"
 dataset_version <- "v1"
 cat("Dataset version:", dataset_version)
 ```
@@ -48,12 +49,11 @@ Set the working and output directories
 
 ```{r directories}
 # Temporary directory to unzip files
-# workdir <- tempdir()
-workdir <- "/home/ubuntu/Data2/imcdatasets/"
+workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-dataset_dir <- file.path(".", "Damond_2019_Pancreas")
+dataset_dir <- file.path(".", dataset_name)
 if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
 
 outdir <- file.path(dataset_dir, dataset_version)
@@ -456,7 +456,7 @@ sce <- SingleCellExperiment(
   rowData = panel,
   colData = cell_metadata
 )
-mainExpName(sce) <- "Damond_2019_Pancreas_FULL"
+mainExpName(sce) <- paste(dataset_name, "FULL", dataset_version, sep = "_")
 ```
 
 ### Counts transformations
@@ -510,7 +510,7 @@ image_list <- c("E02", "E03", "E04", "E05", "E06", "E07", "E08", "E09", "E10",
 
 sce_sub <- sce[, sce$image_name %in% image_list]
 sce_sub$cell_number_absolute <- 1:ncol(sce_sub)
-mainExpName(sce_sub) <- "Damond_2019_Pancreas"
+mainExpName(sce_sub) <- paste(dataset_name, dataset_version, sep = "_")
 
 # Re-calculate quantile normalization for the subset images
 quant <- apply(assay(sce_sub, "counts"), 1, quantile, probs = 0.99)

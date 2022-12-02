@@ -2,7 +2,7 @@
 title: "Preparation of the Jackson, Fischer et al dataset"
 author: "Jana Fischer and Nicolas Damond"
 date: "Created: 15 March 2021; Compiled: `r BiocStyle::doc_date()`"
-package: "`r BiocStyle::pkg_ver('imcdatasets')`"
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"x
 output:
   BiocStyle::html_document:
     titlecaps: false
@@ -40,6 +40,7 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
+dataset_name <- "JacksonFischer_2020_BreastCancer"
 dataset_version <- "v1"
 cat("Dataset version:", dataset_version)
 ```
@@ -48,12 +49,11 @@ Setting the working and output directories
 
 ```{r directories}
 # Temporary directory to unzip files
-# workdir <- tempdir()
-workdir <- "/home/ubuntu/Data2/imcdatasets/"
+workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-dataset_dir <- file.path(".", "JacksonFischer_2020_BreastCancer")
+dataset_dir <- file.path(".", dataset_name)
 if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
 
 outdir <- file.path(dataset_dir, dataset_version)
@@ -100,36 +100,36 @@ The first zip folder contains the main single-cell, sample and patient metadata.
 ```{r import-cell-data, results='hide'}
 # Download dataset
 url_cells <- ("https://zenodo.org/record/4607374/files/SingleCell_and_Metadata.zip?download=1")
-dataset_name <- "SingleCell_and_Metadata.zip"
-download.file(url_cells, destfile = file.path(workdir, dataset_name))
+zip_name <- "SingleCell_and_Metadata.zip"
+download.file(url_cells, destfile = file.path(workdir, zip_name))
 
 # Unzip required files - Basel Cohort
 system2("unzip", args = c(
-    "-o", file.path(workdir, dataset_name),
+    "-o", file.path(workdir, zip_name),
     "Data_publication/BaselTMA/SC_dat.csv",
     "-d", workdir))
 system2("unzip", args = c(
-    "-o", file.path(workdir, dataset_name),
+    "-o", file.path(workdir, zip_name),
     "Data_publication/BaselTMA/Basel_PatientMetadata.csv",
     "-d", workdir))
 
 # Unzip required files - Zurich Cohort
 system2("unzip", args = c(
-    "-o", file.path(workdir, dataset_name),
+    "-o", file.path(workdir, zip_name),
     "Data_publication/ZurichTMA/SC_dat.csv",
     "-d", workdir))
 system2("unzip", args = c(
-    "-o", file.path(workdir, dataset_name),
+    "-o", file.path(workdir, zip_name),
     "Data_publication/ZurichTMA/Zuri_PatientMetadata.csv",
     "-d", workdir))
 
 # Unzip panel file
 system2("unzip", args = c(
-    "-o", file.path(workdir, dataset_name),
+    "-o", file.path(workdir, zip_name),
     "Data_publication/Basel_Zuri_StainingPanel.csv",
     "-d", workdir))
 
-file.remove(file.path(workdir, dataset_name))
+file.remove(file.path(workdir, zip_name))
 ```
 
 Download single cell labels and locations
@@ -575,7 +575,8 @@ We first subset the Zurich cohort to one image per patient.
 
 ```{r subset-sce-zurich}
 sce_zurich <- sce[, sce$patient_cohort == "Zurich"]
-mainExpName(sce_zurich) <- "JacksonFischer_2020_BreastCancer_Zurich"
+mainExpName(sce_zurich) <- paste(dataset_name, "Zurich", dataset_version,
+    sep = "_")
 
 # Randomly select one image per patient
 coldata_zurich <- as.data.table(colData(sce_zurich))
@@ -648,7 +649,8 @@ image_sub_basel <- c("BaselTMA_SP41_257_X3Y1", "BaselTMA_SP41_166_X15Y4",
 ```{r subset-sce-basel}
 # Subset the Basel cohort
 sce_basel <- sce[, sce$patient_cohort == "Basel"]
-mainExpName(sce_basel) <- "JacksonFischer_2020_BreastCancer_Basel"
+mainExpName(sce_basel) <- paste(dataset_name, "Basel", dataset_version,
+    sep = "_")
 
 # Select 100 patients based on the subsetting vector above
 sce_basel <- sce_basel[, sce_basel$image_name %in% image_sub_basel]
@@ -660,7 +662,7 @@ We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHu
 
 ```{r save-sce}
 # Full dataset
-mainExpName(sce) <- "JacksonFischer_2020_BreastCancer_FULL"
+mainExpName(sce) <- paste(dataset_name, "FULL", dataset_version, sep = "_")
 saveRDS(sce, file.path(outdir, "sce_full.rds"))
 print(sce)
 
@@ -986,7 +988,7 @@ names(images_zurich) <- mcols(images_zurich)$image_name
 Finally, we save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-images-zurich}
-saveRDS(images_zurich, file.path(outdir, "images.rds"))
+saveRDS(images_zurich, file.path(outdir, "images_zurich.rds"))
 print(head(images_zurich))
 
 remove(images_zurich)
