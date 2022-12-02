@@ -1,13 +1,14 @@
-#' Obtain the Damond-2019-Pancreas dataset
+#' Obtain the Damond_2019_Pancreas dataset
 #'
-#' Obtain the Damond-2019-Pancreas dataset, which consists of three data
+#' Obtain the Damond_2019_Pancreas dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
 #' The data was obtained by imaging mass cytometry (IMC) of human pancreas 
 #' sections from donors with type 1 diabetes.
 #'
-#' @param data_type type of object to load, should be `sce` for single cell
-#' data, `images` for multichannel images or `masks` for cell segmentation
-#' masks.
+#' @param data_type type of object to load, `images` for multichannel images or
+#' `masks` for cell segmentation masks. Single cell data are retrieved using 
+#' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
+#' \code{SpatialExperiment} format.
 #' @param metadata if FALSE (default), the data object selected in 
 #' \code{data_type} is returned. If TRUE, only the metadata associated to this
 #' object is returned.
@@ -34,30 +35,34 @@
 #'     \linkS4class{CytoImageList} class object.
 #'     \item \code{sce} contains the single cell data extracted from the 
 #'     multichannel images using the cell segmentation masks, as well as the 
-#'     associated metadata, in the form of a \linkS4class{SingleCellExperiment}.
-#'      This represents a total of 252,059 cells x 38 channels.
+#'     associated metadata, in the form of a 
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 252,059 
+#'     cells x 38 channels.
+#'     \item \code{spe} same single cell data as for \code{sce}, but in the
+#'     \linkS4class{SpatialExperiment} format.
 #' }
 #'
 #' All data are downloaded from ExperimentHub and cached for local re-use.
 #'
 #' Mapping between the three data objects is performed via variables located in
 #' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
-#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment}
-#' object. Mapping at the image level can be performed with the
-#' \code{image_name} or \code{image_number} variables. Mapping between cell
-#' segmentation masks and single cell data is performed with the
-#' \code{cell_number} variable, the values of which correspond to the intensity
-#' values of the \code{masks} object. For practical
+#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects. Mapping at the image level can be 
+#' performed with the \code{image_name} or \code{image_number} variables. 
+#' Mapping between cell segmentation masks and single cell data is performed 
+#' with the \code{cell_number} variable, the values of which correspond to the 
+#' intensity values of the \code{masks} object. For practical
 #' examples, please refer to the "Accessing IMC datasets" vignette.
 #'
 #' This dataset is a subset of the complete Damond et al. (2019) dataset
 #' comprising the data from three pancreas donors at different stages of type 1
-#' diabetes (T1D). The three donors present clearly diverging characteristics in
-#' terms of cell type composition and cell-cell interactions, which makes this
-#' dataset ideal for benchmarking spatial and neighborhood analysis algorithms.
+#' diabetes (T1D). The three donors present clearly diverging characteristics 
+#' in terms of cell type composition and cell-cell interactions, which makes 
+#' this dataset ideal for benchmarking spatial and neighborhood analysis 
+#' algorithms.
 #'
-#' The \code{assay} slot of the \linkS4class{SingleCellExperiment} object
-#' contains three assays:
+#' The \code{assay} slots of the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects contain three assays:
 #' \itemize{
 #'     \item \code{counts} contains raw mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
@@ -65,29 +70,31 @@
 #'     and scaled 0-1.
 #' }
 #'
-#' The marker-associated metadata, including antibody information and metal tags
-#' are stored in the \code{rowData} of the \linkS4class{SingleCellExperiment}
-#' object.
+#' The marker-associated metadata, including antibody information and metal 
+#' tags are stored in the \code{rowData} of the 
+#' \linkS4class{SingleCellExperiment} / \linkS4class{SpatialExperiment} 
+#' objects.
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
-#' \linkS4class{SingleCellExperiment} object. These metadata include cell types
-#' (in \code{colData(sce)$cell_type}) and broader cell categories, such  as
-#' "immune" or "islet" cells (in \code{colData(sce)$cell_category}). In addition,
-#' for cells located inside pancreatic islets, the islet they belong to is
-#' indicated in \code{colData(sce)$islet_parent}. For cells not located in
-#' islets, the "islet_parent" value is set to 0 but the spatially closest islet
-#' can be identified with \code{colData(sce)$islet_closest}.
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. These metadata include cell types (in 
+#' \code{colData(sce)$cell_type}) and broader cell categories, such  as
+#' "immune" or "islet" cells (in \code{colData(sce)$cell_category}). In
+#' addition, for cells located inside pancreatic islets, the islet they belong 
+#' to is indicated in \code{colData(sce)$islet_parent}. For cells not located 
+#' in islets, the "islet_parent" value is set to 0 but the spatially closest 
+#' islet can be identified with \code{colData(sce)$islet_closest}.
 #'
 #' The donor-associated metadata are also stored in the \code{colData} of the
-#' \linkS4class{SingleCellExperiment} object. For instance, the donors' IDs can
-#' be retrieved with \code{colData(sce)$patient_id} and the donors' disease 
-#' stage can be obtained with \code{colData(sce)$patient_stage}.
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. For instance, the donors' IDs can be retrieved with 
+#' \code{colData(sce)$patient_id} and the donors' disease stage can be obtained
+#' with \code{colData(sce)$patient_stage}.
 #' 
 #' Neighborhood information, defined here as cells that are localized next to 
 #' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
-#' slot of the \code{SingleCellExperiment} object. Cells in the \code{SelfHits} 
-#' object are represented by unique integers that map to the 
-#' \code{cell_number_absolute} column of \code{colData(sce)}.
+#' slot of the \code{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects.
 #'
 #' The three donors present the following characteristics:
 #' \itemize{
@@ -95,26 +102,26 @@
 #'     many beta cells, severe infiltration of the exocrine pancreas with
 #'     myeloid cells but limited infiltration of islets.
 #'     \item \code{6414} is a donor with recent T1D onset (shortly after
-#'     diagnosis) showing partial beta cell destruction and mild infiltration of
-#'     islets with T cells.
+#'     diagnosis) showing partial beta cell destruction and mild infiltration 
+#'     of islets with T cells.
 #'     \item \code{6180} is a donor with long-duration T1D (11 years after
 #'     diagnosis), showing near-total beta cell destruction and limited immune
 #'     cell infiltration in both the islets and the pancreas.
 #' }
 #' 
 #' Dataset versions: a \code{version} argument can be passed to the function to 
-#' specify which dataset version should be retrieved. The original version 
-#' ("v0", Bioconductor <= 3.15) can be retrieved with the (now deprecated) 
-#' \code{DamondPancreas2019Data} function.
+#' specify which dataset version should be retrieved.
 #' \itemize{
-#'     \item \code{`v1`}: first version of the dataset.
+#'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
+#'     \item \code{`v1`}: consistent object formatting across datasets.
 #' }
 #' 
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.71 Gb.
-#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.4 Mb.
-#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 216 Mb.
+#'     \item \code{`images`}: size in memory = 7.4 Gb, size on disk = 1.7 Gb.
+#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.2 Mb.
+#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 212 Mb.
+#'     \item \code{`spe`}: size in memory = 371 Mb, size on disk = 212 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -129,6 +136,7 @@
 #' https://data.mendeley.com/datasets/cydmwsfztj/2
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
+#' \linkS4class{SpatialExperiment} object with single cell data, a 
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
 #' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
@@ -154,35 +162,34 @@
 #' print(head(masks))
 #'
 #' @import cytomapper
+#' @import SingleCellExperiment
 #' @import methods
 #' @importFrom utils download.file
 #' @importFrom utils read.csv
 #' @importFrom ExperimentHub ExperimentHub
-#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SpatialExperiment SpatialExperiment
 #' @importFrom HDF5Array writeHDF5Array
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
 Damond_2019_Pancreas <- function (
-    data_type = c("sce", "images", "masks"),
+    data_type = c("sce", "spe", "images", "masks"),
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
     version = "latest",
     force = FALSE
 ) {
-    available_versions <- c("v1")
+    available_versions <- c("v0", "v1")
     dataset_name <- "Damond_2019_Pancreas"
-    dataset_version = ifelse(version == "latest",
-        tail(available_versions, n=1), version)
-    dataset_path <- paste(dataset_name, dataset_version, sep = "_")
-    host <- file.path("imcdatasets", dataset_path)
-    
+    dataset_version <- ifelse(version == "latest",
+        utils::tail(available_versions, n=1), version)
+
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         on_disk, h5FilesPath, force)
-  
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-        on_disk, h5FilesPath, force)
-    
+
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
+
     return(cur_dat)
 }

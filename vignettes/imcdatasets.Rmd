@@ -1,13 +1,15 @@
 ---
 title: "Accessing IMC datasets"
-date: "Created: Nov 02, 2020; Compiled: `r BiocStyle::doc_date()`"
+date: "Created: 02 November 2020; Compiled: `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('imcdatasets')`"
 author:
 - name: Nicolas Damond
-  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  affiliation: [Department for Quantitative Biomedicine; University of Zurich, 
+  Institute of Molecular Health Sciences; ETH Zurich]
   email: nicolas.damond@dqbm.uzh.ch
 - name: Nils Eling
-  affiliation: Department for Quantitative Biomedicine, University of Zurich
+  affiliation: [Department for Quantitative Biomedicine; University of Zurich, 
+  Institute of Molecular Health Sciences; ETH Zurich]
   email: nils.eling@dqbm.uzh.ch
 output:
     BiocStyle::html_document:
@@ -21,38 +23,38 @@ vignette: >
 
 ```{r style, echo=FALSE}
 knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE,
-                      fig.retina = 0.75)
+    fig.retina = 0.75)
 library(BiocStyle)
 ```
 
-```{r library, echo=FALSE}
+```{r library, echo=FALSE, results='hide'}
 suppressPackageStartupMessages(c(
-  library(SingleCellExperiment),
-  library(cytomapper),
-  library(imcdatasets)
+    library(SingleCellExperiment),
+    library(cytomapper),
+    library(imcdatasets)
 ))
 ```
 
 # Introduction
 
 The `r Biocpkg("imcdatasets")` package provides access to publicly available
-datasets generated using imaging mass cytometry (IMC) [@giesen2014imc].
+datasets generated using imaging mass cytometry (IMC) [@Giesen-2014-IMC].
 
 IMC is a technology that enables measurement of up to 50 markers from tissue
-sections at a resolution of 1 $\mu m$ @giesen2014imc. In classical processing
-pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) or [steinbock](https://bodenmillergroup.github.io/steinbock/latest/), 
-the multichannel images are segmented to generate cells masks. These masks are
-then used to extract single cell features from the multichannel images.  
+sections at a resolution of 1 $\mu m$ @Giesen-2014-IMC. In classical processing
+pipelines, such as the [ImcSegmentationPipeline](https://github.com/BodenmillerGroup/ImcSegmentationPipeline) 
+or [steinbock](https://bodenmillergroup.github.io/steinbock/latest/), the 
+multichannel images are segmented to generate cells masks. These masks are then
+used to extract single cell features from the multichannel images.  
 
 Each dataset in `imcdatasets` is composed of three elements that can be
 retrieved separately:  
-1. Single-cell data in the form of a `SingleCellExperiment` class object (named
-`XYZ_sce.rds`).  
+1. Single-cell data in the form of a `SingleCellExperiment` or 
+`SpatialExperiment` class object (named `sce.rds`).  
 2. Multichannel images in the form of a `CytoImageList` class object (named
-`XYZ_images.rds`).  
+`images.rds`).  
 3. Cell segmentation masks in the form of a `CytoImageList` class object (named
-`XYZ_masks.rds`).  
-Here, `XYZ` refers to the name of the dataset.
+`masks.rds`).  
 
 # Available datasets
 
@@ -70,28 +72,28 @@ knitr::kable(datasets)
 # Retrieving data
 
 Users can import the datasets by calling a single function and specifying the
-type of data to retrieve. The following examples highlight accessing the dataset
-provided by _Damond, N. et al., A Map of Human Type 1 Diabetes Progression by
-Imaging Mass Cytometry_ [@damond2019pancreas].
+type of data to retrieve. The following examples highlight accessing the 
+dataset provided by _Damond, N. et al., A Map of Human Type 1 Diabetes 
+Progression by Imaging Mass Cytometry_ [@Damond-2019-Pancreas].
 
 __Importing single-cell expression data and metadata__
 
 ```{r import-dataset}
-sce <- Damond_2019_Pancreas(data_type = "sce")
+sce <- Damond_2019_Pancreas("sce")
 sce
 ```
 
 __Importing multichannel images__
 
 ```{r import-images}
-images <- Damond_2019_Pancreas(data_type = "images")
+images <- Damond_2019_Pancreas("images")
 images
 ```
 
 __Importing cell segmentation masks__
 
 ```{r import-masks}
-masks <- Damond_2019_Pancreas(data_type = "masks")
+masks <- Damond_2019_Pancreas("masks")
 masks
 ```
 
@@ -111,7 +113,7 @@ where images/masks will be stored as .h5 files:
 cur_path <- tempdir()
 
 masks <- Damond_2019_Pancreas(data_type = "masks", on_disk = TRUE,
-                              h5FilesPath = cur_path)
+    h5FilesPath = cur_path)
 masks
 ```
 
@@ -123,7 +125,8 @@ Additional information about each dataset is available in the help page:
 ?Damond_2019_Pancreas
 ```
 
-The metadata associated with a specific data object can be displayed as follows:
+The metadata associated with a specific data object can be displayed as 
+follows:
 
 ```{r access-metadata, eval = FALSE}
 Damond_2019_Pancreas(data_type = "sce", metadata = TRUE)
@@ -133,15 +136,14 @@ Damond_2019_Pancreas(data_type = "masks", metadata = TRUE)
 
 # Usage
 
-The `SingleCellExperiment` class objects can be used for data analysis. For more
-information, please refer to the `r Biocpkg("SingleCellExperiment")` package
-and to the [Orchestrating Single-Cell Analysis with Bioconductor](http://bioconductor.org/books/release/OSCA/)
-workflow.  
+The `SingleCellExperiment` class objects can be used for data analysis. For 
+more information, please refer to the `r Biocpkg("SingleCellExperiment")` 
+package and to the [Orchestrating Single-Cell Analysis with Bioconductor](http://bioconductor.org/books/release/OSCA/) workflow.
 
 The `CytoImageList` class objects can be used for plotting cell and pixel
 information. Some typical use cases are given below. For more information,
 please see the `r Biocpkg("cytomapper")` package and the
-[associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html).  
+[associated vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html).
 
 __Subsetting the images and masks__
 
@@ -150,23 +152,23 @@ cur_images <- images[1:5]
 cur_masks <- masks[1:5]
 ```
 
-__Plotting pixel information__  
+__Plotting pixel information__
 
 The `images` objects can be used to display pixel-level data.
 
 ```{r usage-pixel}
 plotPixels(
     cur_images,
-    colour_by = c("CDH", "CD99", "H3"),
+    colour_by = c("CDH1", "CD99", "H3"),
     bcg = list(
         CD99 = c(0,2,1),
-        CDH = c(0,8,1),
+        CDH1 = c(0,8,1),
         H3 = c(0,5,1)
     )
 )
 ```
 
-__Plotting cell information__  
+__Plotting cell information__
 
 The `masks` and `sce` objects can be combined to display cell-level data.
 
@@ -179,7 +181,7 @@ plotCells(
 )
 ```
 
-__Outlining cells on images__  
+__Outlining cells on images__
 
 Cell information can be displayed on top of images by combining the `images`,
 `masks` and `sce` objects.
@@ -188,7 +190,7 @@ Cell information can be displayed on top of images by combining the `images`,
 plotPixels(
     cur_images, mask = cur_masks, object = sce,
     img_id = "image_number", cell_id = "cell_number",
-    outline_by = "CellType",
+    outline_by = "cell_type",
     colour_by = c("H3", "CD99", "CDH1"),
     bcg = list(
         CD99 = c(0,2,1),

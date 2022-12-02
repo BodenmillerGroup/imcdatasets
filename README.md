@@ -7,51 +7,79 @@ __Documentation is available at: https://bodenmillergroup.github.io/imcdatasets_
 The `imcdatasets` package is an extensible resource containing a set of publicly
  available and curated Imaging Mass Cytometry datasets. Each dataset consists of
   three data objects:
-1. Single cell data in the form of a `SingleCellExperiment` class object.
+1. Single cell data in the form of a `SingleCellExperiment` or
+`SpatialExperiment` class object.
 2. Multichannel images formatted into a `CytoImageList` class object.
 3. Cell segmentation masks formatted into a `CytoImageList` class object.
 
 These formats facilitate accession and integration into R/Bioconductor
-workflows. The data objects are hosted on Bioconductor's `ExperimentHub`
-platform.
-
-## Requirements
-The `imcdatasets` package requires R version >= 4.2.
-It builds on data objects contained in the [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment) and [cytomapper](https://bioconductor.org/packages/cytomapper) packages. These packages must, therefore, be installed (see below).
+workflows. The data objects are hosted on Bioconductor's
+[ExperimentHub](https://bioconductor.org/packages/ExperimentHub) platform.
 
 ## Installation
 
-The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) of `imcdatasets` can be installed by following standard
-`Bioconductor` package installation procedures:
+### Release version
+
+The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) of `imcdatasets` requires *R* version >= 4.2 and
+*Bioconductor* version >= 3.16.  
+
+The current release of *Bioconductor* should be installed:
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+BiocManager::install(version = "3.16")
+```
+Then, `imcdatasets` can be installed from *Bioconductor*:
+```{r}
 BiocManager::install("imcdatasets")
 ```
 
-The [development version](https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html) can be installed from GitHub using `devtools`:
+### Development version
+
+The [development version](https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html) of `imcdatasets` requires *R* version >= 4.3 and
+*Bioconductor* version >= 3.17.  
+
+The development version of *Bioconductor* should be installed:
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version='devel')
+```
+Then, `imcdatasets` can be installed from *Bioconductor*:
+```{r}
+BiocManager::install("imcdatasets")
+```
+
+`imcdatasets` can also be installed from GitHub using `devtools`:
 ```{r}
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
 ```
 
-Installing the dependencies (if not already done):
+### Dependencies
+
+`imcdatasets` builds on data objects contained in the
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment),
+[SpatialExperiment](https://bioconductor.org/packages/SpatialExperiment),
+and [cytomapper](https://bioconductor.org/packages/cytomapper) packages.
+
+These packages can be installed as follows:
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install(c("SingleCellExperiment", "cytomapper"))
-```
-
-Loading `imcdatasets` in your R session:
-```{r}
-library(imcdatasets)
+BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"))
 ```
 
 ## Usage
 
+To load `imcdatasets` in your R session, use:
+```{r}
+library(imcdatasets)
+```
+
 Detailed information on how to access the datasets is available in the
-`imcdatasets` vignette, which is available here: https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html.
+[imcdatasets vignette](https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html).
 
 The vignette can also be viewed directly in R:
 ```{r}
@@ -64,7 +92,8 @@ The `imcdatasets` package provides quick and easy access to published and
 curated imaging mass cytometry datasets. Each dataset consists of three data
 objects that can be retrieved individually:
 
-1. __Single cell data__ in the form of a `SingleCellExperiment` class object:
+1. __Single cell data__ in the form of a `SingleCellExperiment` or a
+`SpatialExperiment` class object:
 This object contains cell-level expression values and metadata. The `rowData`
 entry contain marker information while the `colData` entry contain cell-level
 metadata, including _image names_ and _cell numbers_. The `assays` slots contain
@@ -85,8 +114,12 @@ data can be associated to segmentation masks.
 The three data objects can be mapped using the _image names_ contained in the
 metadata of each object. Details are available in the vignette (see above).
 
-For more information about the `SingleCellExperiment` and `CytoImageList`
-objects, please refer to the [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment) and [cytomapper](https://bioconductor.org/packages/cytomapper) packages, respectively.
+For more information about the `SingleCellExperiment`, `SpatialCellExperiment`,
+and `CytoImageList` objects, please refer to the
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment),
+[SpatialExperiment](https://bioconductor.org/packages/SpatialExperiment),
+and [cytomapper](https://bioconductor.org/packages/cytomapper) packages,
+respectively.
 
 ## Available datasets
 
@@ -105,7 +138,7 @@ lines.
   - Documentation: [Zanotelli_2020_Spheroids](https://bodenmillergroup.github.io/imcdatasets/reference/Zanotelli_2020_Spheroids.html).   
   - Publication: [Zanotelli et al. _Mol Syst Biol_ (2020) 16:e9798](https://doi.org/10.15252/msb.20209798).  
 
-### View available datasets directly in R
+### Viewing available datasets in R
 
 In R, currently available datasets can be viewed with:
 ```{r}
@@ -113,8 +146,10 @@ imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
 imc
 ```
-Detailed information about each dataset is available in the help pages (e.g., `?JacksonFischer_2020_BreastCancer`).
-For more information, please refer to the [ExperimentHub vignette](https://bioconductor.org/packages/release/bioc/vignettes/ExperimentHub/inst/doc/ExperimentHub.html).
+Detailed information about each dataset is available in the help pages
+(e.g., `?JacksonFischer_2020_BreastCancer`).
+For more information, please refer to the
+[ExperimentHub vignette](https://bioconductor.org/packages/release/bioc/vignettes/ExperimentHub/inst/doc/ExperimentHub.html).
 
 ## Contributing
 
@@ -123,11 +158,12 @@ Suggestions for new Imaging Mass Cytometry datasets to include in the
 [opening an issue on GitHub](https://github.com/BodenmillerGroup/imcdatasets/issues).
 
 Guidelines about contributions and dataset formatting are provided in a
-[dedicated vignette]().
+[dedicated vignette](https://bodenmillergroup.github.io/imcdatasets/articles/Guidelines_Contribution_Dataset-formatting.html).
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._ R package version 1.5.3, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
+R package version 1.6.1, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

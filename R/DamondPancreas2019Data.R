@@ -1,8 +1,7 @@
 #' Obtain the damond-pancreas-2019 dataset
 #' 
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 #' Obtain the damond-pancreas-2019 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
 #' The data was obtained by imaging mass cytometry of human pancreas sections
@@ -26,9 +25,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
-#' \code{Damond_2019_Pancreas}.
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use \code{Damond_2019_Pancreas}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
 #' consisting of three data objects:
 #' \itemize{
@@ -101,9 +99,9 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 7.40 Gb, size on disk = 1.78 Gb.
-#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.6 Mb.
-#'     \item \code{`sce`}: size in memory = 248 Mb, size on disk = 145 Mb.
+#'     \item \code{`images`}: size in memory = 7.4 Gb, size on disk = 1.7 Gb.
+#'     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.2 Mb.
+#'     \item \code{`sce`}: size in memory = 352 Mb, size on disk = 212 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -160,13 +158,15 @@ DamondPancreas2019Data <- function (
     force = FALSE
 ) {
     .Deprecated("Damond_2019_Pancreas()")
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
-    dataset_name <- "DamondPancreas2019"
-    host <- file.path("imcdatasets", "damond-pancreas-2019")
-  
-    cur_dat <- .loadDataObject(
-      dataset_name, host, data_type, metadata,
-      on_disk, h5FilesPath, force)
+    
+    available_versions <- dataset_version <- "v0"
+    dataset_name <- "Damond_2019_Pancreas"
+    
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
+
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
+
+    return(cur_dat)
 }

@@ -1,7 +1,7 @@
 #' Obtain the jackson-fischer-2020 dataset
 #'
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use 
 #' \code{JacksonFischer_2020_BreastCancer}.
 #' Obtain the jackson-fischer-2020 dataset, which consists of three data
 #' objects: single cell data, multichannel images and cell segmentation masks.
@@ -26,8 +26,8 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This function and the associated dataset are provided for compatibility with 
-#' older versions but are deprecated. As a replacement, please use 
+#' This function is provided for compatibility with older versions but is 
+#' deprecated. As a replacement, please use 
 #' \code{JacksonFischer_2020_BreastCancer}.
 #' This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 #' (2020), consisting of three data objects:
@@ -84,9 +84,9 @@
 #'
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1.99 Gb.
-#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
-#'     \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
+#'     \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 2.0 Gb.
+#'     \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10 Mb.
+#'     \item \code{`sce`}: size in memory = 477 Mb, size on disk = 266 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -144,12 +144,15 @@ JacksonFischer2020Data <- function (
     force = FALSE
 ) {
     .Deprecated("JacksonFischer_2020_BreastCancer()")
-    .checkArguments(data_type, metadata,
-                    on_disk, h5FilesPath, force)
-  
-    dataset_name <- "JacksonFischer2020"
-    host <- file.path("imcdatasets", "jacksonfischer-breastcancer-2020")
-  
-    cur_dat <- .loadDataObject(dataset_name, host, data_type, metadata,
-                               on_disk, h5FilesPath, force)
+
+    available_versions <- dataset_version <- "v0"
+    dataset_name <- "JacksonFischer_2020_BreastCancer"
+
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        on_disk, h5FilesPath, force)
+    
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, on_disk, h5FilesPath, force)
+
+    return(cur_dat)
 }

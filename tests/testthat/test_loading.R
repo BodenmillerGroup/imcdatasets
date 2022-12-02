@@ -16,8 +16,8 @@ check_masks <- function(msk) {
 
 check_intersect <- function(sce, img, msk) {
     mappingcols <- Reduce(intersect, list(colnames(colData(sce)),
-                                            colnames(mcols(img)),
-                                            colnames(mcols(msk))))
+        colnames(mcols(img)),
+        colnames(mcols(msk))))
     expect_true(length(mappingcols) > 0)
 }
 
@@ -51,20 +51,28 @@ testDatasetWorks <- function(x) {
         
         # Fail
         expect_error(
-          do.call(x, args = list(data_type = "test")),
-          regexp = 'The data_type argument should be "sce", "images" or "masks".'
+            do.call(x, args = list(data_type = "test")),
+            regexp = 'The data_type argument should be "sce", "spe", "images", or "masks".'
         )
         expect_error(
-          do.call(x, args = list(data_type = c("sce", "images"))),
-          regexp = 'The data_type argument should be of length 1.'
+            do.call(x, args = list(data_type = c("sce", "images"))),
+            regexp = 'The data_type argument should be of length 1.'
         )
         expect_error(
-          do.call(x, args = list(data_type = "sce", metadata = NA)),
-          regexp = '"metadata" should be either TRUE or FALSE'
+            do.call(x, args = list(data_type = "sce", metadata = NA)),
+            regexp = '"metadata" should be either TRUE or FALSE'
+        )
+        expect_error(
+            do.call(x, args = list(data_type = "sce", version = "1")),
+            regexp = '"version" should be "latest" or one of the available dataset versions, e.g., "v1".'
+        )
+        expect_error(
+            do.call(x, args = list(data_type = "spe", version = "v0")),
+            regexp = 'It is only possible to retrieve SPE objects with dataset versions >= v1.'
         )
         expect_error(do.call(x, args = list(metadata = TRUE)))
         expect_error(do.call(x, args = list(data_type = "masks",
-                                            on_disk = TRUE)))
+            on_disk = TRUE)))
     }
 )}
 

@@ -40,7 +40,8 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
-cat("Dataset version: v1")
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
 ```
 
 Setting the working and output directories
@@ -51,9 +52,11 @@ workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-outdir <- file.path(".", "JacksonFischer_2020_BreastCancer")
-if(!(dir.exists(outdir)))
-    dir.create(outdir)
+dataset_dir <- file.path(".", "JacksonFischer_2020_BreastCancer")
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
 
 # Increase timeout period so that large files can be downloaded
 timeout <- getOption('timeout')
@@ -253,11 +256,11 @@ cell_meta <- cell_meta[, image_number := 1:.N]
 cell_meta <- cell_meta[, .(
   image_name = core,
   image_number = image_number,
+  cells_per_image = Count_Cells,
   image_width = Width_FullStack,
   image_height = Height_FullStack,
   image_area = area,
   image_filename = FileName_FullStack,
-  image_cells_per_image = Count_Cells,
   image_sum_area_cells = sum_area_cells,
   image_percent_tumor_cells = `%tumorcells`,
   image_percent_normal_epithelial_cells = `%normalepithelialcells`,
@@ -319,8 +322,10 @@ Finally, we add unique cell ids as row names, add cell numbers, and order the ce
 
 ```{r cell-rownames}
 # Cell ids are used as row names
-rownames(cell_metadata) <- cell_metadata$cell_id
 cell_metadata$cell_number <- as.integer(sub(".*_", "", cell_metadata$cell_id))
+cell_metadata$cell_id <- paste(cell_metadata$image_name,
+                               cell_metadata$cell_number, sep = "_")
+rownames(cell_metadata) <- cell_metadata$cell_id
 
 # Rows are ordered by image and cell numbers
 cell_metadata <- cell_metadata[order(cell_metadata$image_number,
@@ -340,68 +345,85 @@ cells <- cells[!grepl(paste(gas_channels, collapse = "|"), cells$channel),
                . (image_name = core, cell_id = id, channel, counts = mc_counts)]
 
 # Fix marker and metal names
-cells[, name := sub(".*Di ", "", channel)]
+cells[, full_name := sub(".*Di ", "", channel)]
 cells[, metal := sub("Di .*", "", channel)]
 cells[, weight := sub(".*[A-Za-z ]", "", metal)]
 cells[, metal := gsub("[0-9]+", "", metal)]
 cells[, metal := paste0(metal, weight)]
 
-cells[name == "Rutheni", `:=` (short_name = metal, name = metal)]
-cells[name == "Iridium", `:=` (short_name = metal, name = metal)]
+cells[full_name == "Rutheni", `:=` (short_name = metal, full_name = metal)]
+cells[full_name == "Iridium", `:=` (short_name = metal, full_name = metal)]
 
 # Add missing metal info
-cells[name == "phospho Histone", `:=` (
-  metal = "Eu153", name = "phospho-Histone H3 [S28]", short_name = "p_H3")]
-cells[name == "phospho S6", `:=` (
-  metal = "Er170", name = "phospho-S6 [S235/S236]", short_name = "p_S6")]
-cells[name == "phospho mTOR", `:=` (
-  metal = "Yb173", name = "phospho-mTOR [S2448]", short_name = "p_mTOR")]
+cells[full_name == "phospho Histone", `:=` (
+  metal = "Eu153", full_name = "phospho-Histone H3 [S28]",
+  short_name = "p_H3")]
+cells[full_name == "phospho S6", `:=` (
+  metal = "Er170", full_name = "phospho-S6 [S235/S236]",
+  short_name = "p_S6")]
+cells[full_name == "phospho mTOR", `:=` (
+  metal = "Yb173", full_name = "phospho-mTOR [S2448]",
+  short_name = "p_mTOR")]
 
 # Clarify unclear names
-cells[name == "cleaved", `:=` (
-  name = "cleaved-PARP + cleaved-Caspase3", short_name = "cPARP_cCASP3")]
-cells[name == "cerbB", `:=` (
-  name = "Epidermal growth factor receptor-2", short_name = "HER2")]
-cells[name == "Carboni", `:=` (
-  name = "Carbonic anhydrase IX", short_name = "CA9")]
+cells[full_name == "cleaved", `:=` (
+  full_name = "cleaved-PARP + cleaved-Caspase3", short_name = "cPARP_cCASP3")]
+cells[full_name == "cerbB", `:=` (
+  full_name = "Epidermal growth factor receptor-2", short_name = "HER2")]
+cells[full_name == "Carboni", `:=` (
+  full_name = "Carbonic anhydrase IX", short_name = "CA9")]
 
-cells[metal == "In113", `:=` (name = "Histone H3", short_name = "H3")]
-cells[metal == "La139", `:=` (name = "H3K27me3", short_name = "H3K27me3")]
-cells[metal == "Pr141", `:=` (name = "Cytokeratin 5", short_name = "KRT5")]
-cells[metal == "Nd142", `:=` (name = "Fibronectin", short_name = "FN1")]
-cells[metal == "Nd143", `:=` (name = "Cytokeratin 19", short_name = "KRT19")]
-cells[metal == "Nd144", `:=` (name = "Cytokeratin 8/18", short_name = "KRT8_18")]
-cells[metal == "Nd145", `:=` (name = "Twist", short_name = "TWIST1")]
-cells[metal == "Sm147", `:=` (name = "Cytokeratin 14", short_name = "KRT14")]
-cells[metal == "Nd148", `:=` (name = "Smooth muscle actin", short_name = "SMA")]
-cells[metal == "Sm149", `:=` (name = "Vimentin", short_name = "VIM")]
-cells[metal == "Nd150", `:=` (name = "c-Myc", short_name = "c_Myc")]
-cells[metal == "Sm152", `:=` (name = "CD3 epsilon", short_name = "CD3e")]
-cells[metal == "Gd155", `:=` (name = "Slug", short_name = "SNAI2")]
-cells[metal == "Tb159", `:=` (name = "p53", short_name = "p53")]
-cells[metal == "Gd156", `:=` (name = "Estrogen receptor alpha",
+cells[metal == "In113", `:=` (full_name = "Histone H3", short_name = "H3")]
+cells[metal == "La139", `:=` (full_name = "H3K27me3",
+                              short_name = "H3K27me3")]
+cells[metal == "Pr141", `:=` (full_name = "Cytokeratin 5",
+                              short_name = "KRT5")]
+cells[metal == "Nd142", `:=` (full_name = "Fibronectin", short_name = "FN1")]
+cells[metal == "Nd143", `:=` (full_name = "Cytokeratin 19",
+                              short_name = "KRT19")]
+cells[metal == "Nd144", `:=` (full_name = "Cytokeratin 8/18",
+                              short_name = "KRT8_18")]
+cells[metal == "Nd145", `:=` (full_name = "Twist", short_name = "TWIST1")]
+cells[metal == "Sm147", `:=` (full_name = "Cytokeratin 14",
+                              short_name = "KRT14")]
+cells[metal == "Nd148", `:=` (full_name = "Smooth muscle actin",
+                              short_name = "SMA")]
+cells[metal == "Sm149", `:=` (full_name = "Vimentin", short_name = "VIM")]
+cells[metal == "Nd150", `:=` (full_name = "c-Myc", short_name = "c_Myc")]
+cells[metal == "Sm152", `:=` (full_name = "CD3 epsilon", short_name = "CD3e")]
+cells[metal == "Gd155", `:=` (full_name = "Slug", short_name = "SNAI2")]
+cells[metal == "Tb159", `:=` (full_name = "p53", short_name = "p53")]
+cells[metal == "Gd156", `:=` (full_name = "Estrogen receptor alpha",
                               short_name = "ERa")]
-cells[metal == "Gd158", `:=` (name = "Progesterone receptor A/B",
+cells[metal == "Gd158", `:=` (full_name = "Progesterone receptor A/B",
                               short_name = "PGR")]
-cells[metal == "Er167", `:=` (name = "E-Cadherin", short_name = "CDH1")]
-cells[metal == "Er168", `:=` (name = "Ki-67", short_name = "Ki67")]
-cells[metal == "Tm169", `:=` (name = "Epidermal growth factor receptor",
+cells[metal == "Er167", `:=` (full_name = "E-Cadherin", short_name = "CDH1")]
+cells[metal == "Er168", `:=` (full_name = "Ki-67", short_name = "Ki67")]
+cells[metal == "Tm169", `:=` (full_name = "Epidermal growth factor receptor",
                          short_name = "EGFR")]
-cells[metal == "Yb172", `:=` (name = "von Willebrand factor",
+cells[metal == "Yb172", `:=` (full_name = "von Willebrand factor",
                               short_name = "vWF")]
-cells[metal == "Yb174", `:=` (name = "Cytokeratin 7", short_name = "KRT7")]
-cells[metal == "Lu175", `:=` (name = "Pan-cytokeratin", short_name = "PanCK")]
-cells[metal == "Ir191", `:=` (name = "Ir191", short_name = "DNA1")]
-cells[metal == "Ir193", `:=` (name = "Ir193", short_name = "DNA2")]
+cells[metal == "Yb174", `:=` (full_name = "Cytokeratin 7",
+                              short_name = "KRT7")]
+cells[metal == "Lu175", `:=` (full_name = "Pan-cytokeratin",
+                              short_name = "PanCK")]
+cells[metal == "Ir191", `:=` (full_name = "Iridium 191", short_name = "DNA1")]
+cells[metal == "Ir193", `:=` (full_name = "Iridium 193", short_name = "DNA2")]
 
 # Add missing short names
-cells[name %in% c("CD68", "p53", "CD44", "CD45", "GATA3", "CD20"),
-      short_name := name]
+cells[full_name %in% c("CD68", "p53", "CD44", "CD45", "GATA3", "CD20"),
+      short_name := full_name]
+
+# Ruthenium channels
+cells[startsWith(full_name, "Ru"),
+      full_name := gsub("Ru", "Ruthenium ", full_name)]
 ```
 
 We then import the panel and fix antibody clone names.
 
 ```{r assemble-panel}
+cells$name <- cells$channel
+
 # Select columns
 panel <- panel[, .(
   channel = FullStack,
@@ -422,7 +444,8 @@ panel[metal == "Er167", `:=` (antibody_clone = "36/E-Cadherin")]
 panel[metal == "Yb172", `:=` (antibody_clone = "polyclonal_vWF")]
 
 # Merge all panel information
-panel <- merge(unique(cells[, .(metal, name, short_name)]), panel, by = "metal")
+panel <- merge(unique(cells[, .(metal, name, full_name, short_name)]),
+               panel, by = "metal")
 ```
 
 Finally, we convert the panel table to a `DataFrame` and add target short_names as row names.
@@ -438,6 +461,7 @@ rownames(panel) <- panel$short_name
 Here, we will prepare the counts matrix that will be stored in the `assay` slot of the `SingleCellExperiment` object.
 
 We extract marker expression values from the `cells` table and convert them to a matrix. We then order the counts matrix by `cell_id` and `short_name`.
+We then convert `cell_id` to the {`image_number` `_` `cell_number`} format for consistency with other datasets.
 
 ```{r prepare-counts}
 counts <-  dcast.data.table(cells, "cell_id ~ short_name",
@@ -449,6 +473,12 @@ rownames(counts) <- row_names
 
 counts <- counts[order(match(rownames(counts), rownames(cell_metadata))),
                  order(match(colnames(counts), rownames(panel)))]
+
+# cell_id
+cell_metadata$cell_id <- paste(cell_metadata$image_number,
+                               cell_metadata$cell_number, sep = "_")
+rownames(cell_metadata) <- cell_metadata$cell_id
+rownames(counts) <- rownames(cell_metadata)
 ```
 
 
@@ -489,6 +519,7 @@ We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHu
 
 ```{r save-sce}
 saveRDS(sce, file.path(outdir, "sce.rds"))
+print(sce)
 ```
 
 ### Clean up
@@ -557,7 +588,6 @@ file.remove(file.path(workdir, fn))
 ```{r read-in-masks}
 masks <- loadImages(file.path(workdir, "Basel_Zuri_masks"),
                     pattern = "_full_maks.tiff")
-masks
 ```
 
 ### Clean-up
@@ -637,7 +667,9 @@ mcols(masks) <- merge(
   unique(colData(sce)[, c("image_filename", "image_name", "image_number")]),
   by = "image_filename")
 
-identical(mcols(masks)$image_name, mcols(images)$image_name)
+print(identical(mcols(masks)$image_name, mcols(images)$image_name))
+names(images) <- mcols(images)$image_name
+names(masks) <- mcols(masks)$image_name
 ```
 
 ### Subset channels
@@ -668,10 +700,12 @@ gc()
 
 ```{r save-masks}
 saveRDS(masks, file.path(outdir, "masks.rds"))
+print(head(masks))
 ```
 
 ```{r save-images}
 saveRDS(images, file.path(outdir, "images.rds"))
+print(head(images))
 ```
 
 ## Clean up

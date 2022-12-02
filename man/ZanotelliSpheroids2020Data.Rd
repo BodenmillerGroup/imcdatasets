@@ -40,18 +40,16 @@ A \linkS4class{SingleCellExperiment} object with single cell data, a
 \linkS4class{CytoImageList} object containing cell segmentation masks.
 }
 \description{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
-\code{Zanotelli_2020_Spheroids}.
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 Obtain the zanotelli-spheroids-2020 dataset, which consists of three data
 objects: single cell data, multichannel images and cell segmentation masks.
 The data were obtained by imaging mass cytometry of sections of 3D spheroids
 generated from different cell lines.
 }
 \details{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
-\code{Zanotelli_2020_Spheroids}.
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use \code{Zanotelli_2020_Spheroids}.
 This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. (2020),
 consisting of three data objects:
 \itemize{
@@ -135,9 +133,9 @@ contains a graph of cell neighbors, generated with the
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 21.2 Gb,  size on disk = 881 Mb.
-    \item \code{`masks`}: size in memory = 426 Mb,  size on disk = 11.6 Mb.
-    \item \code{`sce`}: size in memory = 584 Mb, size on disk = 340 Mb.
+    \item \code{`images`}: size in memory = 21.2 Gb, size on disk = 860 Mb.
+    \item \code{`masks`}: size in memory = 426 Mb, size on disk = 12 Mb.
+    \item \code{`sce`}: size in memory = 564 Mb, size on disk = 319 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory

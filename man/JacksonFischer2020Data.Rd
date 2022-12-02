@@ -40,8 +40,8 @@ A \linkS4class{SingleCellExperiment} object with single cell data, a
 \linkS4class{CytoImageList} object containing cell masks.
 }
 \description{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use 
 \code{JacksonFischer_2020_BreastCancer}.
 Obtain the jackson-fischer-2020 dataset, which consists of three data
 objects: single cell data, multichannel images and cell segmentation masks.
@@ -49,8 +49,8 @@ The data was obtained by imaging mass cytometry of tumour tissue from
 patients with breast cancer.
 }
 \details{
-This function and the associated dataset are provided for compatibility with 
-older versions but are deprecated. As a replacement, please use 
+This function is provided for compatibility with older versions but is 
+deprecated. As a replacement, please use 
 \code{JacksonFischer_2020_BreastCancer}.
 This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
 (2020), consisting of three data objects:
@@ -107,9 +107,9 @@ can be retrieved with \code{colData(sce)$grade}.
 
 File sizes:
 \itemize{
-    \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 1.99 Gb.
-    \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10.2 Mb.
-    \item \code{`sce`}: size in memory = 517 Mb, size on disk = 272 Mb.
+    \item \code{`images`}: size in memory = 17.8 Gb, size on disk = 2.0 Gb.
+    \item \code{`masks`}: size in memory = 433 Mb, size on disk = 10 Mb.
+    \item \code{`sce`}: size in memory = 477 Mb, size on disk = 266 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory
