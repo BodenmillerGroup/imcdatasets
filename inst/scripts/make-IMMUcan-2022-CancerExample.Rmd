@@ -19,7 +19,7 @@ knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
 
 # **Introduction**
 
-This script loads example data acquired by the [IMMUcan](https://immucan.eu) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/6810879](https://zenodo.org/record/6810879).   
+This script loads example data acquired by the [IMMUcan](https://immucan.eu) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/7079294](https://zenodo.org/record/7079294).   
 
 
 # **Settings**
@@ -88,23 +88,23 @@ sce$cell_number <- sce$ObjectNumber
 # Add image numbers and cell ids
 image_names <- unique(colData(sce)$image_name)
 image_numbers <- 1:length(image_names)
-names(image_numbers) = image_names
+names(image_numbers) <- image_names
 sce$image_number <- image_numbers[colData(sce)$image_name]
 
 sce$cell_id <- paste(sce$image_number, sce$cell_number, sep = "_")
 
-# CAN THE FOLLOWING COLNAMES BE MODIFIED ?
-# cell_type <- celltype
-# image_width <- width_px
-# image_height <- height_px
-# 
-# cell_area <- area
-# cell_major_axis_length <- major_axis_length
-# cell_minor_axis_length <- minor_axis_length
-# cell_eccentricity <- eccentricity
+# Synchronise additional columns
+sce$cell_type <- sce$celltype
+sce$image_width <- sce$width_px
+sce$image_height <- sce$height_px
+ 
+sce$cell_area <- sce$area
+sce$cell_major_axis_length <- sce$major_axis_length
+sce$cell_minor_axis_length <- sce$minor_axis_length
+sce$cell_eccentricity <- sce$eccentricity
 
 # Add cell ids as row names
-rownames(colData(sce)) <- colData(sce)$cell_id
+colnames(sce) <- colData(sce)$cell_id
 ```
 
 Store cell coordinates in `colData(sce)`
