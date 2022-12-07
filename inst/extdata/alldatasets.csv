@@ -1,4 +1,5 @@
-Reference,Species,Tissue,NumberOfCells,NumberOfImages,NumberOfChannels,FunctionCall
-@damond2019pancreas,Human,Pancreas,252059,100,38,DamondPancreas2019Data()
-@jacksonfischer2020,Human,Primary breast tumour,285851,100,42,JacksonFischer2020Data()
-@zanotellispheroids2020,Human,Cell line spheroids,229047,517,51,ZanotelliSpheroids2020Data()
+FunctionCall,Species,Tissue,NumberOfCells,NumberOfImages,NumberOfChannels,Reference
+Damond_2019_Pancreas(),Human,Pancreas,252059,100,38,@Damond-2019-Pancreas
+HochSchulz_2022_Melanoma(),Human,Metastatic melanoma,325881,50,41,@HochSchulz-2022-Melanoma
+JacksonFischer_2020_BreastCancer(),Human,Primary breast tumour,285851,100,42,@JacksonFischer-2020-BreastCancer
+Zanotelli_2020_Spheroids(),Human,Cell line spheroids,229047,517,51,@Zanotelli-2020-Spheroids
