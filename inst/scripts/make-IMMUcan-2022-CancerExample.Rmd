@@ -209,7 +209,7 @@ Finally, we convert the panel table to a `DataFrame` and add target short_names 
 ```{r prepare-panel}
 panel <- as(panel, "DataFrame")
 panel$antibody_ul_to_add <- as.numeric(panel$antibody_ul_to_add)
-rownames(panel) <- panel$short_name
+rownames(sce) <- rownames(panel) <- panel$short_name
 rowData(sce) <- panel
 ```
 
