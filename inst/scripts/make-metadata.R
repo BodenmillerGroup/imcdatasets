@@ -1,98 +1,155 @@
-# ------------------------------
 # Base metadata for all datasets
-# ------------------------------
 
 df_base <- data.frame(
+    SourceType = "Zip",
     DispatchClass = "Rds",
     Genome = NA,
+    Coordinate_1_based = NA,
+    Species = "Homo sapiens",
+    TaxonomyId = 9606,
+    DataProvider = "University of Zurich",
+    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
     stringsAsFactors = FALSE
 )
 
-# ------------
-# DamondPancreas2019
-# ------------
-df_DamondPancreas2019 <- cbind(
-    df_base,
-    Title = sprintf("DamondPancreas2019_%s", c("sce", "images", "masks")),
-    Description = sprintf(
-        "%s for the DamondPancreas2019 imaging mass cytometry dataset",
-        c("Single cell data", "Multichannel images", "Cell masks")),
-    BiocVersion = rep("3.13", 3),
-    SourceType = rep("Zip", 3),
-    SourceUrl = rep("http://dx.doi.org/10.17632/cydmwsfztj.2", 3),
-    SourceVersion = "Apr 04 2020",
-    Species = "Homo sapiens",
-    TaxonomyId = 9606,
-    Coordinate_1_based = NA,
-    DataProvider = "University of Zurich",
-    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
-    RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-    RDataPath = file.path("imcdatasets", "damond-pancreas-2019",
-                          c("sce.rds", "images.rds", "masks.rds")),
-    DataType = c("sce", "images", "masks"),
-    Notes = c("","","")
+# Dataset-specific metadata
+df_list <- list(
+    
+    # Damond_2019_Pancreas
+    data.frame(
+        Title = sprintf("Damond_2019_Pancreas - %s - %s%s",
+            rep(c("sce", "images", "masks"), 3),
+            rep(c(rep("v1", 2), "v0"), each = 3),
+            rep(c("", " - full", ""), each = 3)),
+        FunctionCall = sprintf("Damond_2019_Pancreas(data_type = '%s'%s%s)",
+            rep(c("sce", "images", "masks"), 3),
+            rep(c("", ", full_dataset = TRUE", ""), each = 3),
+            rep(c("", "", ", dataset_version = 'v0'"), each = 3)),
+        Description = sprintf(
+            "%s (%s) for the Damond_2019_Pancreas IMC dataset",
+            c("Single cell data", "Multichannel images", "Cell masks"),
+            rep(c("subset", "full dataset", "subset"), each = 3)),
+        BiocVersion = rep(c("3.16", "3.16", "3.13"), each = 3),
+        DatasetVersion = rep(c(rep("v1", 2), "v0"), each = 3),
+        SourceUrl = "http://dx.doi.org/10.17632/cydmwsfztj.2",
+        SourceVersion = "Apr 04 2020",
+        RDataClass = rep(c("SingleCellExperiment",
+                           rep("CytoImageList", 2)), 3),
+        RDataPath = file.path(
+            "imcdatasets", "Damond_2019_Pancreas",
+            rep(c(rep("v1", 2), "v0"), each = 3),
+            paste0(rep(c("sce", "images", "masks"), 3),
+                   rep(c("", "_full", ""), each = 3),
+                   rep(c(".rds"), 9))),
+        DataType = rep(c("sce", "images", "masks"), 3),
+        DatasetType = rep(c("matched subset", "full dataset",
+                            "matched subset"), each = 3),
+        Notes = c("")
+    ),
+    
+    # HochSchulz_2022_Melanoma
+    data.frame(
+        Title = sprintf("HochSchulz_2022_Melanoma - %s - %s - %s%s",
+            rep(c("rna", "protein"), each = 6),
+            rep(c("sce", "images", "masks"), 4),
+            rep(c(rep("v1", 3)), each = 4),
+            rep(c("", " - full"), 2, each = 3)),
+        FunctionCall = sprintf(
+            "HochSchulz_2022_Melanoma(data_type = '%s', panel = '%s'%s)",
+            rep(c("sce", "images", "masks"), 4),
+            rep(c("rna", "protein"), each = 6),
+            rep(c("", ", full_dataset = TRUE"), 2, each = 3)),
+        Description = sprintf(
+            "%s (%s panel, %s) for the HochSchulz_2022_Melanoma IMC dataset",
+            c("Single cell data", "Multichannel images", "Cell masks"),
+            rep(c("RNA", "Protein"), each = 6),
+            rep(c("subset", "full dataset"), 2, each = 3)),
+        BiocVersion = "3.16",
+        DatasetVersion = "v1",
+        SourceUrl = "https://doi.org/10.5281/zenodo.5994136",
+        SourceVersion = "Feb 07 2022",
+        RDataClass = rep(c("SingleCellExperiment",
+                           rep("CytoImageList", 2)), 4),
+        RDataPath = file.path(
+            "imcdatasets", "HochSchulz_2022_Melanoma", "v1",
+                paste0(sprintf("%s%s_%s",
+            rep(c("sce", "images", "masks"), 4),
+            rep(c("", "_full"), 2, each = 3),
+            rep(c("rna", "protein"), each = 6)), ".rds")),
+        DataType = rep(c("sce", "images", "masks"), 4),
+        DatasetType = rep(c("matched subset", "full dataset"), 2, each = 3),
+        Notes = c("")
+    ),
+    
+    # JacksonFischer_2020_BreastCancer
+    data.frame(
+        Title = sprintf("JacksonFischer_2020_BreastCancer%s - %s - %s%s",
+            rep(c("", "_Zurich", "", ""), each = 3),
+            rep(c("sce", "images", "masks"), 4),
+            rep(c("v1", "v1", "v1", "v0"), each = 3),
+            rep(c("", "", " - full", ""), each = 3)),
+        FunctionCall = sprintf(
+            "JacksonFischer_2020_BreastCancer(data_type = '%s'%s%s%s)",
+            rep(c("sce", "images", "masks"), 4),
+            rep(c("", ", cohort = 'Zurich'", "", ""), each = 3),
+            rep(c("", "", ", full_dataset = TRUE", ""), each = 3),
+            rep(c("", "", "", ", dataset_version = 'v0'"), each = 3)),
+        Description = sprintf(
+            "%s (%s) for the JacksonFischer_2020_BreastCancer IMC dataset",
+            rep(c("Single cell data", "Multichannel images", "Cell masks"), 4),
+            rep(c("Basel cohort subset", "Zurich cohort subset",
+                  "full dataset", "Basel cohort subset"), each=3)),
+        BiocVersion = rep(c(rep("3.16", 3), "3.13"), each = 3),
+        DatasetVersion = rep(c(rep("v1", 3), "v0"), each = 3),
+        SourceUrl = "https://doi.org/10.5281/zenodo.3518284",
+        SourceVersion = "Nov 04 2019",
+        RDataClass = rep(c("SingleCellExperiment",
+                           rep("CytoImageList", 2)), 4),
+        RDataPath = file.path(
+            "imcdatasets", "JacksonFischer_2020_BreastCancer",
+            rep(c(rep("v1", 3), "v0"), each = 3),
+            paste0(sprintf("%s%s%s",
+                rep(c("sce", "images", "masks"), 4),
+                rep(c("", "_zurich", "", ""), each = 3),
+                rep(c("", "", "_full", ""), each = 3)), ".rds")),
+        DataType = rep(c("sce", "images", "masks"), 4),
+        DatasetType = rep(c("matched subset", "matched subset",
+                            "full dataset", "matched subset"), each = 3),
+        Notes = c("")
+    ),
+    
+    # Zanotelli_2020_Spheroids
+    data.frame(
+        Title = sprintf("Zanotelli_2020_Spheroids - %s - %s",
+            rep(c("sce", "images", "masks"), 2),
+            rep(c("v1", "v0"), each = 3)),
+        FunctionCall = sprintf("Zanotelli_2020_Spheroids(data_type = '%s%s)",
+            rep(c("sce'", "images'", "masks'"), 2),
+            rep(c("", ", dataset_version = 'v0'"), each = 3)),
+        Description = rep(sprintf(
+            "%s for the Zanotelli_2020_Spheroids IMC dataset",
+            c("Single cell data", "Multichannel images", "Cell masks")), 2),
+        BiocVersion = rep(c("3.16", "3.13"), each = 3),
+        DatasetVersion = rep(c("v1", "v0"), each = 3),
+        SourceUrl = "https://zenodo.org/record/4271910",
+        SourceVersion = "Aug 20 2020",
+        RDataClass = rep(c("SingleCellExperiment",
+                           rep("CytoImageList", 2)), 2),
+        RDataPath = file.path(
+            "imcdatasets", "Zanotelli_2020_Spheroids",
+            rep(c("v1", "v0"), each = 3),
+            rep(c("sce.rds", "images.rds", "masks.rds"), 2)),
+        DataType = rep(c("sce", "images", "masks"), 2),
+        DatasetType = rep(c("full and matched dataset"), 6),
+        Notes = c("")
+    )
 )
-
-# ------------
-# JacksonFischer2020
-# ------------
-df_JacksonFischer2020 <- cbind(
-    df_base,
-    Title = sprintf("JacksonFischer2020_%s", c("sce", "images", "masks")),
-    Description = sprintf(
-        "%s for the JacksonFischer2020 imaging mass cytometry dataset",
-        c("Single cell data", "Multichannel images", "Cell masks")),
-    BiocVersion = rep("3.13", 3),
-    SourceType = rep("Zip", 3),
-    SourceUrl = rep("https://doi.org/10.5281/zenodo.3518284", 3),
-    SourceVersion = "Nov 04 2019",
-    Species = "Homo sapiens",
-    TaxonomyId = 9606,
-    Coordinate_1_based = NA,
-    DataProvider = "University of Zurich",
-    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
-    RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-    RDataPath = file.path("imcdatasets", "jackson-fischer-2020",
-                          c("sce.rds", "images.rds", "masks.rds")),
-    DataType = c("sce", "images", "masks"),
-    Notes = c("","","")
-)
-
-# ------------
-# ZanotelliSpheroids2020
-# ------------
-df_ZanotelliSpheroids2020 <- cbind(
-    df_base,
-    Title = sprintf("ZanotelliSpheroids2020_%s", c("sce", "images", "masks")),
-    Description = sprintf(
-        "%s for the ZanotelliSpheroids2020 imaging mass cytometry dataset",
-        c("Single cell data", "Multichannel images", "Cell masks")),
-    BiocVersion = rep("3.13", 3),
-    SourceType = rep("Zip", 3),
-    SourceUrl = rep("https://zenodo.org/record/4271910#.YGWR_T8kz-i", 3),
-    SourceVersion = "Aug 20 2020",
-    Species = "Homo sapiens",
-    TaxonomyId = 9606,
-    Coordinate_1_based = NA,
-    DataProvider = "University of Zurich",
-    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
-    RDataClass = c("SingleCellExperiment", rep("CytoImageList", 2)),
-    RDataPath = file.path("imcdatasets", "zanotelli-spheroids-2020",
-                          c("sce.rds", "images.rds", "masks.rds")),
-    DataType = c("sce", "images", "masks"),
-    Notes = c("","","")
-)
-
-# ---------------------------------
-# Combine for all datasets and save
-# ---------------------------------
 
 # Combine all datasets
-df_all <- rbind(
-    df_DamondPancreas2019, df_JacksonFischer2020, df_ZanotelliSpheroids2020
-)
+dfs <- lapply(df_list, cbind, df_base)
+dfs <- do.call(rbind, dfs)
+dfs[!(dfs$DataType == "images" & dfs$DatasetType == "full dataset"), ]
 
 # Save as .csv file
-write.csv(df_all,
-          file = file.path(".", "inst", "extdata", "metadata.csv"),
-          row.names = FALSE)
+filename <- file.path(".", "inst", "extdata", "metadata.csv")
+write.csv(dfs, file = filename, row.names = FALSE)
