@@ -66,7 +66,7 @@ options(timeout = 1000)
 We will download the already processed data and convert the SpatialExperiment into a SingleCellExperiment object.
 
 ```{r download-cell-data}
-download.file("https://zenodo.org/record/7079294/files/spe.rds", 
+download.file("https://zenodo.org/record/7432486/files/spe.rds", 
               destfile = file.path(workdir, "spe.rds"))
 ```
 
@@ -236,14 +236,14 @@ print(sce)
 ## Import images and masks
 
 ```{r import-images}
-download.file("https://zenodo.org/record/7079294/files/images.rds", 
+download.file("https://zenodo.org/record/7432486/files/images.rds", 
               destfile = file.path(workdir, "images.rds"))
 
 images <- readRDS(file.path(workdir, "images.rds"))
 ```
 
 ```{r import-masks}
-download.file("https://zenodo.org/record/7079294/files/masks.rds", 
+download.file("https://zenodo.org/record/7432486/files/masks.rds", 
               destfile = file.path(workdir, "masks.rds"))
 
 masks <- readRDS(file.path(workdir, "masks.rds"))
