@@ -19,7 +19,7 @@ knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
 
 # **Introduction**
 
-This script loads example data acquired by the [IMMUcan](https://immucan.eu) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/7079294](https://zenodo.org/record/7079294).   
+This script loads example data acquired by the [IMMUcan](https://immucan.eu) consortium. The data was processed as part of the [IMC data analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/) and is hosted at [zenodo.org/record/7432486](https://zenodo.org/record/7432486).   
 
 
 # **Settings**
