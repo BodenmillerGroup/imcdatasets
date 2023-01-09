@@ -103,6 +103,7 @@
 #' \itemize{
 #'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
 #'     \item \code{`v1`}: consistent object formatting across datasets.
+#'     \item \code{`v2`}: added full datasets and Zurich cohort.
 #' }
 #'
 #' File sizes:
@@ -141,7 +142,7 @@
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
 #' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
-#' @author Jana Fischer
+#' @author Nicolas Damond
 #'
 #' @references
 #' Jackson, Fischer et al. (2020).
@@ -184,7 +185,7 @@ JacksonFischer_2020_BreastCancer <- function (
     h5FilesPath = NULL,
     force = FALSE
 ) {
-    available_versions <- c("v0", "v1")
+    available_versions <- c("v0", "v1", "v2")
     dataset_name <- "JacksonFischer_2020_BreastCancer"
     dataset_version <- ifelse(version == "latest",
         utils::tail(available_versions, n=1), version)
@@ -192,10 +193,18 @@ JacksonFischer_2020_BreastCancer <- function (
     if (!cohort %in% c("Basel", "Zurich"))
         stop('"cohort" should be either "Basel" or "Zurich"')
     
+    if (dataset_version %in% c("v0", "v1")) {
+        if (cohort == "Zurich")
+            stop("The Zurich cohort is only available for version 'v2'")
+        
+        if (isTRUE(full_dataset))
+            stop("Full datasets are only available for version 'v2'")
+    }
+    
     .checkArguments(data_type, metadata, dataset_version, available_versions,
         full_dataset, on_disk, h5FilesPath, force)
-    
-    if (cohort == "Zurich" & isFALSE(full_dataset))
+        
+    if (dataset_version == "v2" & isFALSE(full_dataset))
         dataset_name <- paste(dataset_name, cohort, sep = "_")
     
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name,

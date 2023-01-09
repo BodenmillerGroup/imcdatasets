@@ -2,7 +2,7 @@
 title: "Preparation of the Jackson, Fischer et al dataset"
 author: "Jana Fischer and Nicolas Damond"
 date: "Created: 15 March 2021; Compiled: `r BiocStyle::doc_date()`"
-package: "`r BiocStyle::pkg_ver('imcdatasets')`"x
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"
 output:
   BiocStyle::html_document:
     titlecaps: false
@@ -41,7 +41,7 @@ library(cytomapper)
 
 ```{r dataset-version, echo=FALSE}
 dataset_name <- "JacksonFischer_2020_BreastCancer"
-dataset_version <- "v1"
+dataset_version <- "v2"
 cat("Dataset version:", dataset_version)
 ```
 
@@ -667,7 +667,7 @@ saveRDS(sce, file.path(outdir, "sce_full.rds"))
 print(sce)
 
 # Subampled Basel cohort
-saveRDS(sce_basel, file.path(outdir, "sce.rds"))
+saveRDS(sce_basel, file.path(outdir, "sce_basel.rds"))
 print(sce_basel)
 
 # Zurich cohort
@@ -817,7 +817,7 @@ print(head(masks))
 remove(masks)
 
 # Basel cohort
-saveRDS(masks_basel, file.path(outdir, "masks.rds"))
+saveRDS(masks_basel, file.path(outdir, "masks_basel.rds"))
 print(head(masks_basel))
 
 # Zurich cohort
@@ -911,7 +911,7 @@ names(images_basel) <- mcols(images_basel)$image_name
 Finally, we save the generated `CytoImageList` images for uploading to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-images-basel}
-saveRDS(images_basel, file.path(outdir, "images.rds"))
+saveRDS(images_basel, file.path(outdir, "images_basel.rds"))
 print(head(images_basel))
 
 remove(images_basel)
