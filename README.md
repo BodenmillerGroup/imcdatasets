@@ -20,8 +20,8 @@ workflows. The data objects are hosted on Bioconductor's
 
 ### Release version
 
-The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html) of `imcdatasets` requires *R* version >= 4.2 and
-*Bioconductor* version >= 3.16.  
+The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html)
+of `imcdatasets` requires *R* version >= 4.2 and *Bioconductor* version >= 3.16.  
 
 The current release of *Bioconductor* should be installed:
 ```{r}
@@ -36,8 +36,8 @@ BiocManager::install("imcdatasets")
 
 ### Development version
 
-The [development version](https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html) of `imcdatasets` requires *R* version >= 4.3 and
-*Bioconductor* version >= 3.17.  
+The [development version](https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html)
+of `imcdatasets` requires *R* version >= 4.3 and *Bioconductor* version >= 3.17.  
 
 The development version of *Bioconductor* should be installed:
 ```{r}
@@ -163,7 +163,7 @@ Guidelines about contributions and dataset formatting are provided in a
 ## Citation
 
 Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.6.1, https://github.com/BodenmillerGroup/imcdatasets.
+R package version 1.7.1, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

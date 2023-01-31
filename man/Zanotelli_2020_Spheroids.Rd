@@ -6,10 +6,10 @@
 \usage{
 Zanotelli_2020_Spheroids(
   data_type = c("sce", "spe", "images", "masks"),
+  version = "latest",
   metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
-  version = "latest",
   force = FALSE
 )
 }
@@ -18,6 +18,8 @@ Zanotelli_2020_Spheroids(
 `masks` for cell segmentation masks. Single cell data are retrieved using 
 either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
 \code{SpatialExperiment} format.}
+
+\item{version}{dataset version. By default, the latest version is returned.}
 
 \item{metadata}{if FALSE (default), the data object selected in 
 \code{data_type} is returned. If TRUE, only the metadata associated to this
@@ -32,8 +34,6 @@ and \code{masks}.}
 are stored. This path needs to be defined when \code{on_disk = TRUE}.
 When files should only temporarily be stored on disk, please set
 \code{h5FilesPath = getHDF5DumpDir()}.}
-
-\item{version}{dataset version. By default, the latest version is returned.}
 
 \item{force}{logical indicating if images should be overwritten when files
 with the same name already exist on disk.}
