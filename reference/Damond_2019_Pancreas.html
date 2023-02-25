@@ -20,7 +20,7 @@ sections from donors with type 1 diabetes."><!-- mathjax --><script src="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.2</span>
       </span>
     </div>
 
@@ -71,10 +71,11 @@ sections from donors with type 1 diabetes.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">Damond_2019_Pancreas</span><span class="op">(</span></span>
 <span>  data_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sce"</span>, <span class="st">"spe"</span>, <span class="st">"images"</span>, <span class="st">"masks"</span><span class="op">)</span>,</span>
+<span>  full_dataset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  on_disk <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  h5FilesPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -86,6 +87,17 @@ sections from donors with type 1 diabetes.</p>
 `masks` for cell segmentation masks. Single cell data are retrieved using 
 either `sce` for the <code>SingleCellExperiment</code> format or `spe` for the  
 <code>SpatialExperiment</code> format.</p></dd>
+
+
+<dt>full_dataset</dt>
+<dd><p>if FALSE (default), a subset corresponding to 100 images
+is returned. If TRUE, the full dataset (corresponding to 845 images) is 
+returned. Due to memory space limitations, this option is only available for 
+single cell data and masks, not for <code>data_type = "images"</code>.</p></dd>
+
+
+<dt>version</dt>
+<dd><p>dataset version. By default, the latest version is returned.</p></dd>
 
 
 <dt>metadata</dt>
@@ -108,10 +120,6 @@ When files should only temporarily be stored on disk, please set
 <code>h5FilesPath = getHDF5DumpDir()</code>.</p></dd>
 
 
-<dt>version</dt>
-<dd><p>dataset version. By default, the latest version is returned.</p></dd>
-
-
 <dt>force</dt>
 <dd><p>logical indicating if images should be overwritten when files
 with the same name already exist on disk.</p></dd>
@@ -122,14 +130,13 @@ with the same name already exist on disk.</p></dd>
     
 
 <p>A <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object with single cell data, a
-SpatialExperiment object with single cell data, a 
+<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> object with single cell data, a 
 <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing multichannel images, or a
 <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing cell segmentation masks.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
-consisting of three data objects:</p><ul><li><p><code>images</code> contains a hundred 38-channel
+    <p>This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019):</p><ul><li><p><code>images</code> contains a hundred 38-channel
     images in the form of a <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
 <li><p><code>masks</code> contains the cell segmentation
     masks associated with the images, in the form of a
@@ -140,12 +147,12 @@ consisting of three data objects:</p><ul><li><p><code>images</code> contains a h
     <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a>. This represents a total of 252,059 
     cells x 38 channels.</p></li>
 <li><p><code>spe</code> same single cell data as for <code>sce</code>, but in the
-    SpatialExperiment format.</p></li>
+    <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> format.</p></li>
 </ul><p>All data are downloaded from ExperimentHub and cached for local re-use.</p>
 <p>Mapping between the three data objects is performed via variables located in
 their metadata columns: <code>mcols()</code> for the <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a>
 objects and <code>ColData()</code> for the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-SpatialExperiment objects. Mapping at the image level can be 
+<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects. Mapping at the image level can be 
 performed with the <code>image_name</code> or <code>image_number</code> variables. 
 Mapping between cell segmentation masks and single cell data is performed 
 with the <code>cell_number</code> variable, the values of which correspond to the 
@@ -156,18 +163,20 @@ comprising the data from three pancreas donors at different stages of type 1
 diabetes (T1D). The three donors present clearly diverging characteristics 
 in terms of cell type composition and cell-cell interactions, which makes 
 this dataset ideal for benchmarking spatial and neighborhood analysis 
-algorithms.</p>
+algorithms. If <code>full_dataset = TRUE</code>, the full dataset (845 images from
+12 patients) is returned. This option is not available for multichannel 
+images.</p>
 <p>The <code>assay</code> slots of the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-SpatialExperiment objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
+<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
 <li><p><code>exprs</code> contains arsinh-transformed counts, with cofactor 1.</p></li>
 <li><p><code>quant_norm</code> contains counts censored at the 99th percentile 
     and scaled 0-1.</p></li>
 </ul><p>The marker-associated metadata, including antibody information and metal 
 tags are stored in the <code>rowData</code> of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> / SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> / <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects.</p>
 <p>The cell-associated metadata are stored in the <code>colData</code> of the
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects. These metadata include cell types (in 
 <code>colData(sce)$cell_type</code>) and broader cell categories, such  as
 "immune" or "islet" cells (in <code>colData(sce)$cell_category</code>). In
@@ -176,15 +185,15 @@ to is indicated in <code>colData(sce)$islet_parent</code>. For cells not located
 in islets, the "islet_parent" value is set to 0 but the spatially closest 
 islet can be identified with <code>colData(sce)$islet_closest</code>.</p>
 <p>The donor-associated metadata are also stored in the <code>colData</code> of the
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects. For instance, the donors' IDs can be retrieved with 
 <code>colData(sce)$patient_id</code> and the donors' disease stage can be obtained
 with <code>colData(sce)$patient_stage</code>.</p>
 <p>Neighborhood information, defined here as cells that are localized next to 
 each other, is stored as a <code>SelfHits</code> object in the <code>colPairs</code> 
-slot of the <code>SingleCellExperiment</code> and SpatialExperiment 
+slot of the <code>SingleCellExperiment</code> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects.</p>
-<p>The three donors present the following characteristics:</p><ul><li><p><code>6126</code> is a non-diabetic donor, with large islets containing
+<p>The three donors in the subset present the following characteristics:</p><ul><li><p><code>6126</code> is a non-diabetic donor, with large islets containing
     many beta cells, severe infiltration of the exocrine pancreas with
     myeloid cells but limited infiltration of islets.</p></li>
 <li><p><code>6414</code> is a donor with recent T1D onset (shortly after
@@ -193,13 +202,19 @@ objects.</p>
 <li><p><code>6180</code> is a donor with long-duration T1D (11 years after
     diagnosis), showing near-total beta cell destruction and limited immune
     cell infiltration in both the islets and the pancreas.</p></li>
-</ul><p>Dataset versions: a <code>version</code> argument can be passed to the function to 
+</ul><p>For information about other donors in the full dataset, please refer to the
+Damond et al. publication.</p>
+<p>Dataset versions: a <code>version</code> argument can be passed to the function to 
 specify which dataset version should be retrieved.</p><ul><li><p><code>`v0`</code>: original version (Bioconductor &lt;= 3.15).</p></li>
 <li><p><code>`v1`</code>: consistent object formatting across datasets.</p></li>
 </ul><p>File sizes:</p><ul><li><p><code>`images`</code>: size in memory = 7.4 Gb, size on disk = 1.7 Gb.</p></li>
 <li><p><code>`masks`</code>: size in memory = 200 Mb, size on disk = 8.2 Mb.</p></li>
-<li><p><code>`sce`</code>: size in memory = 352 Mb, size on disk = 212 Mb.</p></li>
-<li><p><code>`spe`</code>: size in memory = 371 Mb, size on disk = 212 Mb.</p></li>
+<li><p><code>`sce`</code>: size in memory = 353 Mb, size on disk = 204 Mb.</p></li>
+<li><p><code>`spe`</code>: size in memory = 372 Mb, size on disk = 205 Mb.</p></li>
+<li><p><code>`sce_full`</code>: size in memory = 2.4 Gb, size on disk = 1.5 Gb.</p></li>
+<li><p><code>`spe_full`</code>: size in memory = 2.5 Gb, size on disk = 1.5 Gb.</p></li>
+<li><p><code>`masks_full`</code>: size in memory = 1.4 Gb, 
+    size on disk = 60 Mb.</p></li>
 </ul><p>When storing images on disk, these need to be first fully read into memory
 before writing them to disk. This means the process of downloading the data
 is slower than directly keeping them in memory. However, downstream analysis
@@ -224,7 +239,7 @@ A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry.
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">Damond_2019_Pancreas</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
@@ -237,14 +252,14 @@ A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry.
 <span class="r-out co"><span class="r-pr">#&gt;</span> colnames(252059): 138_1 138_2 ... 319_1149 319_1150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> colData names(28): cell_id image_name ... patient_ethnicity patient_BMI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: Damond_2019_Pancreas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: Damond_2019_Pancreas_v1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">Damond_2019_Pancreas</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2022-10-17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-02-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7719</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
@@ -263,9 +278,27 @@ A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load masks on disk</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: DelayedArray</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Matrix</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘Matrix’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:S4Vectors’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     expand</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘DelayedArray’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     apply, rowsum, scale, sweep</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: rhdf5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘HDF5Array’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:rhdf5’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     h5ls</span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">Damond_2019_Pancreas</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -287,7 +320,7 @@ A Map of Human Type 1 Diabetes Progression by Imaging Mass Cytometry.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.2</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@ Zurich<br><a class="author_email" href="mailto:#"></a><a href="mailto:nils.eling
       </address>
                   
             <h4 data-toc-skip class="date">Created: 02 November 2020;
-Compiled: 21 October 2022</h4>
+Compiled: 25 February 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/HEAD/vignettes/imcdatasets.Rmd" class="external-link"><code>vignettes/imcdatasets.Rmd</code></a></small>
       <div class="hidden name"><code>imcdatasets.Rmd</code></div>
@@ -107,7 +107,7 @@ Compiled: 21 October 2022</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <em><a href="https://bioconductor.org/packages/3.16/imcdatasets" class="external-link">imcdatasets</a></em>
+<p>The <em><a href="https://bioconductor.org/packages/3.17/imcdatasets" class="external-link">imcdatasets</a></em>
 package provides access to publicly available datasets generated using
 imaging mass cytometry (IMC) <span class="citation">(Giesen et al.
 2014)</span>.</p>
@@ -190,6 +190,15 @@ that enables to load the dataset.</p>
 <td align="left"><span class="citation">Zanotelli et al.
 (2020)</span></td>
 </tr>
+<tr class="even">
+<td align="left"><code><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample()</a></code></td>
+<td align="left">Human</td>
+<td align="left">Primary tumor</td>
+<td align="right">46825</td>
+<td align="right">14</td>
+<td align="right">40</td>
+<td align="left">None</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -198,39 +207,38 @@ that enables to load the dataset.</p>
 </h2>
 <p>Users can import the datasets by calling a single function and
 specifying the type of data to retrieve. The following examples
-highlight accessing the dataset provided by <em>Damond, N. et al., A Map
-of Human Type 1 Diabetes Progression by Imaging Mass Cytometry</em>
-<span class="citation">(Damond et al. 2019)</span>.</p>
+highlight accessing an example dataset linked to the <a href="https://immucan.eu/" class="external-link">IMMUcan</a> project.</p>
 <p><strong>Importing single-cell expression data and
 metadata</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span><span class="st">"sce"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span><span class="st">"sce"</span><span class="op">)</span></span>
 <span><span class="va">sce</span></span></code></pre></div>
 <pre><code><span><span class="co">## class: SingleCellExperiment </span></span>
-<span><span class="co">## dim: 38 252059 </span></span>
-<span><span class="co">## metadata(0):</span></span>
-<span><span class="co">## assays(3): counts exprs quant_norm</span></span>
-<span><span class="co">## rownames(38): H3 SMA ... DNA1 DNA2</span></span>
-<span><span class="co">## rowData names(6): channel metal ... antibody_clone full_name</span></span>
-<span><span class="co">## colnames(252059): 138_1 138_2 ... 319_1149 319_1150</span></span>
-<span><span class="co">## colData names(28): cell_id image_name ... patient_ethnicity patient_BMI</span></span>
-<span><span class="co">## reducedDimNames(0):</span></span>
-<span><span class="co">## mainExpName: Damond_2019_Pancreas</span></span>
+<span><span class="co">## dim: 40 47794 </span></span>
+<span><span class="co">## metadata(5): color_vectors cluster_codes SOM_codes delta_area</span></span>
+<span><span class="co">##   filterSpatialContext</span></span>
+<span><span class="co">## assays(2): counts exprs</span></span>
+<span><span class="co">## rownames(40): MPO H3 ... DNA1 DNA2</span></span>
+<span><span class="co">## rowData names(17): channel metal ... ilastik deepcell</span></span>
+<span><span class="co">## colnames(47794): 1_1 1_2 ... 14_2844 14_2845</span></span>
+<span><span class="co">## colData names(43): sample_id ObjectNumber ... cell_x cell_y</span></span>
+<span><span class="co">## reducedDimNames(8): UMAP TSNE ... seurat UMAP_seurat</span></span>
+<span><span class="co">## mainExpName: IMMUcan_2022_CancerExample_v1</span></span>
 <span><span class="co">## altExpNames(0):</span></span></code></pre>
 <p><strong>Importing multichannel images</strong></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">images</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span><span class="st">"images"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">images</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span><span class="st">"images"</span><span class="op">)</span></span>
 <span><span class="va">images</span></span></code></pre></div>
-<pre><code><span><span class="co">## CytoImageList containing 100 image(s)</span></span>
-<span><span class="co">## names(100): E02 E03 E04 E05 E06 E07 E08 E09 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 E21 E22 E23 E24 E25 E26 E27 E28 E29 E30 E31 E32 E33 E34 G01 G02 G03 G04 G05 G06 G07 G08 G09 G10 G11 G12 G13 G14 G15 G16 G17 G18 G19 G20 G21 G22 G23 G24 G25 G26 G27 G28 G29 G30 G31 G32 G33 J01 J02 J03 J04 J05 J06 J07 J08 J09 J10 J11 J12 J13 J14 J15 J16 J17 J18 J19 J20 J21 J22 J23 J24 J25 J26 J27 J28 J29 J30 J31 J32 J33 J34 </span></span>
-<span><span class="co">## Each image contains 38 channel(s)</span></span>
-<span><span class="co">## channelNames(38): H3 SMA INS CD38 CD44 PCSK2 CD99 CD68 MPO SLC2A1 CD20 AMY2A CD3e PPY PIN PD_1 GCG PDX1 SST SYP KRT19 CD45 FOXP3 CD45RA CD8a CA9 IAPP Ki67 NKX6_1 p_HH3 CD4 CD31 CDH1 PTPRN p_Rb cPARP_cCASP3 DNA1 DNA2</span></span></code></pre>
+<pre><code><span><span class="co">## CytoImageList containing 14 image(s)</span></span>
+<span><span class="co">## names(14): Patient1_001 Patient1_002 Patient1_003 Patient2_001 Patient2_002 Patient2_003 Patient2_004 Patient3_001 Patient3_002 Patient3_003 Patient4_005 Patient4_006 Patient4_007 Patient4_008 </span></span>
+<span><span class="co">## Each image contains 40 channel(s)</span></span>
+<span><span class="co">## channelNames(40): MPO H3 SMA CD16 CD38 HLA_DR CD27 CD15 CD45RA CD163 B2M CD20 CD68 IDO1 CD3e LAG3 CD11c PD_1 PDGFRB CD7 GZMB PD_L1 TCF7 CD45RO FOXP3 ICOS CD8a CA9 CD33 Ki67 VISTA CD40 CD4 CD14 CDH1 CD303 CD206 c_PARP DNA1 DNA2</span></span></code></pre>
 <p><strong>Importing cell segmentation masks</strong></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span><span class="st">"masks"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span><span class="st">"masks"</span><span class="op">)</span></span>
 <span><span class="va">masks</span></span></code></pre></div>
-<pre><code><span><span class="co">## CytoImageList containing 100 image(s)</span></span>
-<span><span class="co">## names(100): E02 E03 E04 E05 E06 E07 E08 E09 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 E21 E22 E23 E24 E25 E26 E27 E28 E29 E30 E31 E32 E33 E34 G01 G02 G03 G04 G05 G06 G07 G08 G09 G10 G11 G12 G13 G14 G15 G16 G17 G18 G19 G20 G21 G22 G23 G24 G25 G26 G27 G28 G29 G30 G31 G32 G33 J01 J02 J03 J04 J05 J06 J07 J08 J09 J10 J11 J12 J13 J14 J15 J16 J17 J18 J19 J20 J21 J22 J23 J24 J25 J26 J27 J28 J29 J30 J31 J32 J33 J34 </span></span>
+<pre><code><span><span class="co">## CytoImageList containing 14 image(s)</span></span>
+<span><span class="co">## names(14): Patient1_001 Patient1_002 Patient1_003 Patient2_001 Patient2_002 Patient2_003 Patient2_004 Patient3_001 Patient3_002 Patient3_003 Patient4_005 Patient4_006 Patient4_007 Patient4_008 </span></span>
 <span><span class="co">## Each image contains 1 channel</span></span></code></pre>
 <p><strong>On disk storage</strong></p>
 <p>Objects containing multi-channel images and segmentation masks can
@@ -244,11 +252,11 @@ specify a path where images/masks will be stored as .h5 files:</p>
 <code class="sourceCode R"><span><span class="co"># Create temporary location</span></span>
 <span><span class="va">cur_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    h5FilesPath <span class="op">=</span> <span class="va">cur_path</span><span class="op">)</span></span>
 <span><span class="va">masks</span></span></code></pre></div>
-<pre><code><span><span class="co">## CytoImageList containing 100 image(s)</span></span>
-<span><span class="co">## names(100): E02 E03 E04 E05 E06 E07 E08 E09 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 E21 E22 E23 E24 E25 E26 E27 E28 E29 E30 E31 E32 E33 E34 G01 G02 G03 G04 G05 G06 G07 G08 G09 G10 G11 G12 G13 G14 G15 G16 G17 G18 G19 G20 G21 G22 G23 G24 G25 G26 G27 G28 G29 G30 G31 G32 G33 J01 J02 J03 J04 J05 J06 J07 J08 J09 J10 J11 J12 J13 J14 J15 J16 J17 J18 J19 J20 J21 J22 J23 J24 J25 J26 J27 J28 J29 J30 J31 J32 J33 J34 </span></span>
+<pre><code><span><span class="co">## CytoImageList containing 14 image(s)</span></span>
+<span><span class="co">## names(14): Patient1_001 Patient1_002 Patient1_003 Patient2_001 Patient2_002 Patient2_003 Patient2_004 Patient3_001 Patient3_002 Patient3_003 Patient4_005 Patient4_006 Patient4_007 Patient4_008 </span></span>
 <span><span class="co">## Each image contains 1 channel</span></span></code></pre>
 </div>
 <div class="section level2">
@@ -257,24 +265,24 @@ specify a path where images/masks will be stored as .h5 files:</p>
 <p>Additional information about each dataset is available in the help
 page:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">?</span><span class="va">Damond_2019_Pancreas</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="op">?</span><span class="va">IMMUcan_2022_CancerExample</span></span></code></pre></div>
 <p>The metadata associated with a specific data object can be displayed
 as follows:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"images"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/Damond_2019_Pancreas.html">Damond_2019_Pancreas</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"images"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample</a></span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p>The <code>SingleCellExperiment</code> class objects can be used for
-data analysis. For more information, please refer to the <em><a href="https://bioconductor.org/packages/3.16/SingleCellExperiment" class="external-link">SingleCellExperiment</a></em>
+data analysis. For more information, please refer to the <em><a href="https://bioconductor.org/packages/3.17/SingleCellExperiment" class="external-link">SingleCellExperiment</a></em>
 package and to the <a href="http://bioconductor.org/books/release/OSCA/" class="external-link">Orchestrating
 Single-Cell Analysis with Bioconductor</a> workflow.</p>
 <p>The <code>CytoImageList</code> class objects can be used for plotting
 cell and pixel information. Some typical use cases are given below. For
-more information, please see the <em><a href="https://bioconductor.org/packages/3.16/cytomapper" class="external-link">cytomapper</a></em>
+more information, please see the <em><a href="https://bioconductor.org/packages/3.17/cytomapper" class="external-link">cytomapper</a></em>
 package and the <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/cytomapper/inst/doc/cytomapper.html" class="external-link">associated
 vignette</a>.</p>
 <p><strong>Subsetting the images and masks</strong></p>
@@ -287,11 +295,11 @@ data.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/cytomapper/man/plotPixels.html" class="external-link">plotPixels</a></span><span class="op">(</span></span>
 <span>    <span class="va">cur_images</span>,</span>
-<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CDH1"</span>, <span class="st">"CD99"</span>, <span class="st">"H3"</span><span class="op">)</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD8a"</span>, <span class="st">"CD68"</span>, <span class="st">"CDH1"</span><span class="op">)</span>,</span>
 <span>    bcg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        CD99 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>,</span>
-<span>        CDH1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">8</span>,<span class="fl">1</span><span class="op">)</span>,</span>
-<span>        H3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span></span>
+<span>        CD8a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">4</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>        CD68 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>        CDH1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="imcdatasets_files/figure-html/usage-pixel-1.png" width="700"></p>
@@ -302,7 +310,7 @@ to display cell-level data.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/cytomapper/man/plotCells.html" class="external-link">plotCells</a></span><span class="op">(</span></span>
 <span>    <span class="va">cur_masks</span>, object <span class="op">=</span> <span class="va">sce</span>,</span>
 <span>    img_id <span class="op">=</span> <span class="st">"image_number"</span>, cell_id <span class="op">=</span> <span class="st">"cell_number"</span>,</span>
-<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD8a"</span>, <span class="st">"PIN"</span><span class="op">)</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD8a"</span>, <span class="st">"CD68"</span>, <span class="st">"CDH1"</span><span class="op">)</span>,</span>
 <span>    exprs_values <span class="op">=</span> <span class="st">"exprs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="imcdatasets_files/figure-html/usage-cell-1.png" width="700"></p>
@@ -315,11 +323,11 @@ objects.</p>
 <span>    <span class="va">cur_images</span>, mask <span class="op">=</span> <span class="va">cur_masks</span>, object <span class="op">=</span> <span class="va">sce</span>,</span>
 <span>    img_id <span class="op">=</span> <span class="st">"image_number"</span>, cell_id <span class="op">=</span> <span class="st">"cell_number"</span>,</span>
 <span>    outline_by <span class="op">=</span> <span class="st">"cell_type"</span>,</span>
-<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H3"</span>, <span class="st">"CD99"</span>, <span class="st">"CDH1"</span><span class="op">)</span>,</span>
+<span>    colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD8a"</span>, <span class="st">"CD68"</span>, <span class="st">"CDH1"</span><span class="op">)</span>,</span>
 <span>    bcg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        CD99 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>,</span>
-<span>        CDH1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">8</span>,<span class="fl">1</span><span class="op">)</span>,</span>
-<span>        H3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span></span>
+<span>        CD8a  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>        CD68 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>        CDH1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="imcdatasets_files/figure-html/usage-outline-1.png" width="700"></p>
@@ -327,13 +335,13 @@ objects.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<pre><code><span><span class="co">## R version 4.2.1 (2022-06-23)</span></span>
+<pre><code><span><span class="co">## R Under development (unstable) (2022-11-18 r83369)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
 <span><span class="co">## Running under: Ubuntu 20.04.5 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
-<span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3</span></span>
-<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3</span></span>
+<span><span class="co">## BLAS:   /usr/local/lib/R/lib/libRblas.so</span></span>
+<span><span class="co">## LAPACK: /usr/local/lib/R/lib/libRlapack.so</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -341,78 +349,89 @@ objects.</p>
 <span><span class="co">##  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
 <span><span class="co">## [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
 <span><span class="co">## </span></span>
+<span><span class="co">## time zone: Etc/UTC</span></span>
+<span><span class="co">## tzcode source: system (glibc)</span></span>
+<span><span class="co">## </span></span>
 <span><span class="co">## attached base packages:</span></span>
 <span><span class="co">## [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] imcdatasets_1.5.3           cytomapper_1.9.0           </span></span>
-<span><span class="co">##  [3] EBImage_4.39.0              SingleCellExperiment_1.19.1</span></span>
-<span><span class="co">##  [5] SummarizedExperiment_1.27.3 Biobase_2.57.1             </span></span>
-<span><span class="co">##  [7] GenomicRanges_1.49.1        GenomeInfoDb_1.33.13       </span></span>
-<span><span class="co">##  [9] IRanges_2.31.2              S4Vectors_0.35.4           </span></span>
-<span><span class="co">## [11] BiocGenerics_0.43.4         MatrixGenerics_1.9.1       </span></span>
-<span><span class="co">## [13] matrixStats_0.62.0          BiocStyle_2.25.0           </span></span>
+<span><span class="co">##  [1] imcdatasets_1.7.2           SpatialExperiment_1.9.3    </span></span>
+<span><span class="co">##  [3] cytomapper_1.11.1           EBImage_4.41.1             </span></span>
+<span><span class="co">##  [5] SingleCellExperiment_1.21.0 SummarizedExperiment_1.29.1</span></span>
+<span><span class="co">##  [7] Biobase_2.59.0              GenomicRanges_1.51.4       </span></span>
+<span><span class="co">##  [9] GenomeInfoDb_1.35.13        IRanges_2.33.0             </span></span>
+<span><span class="co">## [11] S4Vectors_0.37.3            BiocGenerics_0.45.0        </span></span>
+<span><span class="co">## [13] MatrixGenerics_1.11.0       matrixStats_0.63.0         </span></span>
+<span><span class="co">## [15] BiocStyle_2.27.1           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] ggbeeswarm_0.6.0              colorspace_2.0-3             </span></span>
-<span><span class="co">##   [3] ellipsis_0.3.2                rprojroot_2.0.3              </span></span>
-<span><span class="co">##   [5] XVector_0.37.1                fftwtools_0.9-11             </span></span>
-<span><span class="co">##   [7] fs_1.5.2                      rstudioapi_0.14              </span></span>
-<span><span class="co">##   [9] bit64_4.0.5                   AnnotationDbi_1.59.1         </span></span>
-<span><span class="co">##  [11] interactiveDisplayBase_1.35.1 fansi_1.0.3                  </span></span>
-<span><span class="co">##  [13] codetools_0.2-18              cachem_1.0.6                 </span></span>
-<span><span class="co">##  [15] knitr_1.40                    jsonlite_1.8.3               </span></span>
-<span><span class="co">##  [17] dbplyr_2.2.1                  png_0.1-7                    </span></span>
-<span><span class="co">##  [19] shinydashboard_0.7.2          shiny_1.7.2                  </span></span>
-<span><span class="co">##  [21] HDF5Array_1.25.2              httr_1.4.4                   </span></span>
-<span><span class="co">##  [23] BiocManager_1.30.18           compiler_4.2.1               </span></span>
-<span><span class="co">##  [25] assertthat_0.2.1              Matrix_1.5-1                 </span></span>
-<span><span class="co">##  [27] fastmap_1.1.0                 cli_3.4.1                    </span></span>
-<span><span class="co">##  [29] svgPanZoom_0.3.4              later_1.3.0                  </span></span>
-<span><span class="co">##  [31] htmltools_0.5.3               tools_4.2.1                  </span></span>
-<span><span class="co">##  [33] gtable_0.3.1                  glue_1.6.2                   </span></span>
-<span><span class="co">##  [35] GenomeInfoDbData_1.2.9        dplyr_1.0.10                 </span></span>
-<span><span class="co">##  [37] rappdirs_0.3.3                Rcpp_1.0.9                   </span></span>
-<span><span class="co">##  [39] jquerylib_0.1.4               pkgdown_2.0.6                </span></span>
-<span><span class="co">##  [41] raster_3.6-3                  Biostrings_2.65.6            </span></span>
-<span><span class="co">##  [43] vctrs_0.4.2                   rhdf5filters_1.9.0           </span></span>
-<span><span class="co">##  [45] svglite_2.1.0                 ExperimentHub_2.5.0          </span></span>
-<span><span class="co">##  [47] xfun_0.34                     stringr_1.4.1                </span></span>
-<span><span class="co">##  [49] mime_0.12                     lifecycle_1.0.3              </span></span>
-<span><span class="co">##  [51] terra_1.6-17                  AnnotationHub_3.5.2          </span></span>
-<span><span class="co">##  [53] zlibbioc_1.43.0               scales_1.2.1                 </span></span>
-<span><span class="co">##  [55] ragg_1.2.3                    promises_1.2.0.1             </span></span>
-<span><span class="co">##  [57] parallel_4.2.1                rhdf5_2.41.1                 </span></span>
-<span><span class="co">##  [59] RColorBrewer_1.1-3            curl_4.3.3                   </span></span>
-<span><span class="co">##  [61] yaml_2.3.6                    memoise_2.0.1                </span></span>
-<span><span class="co">##  [63] gridExtra_2.3                 ggplot2_3.3.6                </span></span>
-<span><span class="co">##  [65] sass_0.4.2                    stringi_1.7.8                </span></span>
-<span><span class="co">##  [67] RSQLite_2.2.18                highr_0.9                    </span></span>
-<span><span class="co">##  [69] BiocVersion_3.16.0            desc_1.4.2                   </span></span>
-<span><span class="co">##  [71] tiff_0.1-11                   filelock_1.0.2               </span></span>
-<span><span class="co">##  [73] BiocParallel_1.31.14          rlang_1.0.6                  </span></span>
-<span><span class="co">##  [75] pkgconfig_2.0.3               systemfonts_1.0.4            </span></span>
-<span><span class="co">##  [77] bitops_1.0-7                  evaluate_0.17                </span></span>
-<span><span class="co">##  [79] lattice_0.20-45               purrr_0.3.5                  </span></span>
-<span><span class="co">##  [81] Rhdf5lib_1.19.2               htmlwidgets_1.5.4            </span></span>
-<span><span class="co">##  [83] bit_4.0.4                     tidyselect_1.2.0             </span></span>
-<span><span class="co">##  [85] magrittr_2.0.3                bookdown_0.29                </span></span>
-<span><span class="co">##  [87] R6_2.5.1                      generics_0.1.3               </span></span>
-<span><span class="co">##  [89] nnls_1.4                      DelayedArray_0.23.2          </span></span>
-<span><span class="co">##  [91] DBI_1.1.3                     withr_2.5.0                  </span></span>
-<span><span class="co">##  [93] pillar_1.8.1                  KEGGREST_1.37.3              </span></span>
-<span><span class="co">##  [95] abind_1.4-5                   RCurl_1.98-1.9               </span></span>
-<span><span class="co">##  [97] sp_1.5-0                      tibble_3.1.8                 </span></span>
-<span><span class="co">##  [99] crayon_1.5.2                  utf8_1.2.2                   </span></span>
-<span><span class="co">## [101] BiocFileCache_2.5.2           rmarkdown_2.17               </span></span>
-<span><span class="co">## [103] viridis_0.6.2                 jpeg_0.1-9                   </span></span>
-<span><span class="co">## [105] locfit_1.5-9.6                grid_4.2.1                   </span></span>
-<span><span class="co">## [107] blob_1.2.3                    digest_0.6.30                </span></span>
-<span><span class="co">## [109] xtable_1.8-4                  httpuv_1.6.6                 </span></span>
-<span><span class="co">## [111] textshaping_0.3.6             munsell_0.5.0                </span></span>
-<span><span class="co">## [113] beeswarm_0.4.0                viridisLite_0.4.1            </span></span>
-<span><span class="co">## [115] vipor_0.4.5                   bslib_0.4.0</span></span></code></pre>
+<span><span class="co">##   [1] RColorBrewer_1.1-3            rstudioapi_0.14              </span></span>
+<span><span class="co">##   [3] jsonlite_1.8.4                magrittr_2.0.3               </span></span>
+<span><span class="co">##   [5] ggbeeswarm_0.7.1              magick_2.7.3                 </span></span>
+<span><span class="co">##   [7] rmarkdown_2.20                fs_1.6.0                     </span></span>
+<span><span class="co">##   [9] zlibbioc_1.45.0               ragg_1.2.5                   </span></span>
+<span><span class="co">##  [11] vctrs_0.5.2                   memoise_2.0.1                </span></span>
+<span><span class="co">##  [13] DelayedMatrixStats_1.21.0     RCurl_1.98-1.9               </span></span>
+<span><span class="co">##  [15] terra_1.7-3                   svgPanZoom_0.3.4             </span></span>
+<span><span class="co">##  [17] htmltools_0.5.4               curl_5.0.0                   </span></span>
+<span><span class="co">##  [19] AnnotationHub_3.7.0           raster_3.6-14                </span></span>
+<span><span class="co">##  [21] Rhdf5lib_1.21.0               rhdf5_2.43.0                 </span></span>
+<span><span class="co">##  [23] sass_0.4.5                    bslib_0.4.2                  </span></span>
+<span><span class="co">##  [25] htmlwidgets_1.6.1             desc_1.4.2                   </span></span>
+<span><span class="co">##  [27] cachem_1.0.6                  mime_0.12                    </span></span>
+<span><span class="co">##  [29] lifecycle_1.0.3               pkgconfig_2.0.3              </span></span>
+<span><span class="co">##  [31] Matrix_1.5-3                  R6_2.5.1                     </span></span>
+<span><span class="co">##  [33] fastmap_1.1.0                 GenomeInfoDbData_1.2.9       </span></span>
+<span><span class="co">##  [35] shiny_1.7.4                   digest_0.6.31                </span></span>
+<span><span class="co">##  [37] colorspace_2.1-0              AnnotationDbi_1.61.0         </span></span>
+<span><span class="co">##  [39] rprojroot_2.0.3               dqrng_0.3.0                  </span></span>
+<span><span class="co">##  [41] ExperimentHub_2.7.0           textshaping_0.3.6            </span></span>
+<span><span class="co">##  [43] RSQLite_2.2.20                beachmat_2.15.0              </span></span>
+<span><span class="co">##  [45] filelock_1.0.2                fansi_1.0.4                  </span></span>
+<span><span class="co">##  [47] nnls_1.4                      httr_1.4.4                   </span></span>
+<span><span class="co">##  [49] abind_1.4-5                   compiler_4.3.0               </span></span>
+<span><span class="co">##  [51] withr_2.5.0                   bit64_4.0.5                  </span></span>
+<span><span class="co">##  [53] tiff_0.1-11                   BiocParallel_1.33.9          </span></span>
+<span><span class="co">##  [55] viridis_0.6.2                 DBI_1.1.3                    </span></span>
+<span><span class="co">##  [57] highr_0.10                    HDF5Array_1.27.0             </span></span>
+<span><span class="co">##  [59] R.utils_2.12.2                rappdirs_0.3.3               </span></span>
+<span><span class="co">##  [61] DelayedArray_0.25.0           rjson_0.2.21                 </span></span>
+<span><span class="co">##  [63] tools_4.3.0                   vipor_0.4.5                  </span></span>
+<span><span class="co">##  [65] interactiveDisplayBase_1.37.0 beeswarm_0.4.0               </span></span>
+<span><span class="co">##  [67] httpuv_1.6.8                  R.oo_1.25.0                  </span></span>
+<span><span class="co">##  [69] glue_1.6.2                    rhdf5filters_1.11.0          </span></span>
+<span><span class="co">##  [71] promises_1.2.0.1              grid_4.3.0                   </span></span>
+<span><span class="co">##  [73] generics_0.1.3                gtable_0.3.1                 </span></span>
+<span><span class="co">##  [75] R.methodsS3_1.8.2             sp_1.6-0                     </span></span>
+<span><span class="co">##  [77] utf8_1.2.2                    XVector_0.39.0               </span></span>
+<span><span class="co">##  [79] BiocVersion_3.17.1            pillar_1.8.1                 </span></span>
+<span><span class="co">##  [81] stringr_1.5.0                 limma_3.55.2                 </span></span>
+<span><span class="co">##  [83] later_1.3.0                   dplyr_1.0.10                 </span></span>
+<span><span class="co">##  [85] BiocFileCache_2.7.1           lattice_0.20-45              </span></span>
+<span><span class="co">##  [87] bit_4.0.5                     tidyselect_1.2.0             </span></span>
+<span><span class="co">##  [89] locfit_1.5-9.7                Biostrings_2.67.0            </span></span>
+<span><span class="co">##  [91] scuttle_1.9.4                 knitr_1.41                   </span></span>
+<span><span class="co">##  [93] gridExtra_2.3                 bookdown_0.32                </span></span>
+<span><span class="co">##  [95] edgeR_3.41.2                  svglite_2.1.1                </span></span>
+<span><span class="co">##  [97] xfun_0.36                     shinydashboard_0.7.2         </span></span>
+<span><span class="co">##  [99] DropletUtils_1.19.2           stringi_1.7.12               </span></span>
+<span><span class="co">## [101] fftwtools_0.9-11              yaml_2.3.7                   </span></span>
+<span><span class="co">## [103] evaluate_0.20                 codetools_0.2-18             </span></span>
+<span><span class="co">## [105] tibble_3.1.8                  BiocManager_1.30.19          </span></span>
+<span><span class="co">## [107] cli_3.6.0                     xtable_1.8-4                 </span></span>
+<span><span class="co">## [109] systemfonts_1.0.4             munsell_0.5.0                </span></span>
+<span><span class="co">## [111] jquerylib_0.1.4               Rcpp_1.0.10                  </span></span>
+<span><span class="co">## [113] dbplyr_2.3.0                  png_0.1-8                    </span></span>
+<span><span class="co">## [115] parallel_4.3.0                ellipsis_0.3.2               </span></span>
+<span><span class="co">## [117] pkgdown_2.0.7                 ggplot2_3.4.0                </span></span>
+<span><span class="co">## [119] assertthat_0.2.1              blob_1.2.3                   </span></span>
+<span><span class="co">## [121] jpeg_0.1-10                   sparseMatrixStats_1.11.1     </span></span>
+<span><span class="co">## [123] bitops_1.0-7                  viridisLite_0.4.1            </span></span>
+<span><span class="co">## [125] scales_1.2.1                  crayon_1.5.2                 </span></span>
+<span><span class="co">## [127] purrr_1.0.1                   rlang_1.0.6                  </span></span>
+<span><span class="co">## [129] KEGGREST_1.39.0</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -463,7 +482,7 @@ Spheroids.”</span> <em>Mol Syst Biol</em> 16 (12): e9798.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

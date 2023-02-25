@@ -21,7 +21,7 @@ patients with breast cancer."><!-- mathjax --><script src="https://cdnjs.cloudfl
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.2</span>
       </span>
     </div>
 
@@ -73,10 +73,12 @@ patients with breast cancer.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">JacksonFischer_2020_BreastCancer</span><span class="op">(</span></span>
 <span>  data_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sce"</span>, <span class="st">"spe"</span>, <span class="st">"images"</span>, <span class="st">"masks"</span><span class="op">)</span>,</span>
+<span>  full_dataset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cohort <span class="op">=</span> <span class="st">"Basel"</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  on_disk <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  h5FilesPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  version <span class="op">=</span> <span class="st">"latest"</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -88,6 +90,23 @@ patients with breast cancer.</p>
 `masks` for cell segmentation masks. Single cell data are retrieved using 
 either `sce` for the <code>SingleCellExperiment</code> format or `spe` for the  
 <code>SpatialExperiment</code> format.</p></dd>
+
+
+<dt>full_dataset</dt>
+<dd><p>if FALSE (default), a subset corresponding to 100 images
+is returned. If TRUE, the full dataset is returned, including both "Basel" 
+and "Zurich" cohorts. Due to memory space limitations, this option is only 
+available for single cell data and masks, not for 
+<code>data_type = "images"</code>.</p></dd>
+
+
+<dt>cohort</dt>
+<dd><p>which patient cohort should be returned? Can be set to "Basel"
+(default) or "Zurich". Ignored if <code>full_dataset</code> is set to TRUE.</p></dd>
+
+
+<dt>version</dt>
+<dd><p>dataset version. By default, the latest version is returned.</p></dd>
 
 
 <dt>metadata</dt>
@@ -110,10 +129,6 @@ When files should only temporarily be stored on disk, please set
 <code>h5FilesPath = getHDF5DumpDir()</code>.</p></dd>
 
 
-<dt>version</dt>
-<dd><p>dataset version. By default, the latest version is returned.</p></dd>
-
-
 <dt>force</dt>
 <dd><p>logical indicating if images should be overwritten when files
 with the same name already exist on disk.</p></dd>
@@ -124,14 +139,14 @@ with the same name already exist on disk.</p></dd>
     
 
 <p>A <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object with single cell data, a
-SpatialExperiment object with single cell data, a 
+<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> object with single cell data, a 
 <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing multichannel images, or a
 <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing cell segmentation masks.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>This is an Imaging Mass Cytometry (IMC) dataset from Jackson, Fischer et al.
-(2020), consisting of three data objects:</p><ul><li><p><code>images</code> contains a hundred 42-channel
+(2020):</p><ul><li><p><code>images</code> contains a hundred 42-channel
     images in the form of a <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
 <li><p><code>masks</code> contains the cell segmentation
     masks associated with the images, in the form of a
@@ -142,12 +157,12 @@ SpatialExperiment object with single cell data, a
     <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a>. This represents a total of 285,851 
     cells x 42 channels.</p></li>
 <li><p><code>spe</code> same single cell data as for <code>sce</code>, but in the
-    SpatialExperiment format.</p></li>
+    <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> format.</p></li>
 </ul><p>All data are downloaded from ExperimentHub and cached for local re-use.</p>
 <p>Mapping between the three data objects is performed via variables located in
 their metadata columns: <code>mcols()</code> for the <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a>
 objects and <code>ColData()</code> for the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-SpatialExperiment objects. Mapping at the image level can be 
+<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects. Mapping at the image level can be 
 performed with the <code>image_name</code> variable. Mapping between cell 
 segmentation masks and single cell data is performed with the 
 <code>cell_number</code> variable, the values of which correspond to the intensity
@@ -155,7 +170,13 @@ values of the <code>masks</code> object. For practical examples, please refer
 to the "Accessing IMC datasets" vignette.</p>
 <p>This dataset is a subset of the complete Jackson, Fischer et al. (2020)
 dataset comprising the data from tumour tissue from 100 patients with breast
-cancer (one image per patient).</p>
+cancer (one image per patient). By default, data from the "Basel" cohort are
+returned. By setting <code>cohort = "Zurich"</code>, data from the "Zurich" 
+cohort, corresponding to images and associated data from 72 patients, are 
+returned. For details about the patient cohorts, refer to the publication. 
+If <code>full_dataset = TRUE</code>, the full dataset is returned (including both 
+"Basel" and "Zurich" patient cohorts). This option is not available for 
+multichannel images.</p>
 <p>The <code>assay</code> slot of the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object
 contains three assays:</p><ul><li><p><code>counts</code> contains mean ion counts per cell.</p></li>
 <li><p><code>exprs</code> contains arsinh-transformed counts, with cofactor 1.</p></li>
@@ -163,25 +184,38 @@ contains three assays:</p><ul><li><p><code>counts</code> contains mean ion count
     99th percentile).</p></li>
 </ul><p>The marker-associated metadata, including antibody information and metal 
 tags are stored in the <code>rowData</code> of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects.</p>
 <p>The cell-associated metadata are stored in the <code>colData</code> of the
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects. These metadata include clusters (in 
 <code>colData(sce)$cell_cluster_phenograph</code>) and metaclusters (in
 <code>colData(sce)$cell_metacluster</code>), as well as spatial information (e.g., 
 cell areas are stored in <code>colData(sce)$cell_area</code>).</p>
 <p>The clinical data are also stored in the <code>colData</code> of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and SpatialExperiment 
+<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
 objects. For instance, the tumor grades can be retrieved with 
 <code>colData(sce)$tumor_grade</code>.</p>
 <p>Dataset versions: a <code>version</code> argument can be passed to the function to 
 specify which dataset version should be retrieved.</p><ul><li><p><code>`v0`</code>: original version (Bioconductor &lt;= 3.15).</p></li>
 <li><p><code>`v1`</code>: consistent object formatting across datasets.</p></li>
-</ul><p>File sizes:</p><ul><li><p><code>`images`</code>: size in memory = 17.8 Gb, size on disk = 2.0 Gb.</p></li>
-<li><p><code>`masks`</code>: size in memory = 433 Mb, size on disk = 10 Mb.</p></li>
-<li><p><code>`sce`</code>: size in memory = 477 Mb, size on disk = 266 Mb.</p></li>
-<li><p><code>`spe`</code>: size in memory = 496 Mb, size on disk = 267 Mb.</p></li>
+<li><p><code>`v2`</code>: added full datasets and Zurich cohort.</p></li>
+</ul><p>File sizes:</p><ul><li><p><code>`images_basel`</code>: size in memory = 19 Gb, 
+    size on disk = 2.0 Gb.</p></li>
+<li><p><code>`masks_basel`</code>: size in memory = 433 Mb, 
+    size on disk = 10 Mb.</p></li>
+<li><p><code>`sce_basel`</code>: size in memory = 513 Mb, 
+    size on disk = 270 Mb.</p></li>
+<li><p><code>`images_zurich`</code>: size in memory = 6.0 Gb, 
+    size on disk = 724 Mb.</p></li>
+<li><p><code>`masks_zurich`</code>: size in memory = 137 Mb, 
+    size on disk = 3.4 Mb.</p></li>
+<li><p><code>`sce_zurich`</code>: size in memory = 188 Mb, 
+    size on disk = 105 Mb.</p></li>
+<li><p><code>`masks_full`</code>: size in memory = 2.1 Gb, 
+    size on disk = 10 Mb.</p></li>
+<li><p><code>`sce_full`</code>: size in memory = 2.2 Gb, 
+    size on disk = 1.2 Gb.</p></li>
 </ul><p>When storing images on disk, these need to be first fully read into memory
 before writing them to disk. This means the process of downloading the data
 is slower than directly keeping them in memory. However, downstream analysis
@@ -199,55 +233,57 @@ The single-cell pathology landscape of breast cancer.
     </div>
     <div id="author">
     <h2>Author</h2>
-    <p>Jana Fischer</p>
+    <p>Nicolas Damond</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">JacksonFischer_2020_BreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class: SingleCellExperiment </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 42 285851 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 45 285851 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> assays(3): counts exprs quant_norm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(42): Ru96 Ru98 ... DNA1 DNA2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(45): Ru96 Ru98 ... DNA1 DNA2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(6): metal name ... channel antibody_clone</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(285851): 1_1 1_2 ... 100_3941 100_3942</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(70): image_name cell_id ... tumor_response cell_number</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(285851): 1_1 1_2 ... 375_3941 375_3942</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(74): image_name cell_id ... patient_cohort cell_number</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: JacksonFischer_2020_BreastCancer</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: JacksonFischer_2020_BreastCancer_Basel_v2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">JacksonFischer_2020_BreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2022-10-17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7725</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-02-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7834</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $species: Homo sapiens</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $rdataclass: SingleCellExperiment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $rdatadateadded: 2022-10-17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $title: JacksonFischer_2020_BreastCancer - sce - v1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $description: Single cell data for the JacksonFischer_2020_BreastCancer IM...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # $rdatadateadded: 2023-01-30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # $title: JacksonFischer_2020_BreastCancer_Basel - sce - v2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # $description: Single cell data (Basel cohort subset) for the JacksonFische...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $taxonomyid: 9606</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $genome: NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $sourcetype: Zip</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $sourceurl: https://doi.org/10.5281/zenodo.3518284</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $sourcesize: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $tags: c("SingleCellData", "TechnologyData", "Tissue") </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # retrieve record with 'object[["EH7725"]]' </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # $tags: c("Homo_sapiens_Data", "ImmunoOncologyData",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #   "ReproducibleResearch", "SingleCellData", "SpatialData",</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> #   "TechnologyData", "Tissue") </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # retrieve record with 'object[["EH7834"]]' </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load masks on disk</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">JacksonFischer_2020_BreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> </span></span>
 <span class="r-in"><span><span class="cn">TRUE</span>, h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2022-10-17</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-02-14</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -270,7 +306,7 @@ The single-cell pathology landscape of breast cancer.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

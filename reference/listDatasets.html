@@ -18,7 +18,7 @@ package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/ma
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.2</span>
       </span>
     </div>
 
@@ -92,17 +92,20 @@ segmentation masks.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">listDatasets</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 3 rows and 7 columns</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>incomplete final line found by readTableHeader on '/home/ubuntu/packages/R/r-source/library/imcdatasets/extdata/alldatasets.csv'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 4 rows and 7 columns</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             FunctionCall     Species                Tissue NumberOfCells</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;character&gt; &lt;character&gt;           &lt;character&gt;     &lt;integer&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 Damond_2019_Pancreas()       Human              Pancreas        252059</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 JacksonFischer_2020_..       Human Primary breast tumour        285851</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 Zanotelli_2020_Spher..       Human   Cell line spheroids        229047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 IMMUcan_2022_CancerE..       Human         Primary tumor         46825</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   NumberOfImages NumberOfChannels              Reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;integer&gt;        &lt;integer&gt;            &lt;character&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1            100               38  @Damond-2019-Pancreas</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2            100               42 @JacksonFischer-2020..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3            517               51 @Zanotelli-2020-Sphe..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             14               40                   None</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -118,7 +121,7 @@ segmentation masks.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
