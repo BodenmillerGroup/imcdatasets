@@ -1,6 +1,7 @@
 # imcdatasets
 
-__Documentation is available at: https://bodenmillergroup.github.io/imcdatasets__
+__Documentation is available at:
+https://bodenmillergroup.github.io/imcdatasets/index.html__
 
 ## Introduction
 
