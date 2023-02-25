@@ -169,26 +169,26 @@
 #'
 #' @export
 HochSchulz_2022_Melanoma <- function (
-        data_type = c("sce", "spe", "images", "masks"),
-        panel = "rna",
-        full_dataset = FALSE,
-        version = "latest",
-        metadata = FALSE,
-        on_disk = FALSE,
-        h5FilesPath = NULL,
-        force = FALSE
+    data_type = c("sce", "spe", "images", "masks"),
+    panel = "rna",
+    full_dataset = FALSE,
+    version = "latest",
+    metadata = FALSE,
+    on_disk = FALSE,
+    h5FilesPath = NULL,
+    force = FALSE
 ) {
     available_versions <- c("v1")
     dataset_name <- "HochSchulz_2022_Melanoma"
     dataset_version <- ifelse(version == "latest",
-                              utils::tail(available_versions, n=1), version)
+        utils::tail(available_versions, n=1), version)
     
     .checkArguments(data_type, metadata, dataset_version, available_versions,
-                    full_dataset, on_disk, h5FilesPath, force)
+        full_dataset, on_disk, h5FilesPath, force)
     
     if (!panel %in% c("rna", "protein"))
         stop('"panel" should be either "rna" or "protein"')
-    dataset_name <- paste(dataset_name, panel, sep = " - ")
+    dataset_name_panel <- paste(dataset_name, panel, sep = " - ")
     
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name_panel,
         dataset_version, full_dataset, on_disk, h5FilesPath, force)
