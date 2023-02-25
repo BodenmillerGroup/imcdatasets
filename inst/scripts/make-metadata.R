@@ -14,7 +14,7 @@ df_base <- data.frame(
 
 # Dataset-specific metadata
 df_list <- list(
-  
+
     # Damond_2019_Pancreas
     data.frame(
         Title = sprintf(
@@ -46,6 +46,34 @@ df_list <- list(
         DataType = rep(c("sce", "images", "masks"), 3),
         DatasetType = rep(c("matched subset", "full dataset",
             "matched subset"), each = 3),
+        Notes = c("")
+    ),
+    
+    # IMMUcan_2022_CancerExample
+    data.frame(
+        Title = sprintf(
+            "IMMUcan_2022_CancerExample - %s - %s",
+            rep(c("sce", "images", "masks")),
+            rep(c("v1"), 1)),
+        FunctionCall = sprintf(
+            "IMMUcan_2022_CancerExample(data_type = '%s",
+            paste0(rep(c("sce'", "images'", "masks'"), 1),
+                rep(c(")"), each = 3))),
+        Description = sprintf(
+            "%s for the IMMUcan_2022_CancerExample IMC dataset",
+            c("Single cell data", "Multichannel images", "Cell masks")),
+        BiocVersion = rep(c("3.17"), each=3),
+        DatasetVersion = rep(c("v1"), each=3),
+        SourceUrl = "https://zenodo.org/record/6810879",
+        SourceVersion = "Sep 14 2022",
+        RDataClass = rep(c("SingleCellExperiment",
+            rep("CytoImageList", 2)), 1),
+        RDataPath = file.path(
+            "imcdatasets", "IMMUcan_2022_CancerExample",
+            rep(c("v1"), each = 3),
+            rep(c("sce.rds", "images.rds", "masks.rds"), 1)),
+        DataType = rep(c("sce", "images", "masks"), 1),
+        DatasetType = rep(c("matched subset"), 3),
         Notes = c("")
     ),
 
@@ -88,13 +116,13 @@ df_list <- list(
             "matched subset"), each = 3),
         Notes = c("")
     ),
-    
+
     # Zanotelli_2020_Spheroids
     data.frame(
         Title = sprintf(
             "Zanotelli_2020_Spheroids - %s",
             paste(c("sce", "images", "masks"),
-                  rep(c("v1", "v0"), each = 3), sep = " - ")),
+                rep(c("v1", "v0"), each = 3), sep = " - ")),
         FunctionCall = sprintf(
             "Zanotelli_2020_Spheroids(data_type = '%s",
             paste0(rep(c("sce'", "images'", "masks'"), 2),
