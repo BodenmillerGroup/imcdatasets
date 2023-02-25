@@ -48,7 +48,7 @@ df_list <- list(
             "matched subset"), each = 3),
         Notes = c("")
     ),
-
+    
     # IMMUcan_2022_CancerExample
     data.frame(
         Title = sprintf(
