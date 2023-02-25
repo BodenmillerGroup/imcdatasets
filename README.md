@@ -1,6 +1,7 @@
 # imcdatasets
 
-__Documentation is available at: https://bodenmillergroup.github.io/imcdatasets__
+__Documentation is available at:
+https://bodenmillergroup.github.io/imcdatasets/index.html__
 
 ## Introduction
 
@@ -138,6 +139,10 @@ lines.
   - Documentation: [Zanotelli_2020_Spheroids](https://bodenmillergroup.github.io/imcdatasets/reference/Zanotelli_2020_Spheroids.html).   
   - Publication: [Zanotelli et al. _Mol Syst Biol_ (2020) 16:e9798](https://doi.org/10.15252/msb.20209798).  
 
+* __IMMUcan_2022_CancerExample__: Example data from the
+[IMMUcan](https://immucan.eu/) project.   
+    - Documentation: [IMMUcan_2022_CancerExample](https://bodenmillergroup.github.io/imcdatasets/reference/IMMUcan_2022_CancerExample.html).  
+
 ### Viewing available datasets in R
 
 In R, currently available datasets can be viewed with:
@@ -162,8 +167,8 @@ Guidelines about contributions and dataset formatting are provided in a
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2022). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.7.1, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J (2023). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
+R package version 1.7.2, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

@@ -22,12 +22,12 @@
         stop('The version argument should be of length 1.')
     }
     
-    if (!(dataset_version %in% available_versions)) {
-        stop('"version" should be "latest" or one of the available dataset versions, e.g., "v1".')
-    }
-    
     if (data_type == "spe" & dataset_version == "v0") {
         stop('It is only possible to retrieve SPE objects with dataset versions >= v1.')
+    }
+    
+    if (!(dataset_version %in% available_versions)) {
+        stop('"version" should be "latest" or one of the available dataset versions, e.g., "v1".')
     }
     
     if (full_dataset == TRUE & data_type == "images") {
