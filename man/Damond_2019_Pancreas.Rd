@@ -6,10 +6,11 @@
 \usage{
 Damond_2019_Pancreas(
   data_type = c("sce", "spe", "images", "masks"),
+  full_dataset = FALSE,
+  version = "latest",
   metadata = FALSE,
   on_disk = FALSE,
   h5FilesPath = NULL,
-  version = "latest",
   force = FALSE
 )
 }
@@ -18,6 +19,13 @@ Damond_2019_Pancreas(
 `masks` for cell segmentation masks. Single cell data are retrieved using 
 either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
 \code{SpatialExperiment} format.}
+
+\item{full_dataset}{if FALSE (default), a subset corresponding to 100 images
+is returned. If TRUE, the full dataset (corresponding to 845 images) is 
+returned. Due to memory space limitations, this option is only available for 
+single cell data and masks, not for \code{data_type = "images"}.}
+
+\item{version}{dataset version. By default, the latest version is returned.}
 
 \item{metadata}{if FALSE (default), the data object selected in 
 \code{data_type} is returned. If TRUE, only the metadata associated to this
@@ -32,8 +40,6 @@ and \code{masks}.}
 are stored. This path needs to be defined when \code{on_disk = TRUE}.
 When files should only temporarily be stored on disk, please set
 \code{h5FilesPath = getHDF5DumpDir()}.}
-
-\item{version}{dataset version. By default, the latest version is returned.}
 
 \item{force}{logical indicating if images should be overwritten when files
 with the same name already exist on disk.}
@@ -51,8 +57,7 @@ The data was obtained by imaging mass cytometry (IMC) of human pancreas
 sections from donors with type 1 diabetes.
 }
 \details{
-This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019),
-consisting of three data objects:
+This is an Imaging Mass Cytometry (IMC) dataset from Damond et al. (2019):
 \itemize{
     \item \code{images} contains a hundred 38-channel
     images in the form of a \linkS4class{CytoImageList} class object.
@@ -85,7 +90,9 @@ comprising the data from three pancreas donors at different stages of type 1
 diabetes (T1D). The three donors present clearly diverging characteristics 
 in terms of cell type composition and cell-cell interactions, which makes 
 this dataset ideal for benchmarking spatial and neighborhood analysis 
-algorithms.
+algorithms. If \code{full_dataset = TRUE}, the full dataset (845 images from
+12 patients) is returned. This option is not available for multichannel 
+images.
 
 The \code{assay} slots of the \linkS4class{SingleCellExperiment} and 
 \linkS4class{SpatialExperiment} objects contain three assays:
@@ -122,7 +129,7 @@ each other, is stored as a \code{SelfHits} object in the \code{colPairs}
 slot of the \code{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
 objects.
 
-The three donors present the following characteristics:
+The three donors in the subset present the following characteristics:
 \itemize{
     \item \code{6126} is a non-diabetic donor, with large islets containing
     many beta cells, severe infiltration of the exocrine pancreas with
@@ -134,6 +141,8 @@ The three donors present the following characteristics:
     diagnosis), showing near-total beta cell destruction and limited immune
     cell infiltration in both the islets and the pancreas.
 }
+For information about other donors in the full dataset, please refer to the
+Damond et al. publication.
 
 Dataset versions: a \code{version} argument can be passed to the function to 
 specify which dataset version should be retrieved.
@@ -146,8 +155,12 @@ File sizes:
 \itemize{
     \item \code{`images`}: size in memory = 7.4 Gb, size on disk = 1.7 Gb.
     \item \code{`masks`}: size in memory = 200 Mb, size on disk = 8.2 Mb.
-    \item \code{`sce`}: size in memory = 352 Mb, size on disk = 212 Mb.
-    \item \code{`spe`}: size in memory = 371 Mb, size on disk = 212 Mb.
+    \item \code{`sce`}: size in memory = 353 Mb, size on disk = 204 Mb.
+    \item \code{`spe`}: size in memory = 372 Mb, size on disk = 205 Mb.
+    \item \code{`sce_full`}: size in memory = 2.4 Gb, size on disk = 1.5 Gb.
+    \item \code{`spe_full`}: size in memory = 2.5 Gb, size on disk = 1.5 Gb.
+    \item \code{`masks_full`}: size in memory = 1.4 Gb, 
+    size on disk = 60 Mb.
 }
 
 When storing images on disk, these need to be first fully read into memory

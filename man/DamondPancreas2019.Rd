@@ -10,5 +10,5 @@ These functions are defunct and no longer available.
 \details{
 Defunct functions are: \code{DamondPancreas2019_sce},
 \code{DamondPancreas2019_masks}, and \code{DamondPancreas2019_images}. Please 
-use the \code{Damond_2019_Pancreas2019} function instead.
+use the \code{Damond_2019_Pancreas} function instead.
 }

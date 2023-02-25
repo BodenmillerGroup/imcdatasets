@@ -14,7 +14,7 @@ df_base <- data.frame(
 
 # Dataset-specific metadata
 df_list <- list(
-    
+
     # Damond_2019_Pancreas
     data.frame(
         Title = sprintf(
@@ -48,7 +48,7 @@ df_list <- list(
             "matched subset"), each = 3),
         Notes = c("")
     ),
-    
+
     # IMMUcan_2022_CancerExample
     data.frame(
         Title = sprintf(
@@ -76,7 +76,7 @@ df_list <- list(
         DatasetType = rep(c("matched subset"), 3),
         Notes = c("")
     ),
-    
+
     # JacksonFischer_2020_BreastCancer
     data.frame(
         Title = sprintf("JacksonFischer_2020_BreastCancer%s - %s - %s%s",
@@ -116,7 +116,7 @@ df_list <- list(
             "matched subset"), each = 3),
         Notes = c("")
     ),
-    
+
     # Zanotelli_2020_Spheroids
     data.frame(
         Title = sprintf(

@@ -1,6 +1,6 @@
 # Argument check for wrapper functions
 .checkArguments <- function(data_type, metadata, dataset_version,
-    available_versions, on_disk, h5FilesPath, force
+    available_versions, full_dataset, on_disk, h5FilesPath, force
 ) {
     if (length(data_type) != 1) {
         stop('The data_type argument should be of length 1.')
@@ -14,6 +14,10 @@
         stop('"metadata" should be either TRUE or FALSE')
     }
     
+    if (!(isTRUE(full_dataset) | isFALSE(full_dataset))) {
+        stop('"full_dataset" should be either TRUE or FALSE')
+    }
+    
     if (length(dataset_version) != 1) {
         stop('The version argument should be of length 1.')
     }
@@ -24,6 +28,14 @@
     
     if (data_type == "spe" & dataset_version == "v0") {
         stop('It is only possible to retrieve SPE objects with dataset versions >= v1.')
+    }
+    
+    if (full_dataset == TRUE & data_type == "images") {
+        stop('Full datasets are only available for masks and single cell data.')
+    }
+    
+    if (full_dataset == TRUE & dataset_version == "v0") {
+        stop('Full datasets are only available for dataset versions >= v1.')
     }
     
     if (!(isTRUE(on_disk) | isFALSE(on_disk))) {
@@ -46,15 +58,20 @@
 
 # Load data objects
 .loadDataObject <- function(data_type, metadata, dataset_name, dataset_version,
-    on_disk, h5FilesPath, force
+    full_dataset, on_disk, h5FilesPath, force
 ) {
     ## Load queried dataset
     eh <- ExperimentHub()
-    if (data_type == "spe")
-        title <- paste(dataset_name, "sce", dataset_version, sep = " - ")
-    else
+    if (grepl("spe", data_type)) {
+        title <- paste(dataset_name, gsub("spe", "sce", data_type), 
+            dataset_version, sep = " - ")
+    } else {
         title <- paste(dataset_name, data_type, dataset_version, sep = " - ")
-        
+    }
+    
+    if (isTRUE(full_dataset))
+        title <- paste(title, "full", sep = " - ")
+    
     object_id <- eh[eh$title == title]$ah_id
 
     if (metadata) {
