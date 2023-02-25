@@ -2,4 +2,4 @@ FunctionCall,Species,Tissue,NumberOfCells,NumberOfImages,NumberOfChannels,Refere
 Damond_2019_Pancreas(),Human,Pancreas,252059,100,38,@Damond-2019-Pancreas
 JacksonFischer_2020_BreastCancer(),Human,Primary breast tumour,285851,100,42,@JacksonFischer-2020-BreastCancer
 Zanotelli_2020_Spheroids(),Human,Cell line spheroids,229047,517,51,@Zanotelli-2020-Spheroids
-IMMUcan_2022_CancerExample(),Human,Primary tumor,46825,14,40,@IMMUcan-2022-CancerExample
+IMMUcan_2022_CancerExample(),Human,Primary tumor,46825,14,40,None
