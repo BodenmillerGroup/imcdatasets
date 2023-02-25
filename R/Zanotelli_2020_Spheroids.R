@@ -1,0 +1,202 @@
+#' Obtain the Zanotelli_2020_Spheroids dataset
+#'
+#' Obtain the Zanotelli_2020_Spheroids dataset, which consists of three data
+#' objects: single cell data, multichannel images and cell segmentation masks.
+#' The data were obtained by imaging mass cytometry (IMC) of sections of 3D
+#' spheroids generated from different cell lines.
+#'
+#' @param data_type type of object to load, `images` for multichannel images or
+#' `masks` for cell segmentation masks. Single cell data are retrieved using 
+#' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
+#' \code{SpatialExperiment} format.
+#' @param version dataset version. By default, the latest version is returned.
+#' @param metadata if FALSE (default), the data object selected in 
+#' \code{data_type} is returned. If TRUE, only the metadata associated to this
+#' object is returned.
+#' @param on_disk logical indicating if images in form of
+#' \linkS4class{HDF5Array} objects (as .h5 files) should be stored on disk
+#' rather than in memory. This setting is valid when downloading \code{images}
+#' and \code{masks}.
+#' @param h5FilesPath path to where the .h5 files for on disk representation
+#' are stored. This path needs to be defined when \code{on_disk = TRUE}.
+#' When files should only temporarily be stored on disk, please set
+#' \code{h5FilesPath = getHDF5DumpDir()}.
+#' @param force logical indicating if images should be overwritten when files
+#' with the same name already exist on disk.
+#'
+#' @details
+#' This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. 
+#' (2020), consisting of three data objects:
+#' \itemize{
+#'     \item \code{images} contains 517 multichannel images, each containing 51 
+#'     channels, in the form of a \linkS4class{CytoImageList} class object.
+#'     \item \code{masks} contains the cell segmentation
+#'     masks associated with the images, in the form of a
+#'     \linkS4class{CytoImageList} class object.
+#'     \item \code{sce} contains the single cell data extracted from the 
+#'     multichannel images using the cell segmentation masks, as well as the 
+#'     associated metadata, in the form of a
+#'     \linkS4class{SingleCellExperiment}. This represents a total of 229,047 
+#'     cells x 51 channels.
+#'     \item \code{spe} same single cell data as for \code{sce}, but in the
+#'     \linkS4class{SpatialExperiment} format.
+#' }
+#'
+#' All data are downloaded from ExperimentHub and cached for local re-use.
+#'
+#' Mapping between the three data objects is performed via variables located in
+#' their metadata columns: \code{mcols()} for the \linkS4class{CytoImageList}
+#' objects and \code{ColData()} for the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects. Mapping at the image level can be 
+#' performed with the \code{image_name} or \code{image_number} variables. 
+#' Mapping between cell segmentation masks and single cell data is performed 
+#' with the \code{cell_number} variable, the values of which correspond to the 
+#' intensity values of the \code{masks} object. For practical examples, please 
+#' refer to the "Accessing IMC datasets" vignette.
+#'
+#' This dataset was obtained as following (the names of the experimental
+#' variables, located in the \code{colData} of the
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects, are indicated in parentheses): \emph{i)} Cells from four different 
+#' cell lines (\code{cell_line}) were seeded at three different densities 
+#' (\code{treatment_concentration}, relative densities) and grown for either 72
+#' or 96 hours (\code{treatment_time_point}, duration in hours). In the 
+#' appropriate experimental conditions (see the paper for details), the cells 
+#' aggregate into 3D spheroids. \emph{ii)} Cells were harvested and pooled into
+#' 60-well barcoding plates. \emph{iii)} A pellet of each spheroid pool was 
+#' generated and cut into several 6 um-thick sections. \emph{iv)} A subset of 
+#' these sections (\code{site_id}) were stained with an IMC panel and acquired 
+#' as one or more acquisitions (\code{acquisition_id}) containing multiple 
+#' spheres each. \emph{v)} Spheres in these acquisitions were identified by 
+#' computer vision and cropped into individual images (\code{image_number}).
+#'
+#' Other relevant cell metadata include:
+#' \itemize{
+#'     \item \code{treatment_name}: experimental conditions in the format:
+#'     \code{"Cell line name"_c"seeding density"_tp"time point"}.
+#'     \item \code{cell_x/cell_y}: cell centroid position in the image.
+#'     \item \code{cell_area}: area of the cell (um^2).
+#'     \item \code{distance_rim}: estimated distance to spheroid border.
+#'     \item \code{distance_sphere}: distance to spheroid section border.
+#'     \item \code{distance_other_sphere}: distance to the closest of the other 
+#'     spheroid sections in the same image (if there is any).
+#'     \item \code{distance_background}: distance to background pixels.
+#' }
+#' For a full description of the other experimental variables, please refer to
+#' the publication (https://doi.org/10.15252/msb.20209798) and to the
+#' original dataset repository (https://doi.org/10.5281/zenodo.4271910).
+#'
+#' The marker-associated metadata, including antibody information and metal 
+#' tags are stored in the \code{rowData} of the 
+#' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. The channels with names starting with "BC_" are the channels used 
+#' for barcoding. Post-transcriptional modification of the protein targets are 
+#' indicated in brackets.
+#'
+#' The \code{assay} slots of the \linkS4class{SingleCellExperiment} and 
+#' \linkS4class{SpatialExperiment} objects contain three assays:
+#' \itemize{
+#'     \item \code{counts} contains raw mean ion counts per cell.
+#'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
+#'     \item \code{quant_norm} contains counts censored at the 99th percentile 
+#'     and scaled 0-1.
+#' }
+#' 
+#' In addition, the \code{altExp} slot of the 
+#' \linkS4class{SingleCellExperiment} object contains another 
+#' \linkS4class{SingleCellExperiment} object where the counts matrix represents
+#'  raw mean ion counts for cells neighboring the current cell.
+#'
+#' Neighborhood information, defined here as cells that are localized next to 
+#' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
+#' slot of the \code{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
+#' objects. Cells in the \code{SelfHits} 
+#' object are represented by unique integers that map to the 
+#' \code{cell_number_absolute} column of \code{colData(sce)}.
+#' 
+#' Dataset versions: a \code{version} argument can be passed to the function to 
+#' specify which dataset version should be retrieved.
+#' \itemize{
+#'     \item \code{`v0`}: original version (Bioconductor <= 3.15).
+#'     \item \code{`v1`}: consistent object formatting across datasets.
+#' }
+#' 
+#' File sizes:
+#' \itemize{
+#'     \item \code{`images`}: size in memory = 21.2 Gb, size on disk = 860 Mb.
+#'     \item \code{`masks`}: size in memory = 426 Mb, size on disk = 12 Mb.
+#'     \item \code{`sce`}: size in memory = 564 Mb, size on disk = 319 Mb.
+#'     \item \code{`spe`}: size in memory = 596 Mb, size on disk = 320 Mb.
+#' }
+#'
+#' When storing images on disk, these need to be first fully read into memory
+#' before writing them to disk. This means the process of downloading the data
+#' is slower than directly keeping them in memory. However, downstream analysis
+#' will lose its memory overhead when storing images on disk.
+#'
+#' Original source: Zanotelli et al. (2020):
+#' https://doi.org/10.15252/msb.20209798
+#'
+#' Original link to raw data, also containing the entire dataset:
+#' https://doi.org/10.5281/zenodo.4271910
+#'
+#' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
+#' \linkS4class{SpatialExperiment} object with single cell data, a 
+#' \linkS4class{CytoImageList} object containing multichannel images, or a
+#' \linkS4class{CytoImageList} object containing cell segmentation masks.
+#'
+#' @author Nicolas Damond
+#'
+#' @references
+#' Zanotelli VRT et al. (2020).
+#' A quantitative analysis of the interplay of environment, neighborhood, and
+#' cell state in 3D spheroids
+#' \emph{Mol Syst Biol} 16(12), e9798.
+#'
+#' @examples
+#' # Load single cell data
+#' sce <- Zanotelli_2020_Spheroids(data_type = "sce")
+#' print(sce)
+#'
+#' # Display metadata
+#' Zanotelli_2020_Spheroids(data_type = "sce", metadata = TRUE)
+#' 
+#' # Load masks on disk
+#' library(HDF5Array)
+#' masks <- Zanotelli_2020_Spheroids(data_type = "masks", on_disk = TRUE,
+#' h5FilesPath = getHDF5DumpDir())
+#' print(head(masks))
+#'
+#' @import cytomapper
+#' @import SingleCellExperiment
+#' @import methods
+#' @importFrom utils download.file
+#' @importFrom utils read.csv
+#' @importFrom ExperimentHub ExperimentHub
+#' @importFrom SpatialExperiment SpatialExperiment
+#' @importFrom HDF5Array writeHDF5Array
+#' @importFrom DelayedArray DelayedArray
+#'
+#' @export
+Zanotelli_2020_Spheroids <- function (
+    data_type = c("sce", "spe", "images", "masks"),
+    version = "latest",
+    metadata = FALSE,
+    on_disk = FALSE,
+    h5FilesPath = NULL,
+    force = FALSE
+) {
+    available_versions <- c("v0", "v1")
+    dataset_name <- "Zanotelli_2020_Spheroids"
+    dataset_version <- ifelse(version == "latest",
+        utils::tail(available_versions, n=1), version)
+    full_dataset <- FALSE
+
+    .checkArguments(data_type, metadata, dataset_version, available_versions,
+        full_dataset, on_disk, h5FilesPath, force)
+
+    cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
+        dataset_version, full_dataset, on_disk, h5FilesPath, force)
+
+    return(cur_dat)
+}

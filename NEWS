@@ -2,7 +2,7 @@ Changes in version 0.1.0 (2020-11-02):
 
 + Initial commit
 + Creation of the imcdatasets package
-+ Added the damond-pancreas-2019 dataset
++ Added data from Damond et al (2019) Cell Metab 29(3):755-768
 
 Changes in version 0.99.0 (2020-11-12):
 
@@ -13,7 +13,7 @@ Changes in version 0.99.0 (2020-11-12):
 
 Changes in version 0.99.6 (2021-03-23):
 
-+ Added data from Jackson, Fischer et al. Nature 578,615–620(2020)
++ Added data from Jackson, Fischer et al (2020) Nature 578:615–620
 
 Changes in version 0.99.7 (2021-03-24):
 
@@ -26,7 +26,7 @@ Changes in version 0.99.8 (2021-04-15):
 
 Changes in version 0.99.9 (2021-04-20):
 
-+ Added data from Zanotelli et al. Mol Syst Biol 16:e9798(2020)
++ Added data from Zanotelli et al (2020) Mol Syst Biol 16:e9798
 
 Changes in version 1.0.0 (2021-05-19):
 
@@ -35,3 +35,39 @@ Changes in version 1.0.0 (2021-05-19):
 Changes in version 1.1.1 (2021-05-25):
 
 + Added documentation (dataset list in README, print out examples in help pages)
+
+Changes in version 1.4.1 (2022-06-29):
+
++ Added deprecation note for .onLoad functions
+
+Changes in version 1.5.2 (2022-07-04):
+
++ Updated wrapper functions
++ Updated test functions
++ Updated BiocViews and documentation
++ Added LICENSE file
+
+Changes in version 1.5.3 (2022-10-19):
+
++ Updated all datasets to have consistent object formatting.
++ Added dataset versioning.
++ Added new dataset loading functions and deprecated the old ones.
++ New vignette with guidelines for contribution and dataset formatting.
+
+Changes in version 1.5.4 (2022-10-21):
+
++ Possibility to retrieve single cell data in the SpatialExperiment format.
+
+Changes in version 1.7.1 (2023-01-31):
+
++ Added full dataset (masks and single cell data) for the JacksonFischer
+dataset.
++ Added "Zurich" cohort for the JacksonFischer dataset.
++ Added full datasets (masks and single cell data) for the Damond... dataset.
++ Make deprecated functions (`DamondPancreas2019Data`,
+`JacksonFischer2020Data`, and `ZanotelliSpheroids2020Data`) defunct.
+
+Changes in version 1.7.2 (2023-02-25):
+
++ Added IMMUcan_2022_CancerExample dataset.
++ Using the IMMUcan_2022_CancerExample dataset in the vignette.

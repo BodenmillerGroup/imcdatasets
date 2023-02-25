@@ -16,8 +16,8 @@ check_masks <- function(msk) {
 
 check_intersect <- function(sce, img, msk) {
     mappingcols <- Reduce(intersect, list(colnames(colData(sce)),
-                                          colnames(mcols(img)),
-                                          colnames(mcols(msk))))
+        colnames(mcols(img)),
+        colnames(mcols(msk))))
     expect_true(length(mappingcols) > 0)
 }
 
@@ -25,7 +25,8 @@ datasets <- list(
     "Damond_2019_Pancreas",
     "HochSchulz_2022_Melanoma",
     "JacksonFischer_2020_BreastCancer",
-    "Zanotelli_2020_Spheroids"
+    "Zanotelli_2020_Spheroids",
+    "IMMUcan_2022_CancerExample"
 )
 
 testDatasetWorks <- function(x) {
@@ -66,9 +67,8 @@ testDatasetWorks <- function(x) {
         )
         expect_error(do.call(x, args = list(metadata = TRUE)))
         expect_error(do.call(x, args = list(data_type = "masks",
-                                            on_disk = TRUE)))
+            on_disk = TRUE)))
     }
-    )
-}
+)}
 
 lapply(datasets, testDatasetWorks)
