@@ -40,7 +40,8 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
-dataset_version <- "v1"
+dataset_name <- "JacksonFischer_2020_BreastCancer"
+dataset_version <- "v2"
 cat("Dataset version:", dataset_version)
 ```
 
@@ -52,7 +53,7 @@ workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-dataset_dir <- file.path(".", "JacksonFischer_2020_BreastCancer")
+dataset_dir <- file.path(".", dataset_name)
 if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
 
 outdir <- file.path(dataset_dir, dataset_version)
@@ -66,7 +67,9 @@ options(timeout = 1000)
 
 # **Single cell data**
 
-We will download a subset of single-cell data corresponding to 100 images from [@JacksonFischer-2020-BreastCancer] from [zenodo](https://doi.org/10.5281/zenodo.3518284).
+We will download single-cell data corresponding from
+[@JacksonFischer-2020-BreastCancer] from 
+[zenodo](https://doi.org/10.5281/zenodo.3518284).
 
 ## Download single cell data
 
@@ -97,21 +100,36 @@ The first zip folder contains the main single-cell, sample and patient metadata.
 ```{r import-cell-data, results='hide'}
 # Download dataset
 url_cells <- ("https://zenodo.org/record/4607374/files/SingleCell_and_Metadata.zip?download=1")
-dataset_name <- "SingleCell_and_Metadata.zip"
-download.file(url_cells, destfile = file.path(workdir, dataset_name))
+zip_name <- "SingleCell_and_Metadata.zip"
+download.file(url_cells, destfile = file.path(workdir, zip_name))
 
-# Unzip only required files
-system2("unzip", args = c("-o", file.path(workdir, dataset_name),
-                          "Data_publication/BaselTMA/SC_dat.csv",
-                          "-d", workdir))
-system2("unzip", args = c("-o", file.path(workdir, dataset_name),
-                          "Data_publication/BaselTMA/Basel_PatientMetadata.csv",
-                          "-d", workdir))
-system2("unzip", args = c("-o", file.path(workdir, dataset_name),
-                          "Data_publication/Basel_Zuri_StainingPanel.csv",
-                          "-d", workdir))
+# Unzip required files - Basel Cohort
+system2("unzip", args = c(
+    "-o", file.path(workdir, zip_name),
+    "Data_publication/BaselTMA/SC_dat.csv",
+    "-d", workdir))
+system2("unzip", args = c(
+    "-o", file.path(workdir, zip_name),
+    "Data_publication/BaselTMA/Basel_PatientMetadata.csv",
+    "-d", workdir))
 
-file.remove(file.path(workdir, dataset_name))
+# Unzip required files - Zurich Cohort
+system2("unzip", args = c(
+    "-o", file.path(workdir, zip_name),
+    "Data_publication/ZurichTMA/SC_dat.csv",
+    "-d", workdir))
+system2("unzip", args = c(
+    "-o", file.path(workdir, zip_name),
+    "Data_publication/ZurichTMA/Zuri_PatientMetadata.csv",
+    "-d", workdir))
+
+# Unzip panel file
+system2("unzip", args = c(
+    "-o", file.path(workdir, zip_name),
+    "Data_publication/Basel_Zuri_StainingPanel.csv",
+    "-d", workdir))
+
+file.remove(file.path(workdir, zip_name))
 ```
 
 Download single cell labels and locations
@@ -129,59 +147,74 @@ importData(url_locations, workdir, "singlecell_locations.zip")
 
 ## Read in single-cell data
 
-We read in single cell data linked to the Basel cohort, including single cell data, cell metadata, clinical data, antibody panel information, and cell clusters.
+We read in single cell data linked to the Basel and Zurich cohorts, including 
+single cell data, cell metadata, clinical data, antibody panel information, and
+cell clusters.
 
 ```{r read-in-cell-data}
 # Single cell expressions and spatial features
-cells <- fread(file.path(
-  workdir, "Data_publication/BaselTMA/SC_dat.csv"))
+cells <- rbind(
+    fread(file.path(workdir, "Data_publication/BaselTMA/SC_dat.csv")),
+    fread(file.path(workdir, "Data_publication/ZurichTMA/SC_dat.csv"))
+)
 
 # Sample and clinical metadata
-cell_meta <- fread(file.path(
-  workdir, "Data_publication/BaselTMA/Basel_PatientMetadata.csv"))
+cell_meta_basel <- fread(file.path(workdir,
+                    "Data_publication/BaselTMA/Basel_PatientMetadata.csv"))
+cell_meta_zuri <- fread(file.path(workdir,
+                    "Data_publication/ZurichTMA/Zuri_PatientMetadata.csv"))
+
+cell_meta_zuri[, HER2Status := HER2]
+cell_meta_zuri[ ,':=' (HER2 = NULL, ER = NULL, PR = NULL)]  
+
+cell_meta <- as.data.table(rbind(
+  data.frame(c(cell_meta_basel, sapply(
+      setdiff(names(cell_meta_zuri),names(cell_meta_basel)), function(x) NA))),
+  data.frame(c(cell_meta_zuri, sapply(
+      setdiff(names(cell_meta_basel),names(cell_meta_zuri)), function(x) NA)))
+))
 
 # Panel information
 panel <- fread(file.path(
   workdir, "Data_publication/Basel_Zuri_StainingPanel.csv"))
 
 # Cluster labels (merge PhenoGraph cluster labels and metacluster labels)
-phenograph_clusters <- fread(file.path(
+pg_clusters_basel <- fread(file.path(
   workdir, "Cluster_labels/PG_basel.csv"), header = TRUE)
+setnames(pg_clusters_basel, "PhenoGraphBasel", "PhenoGraph")
 
-meta_clusters <- fread(file.path(
+pg_clusters_zuri <- fread(file.path(
+  workdir, "Cluster_labels/PG_zurich.csv"), header = TRUE)
+pg_clusters <- rbind(pg_clusters_basel,
+                             pg_clusters_zuri)
+
+meta_clusters_basel <- fread(file.path(
   workdir, "Cluster_labels/Basel_metaclusters.csv"), header = TRUE)
+meta_clusters_zuri <- fread(file.path(
+  workdir, "Cluster_labels/Zurich_matched_metaclusters.csv"), header = TRUE)
+meta_clusters <- rbind(meta_clusters_basel, meta_clusters_zuri)
 
-clusters <- merge(phenograph_clusters, meta_clusters, by = "id", all.x = TRUE)
-remove(phenograph_clusters, meta_clusters)
+clusters <- merge(pg_clusters, meta_clusters, by = "id", all.x = TRUE)
 
 # Single-cell locations
-locations <- fread(file.path(
+locations_basel <- fread(file.path(
   workdir, "Basel_SC_locations.csv"), header = TRUE)
+locations_zuri <- fread(file.path(
+  workdir, "Zurich_SC_locations.csv"), header = TRUE)
+locations <- rbind(locations_basel, locations_zuri)
+
+# Remove data frames that are not needed anymore
+remove(cell_meta_basel, cell_meta_zuri)
+remove(locations_basel, locations_zuri)
+remove(pg_clusters_basel, pg_clusters_zuri, pg_clusters)
+remove(meta_clusters_basel, meta_clusters_zuri, meta_clusters)
 ```
 
-### Subset patients and images
+Filter out non-breast images
 
-We select a set of a hundred patients as an example dataset and sample one primary tumor core (one image) per patient.
-
-```{r subset-images}
-# Exclude healthy tissue samples and controls
-cell_meta <- cell_meta[diseasestatus == "tumor", ]
-
-# Exclude patients for which the tumor core was split across 2 images (machine failure)
-cell_meta[, ncores := .N, by = "PID"]
-cell_meta <- cell_meta[ncores == 1,]
-
-# Randomly sample 100 patients
-set.seed(2)
-cell_meta <- cell_meta[PID %in% sample(cell_meta$PID, 100, replace = FALSE), ]
-```
-
-We then subset single cell data to selected images.
-
-```{r subset-cell-data}
-cells <- cells[core %in% cell_meta$core, ]
-locations <- locations[core %in% cell_meta$core, ]
-clusters <- clusters[core %in% cell_meta$core, ]
+```{r remove-non-breast-images}
+img_to_remove <- paste(c("Liver", "control", "non-breast"), collapse = "|")
+cells <- cells[grep(img_to_remove, cells$core, invert = TRUE), ]
 ```
 
 
@@ -244,7 +277,7 @@ cell_metadata <- merge(cell_metadata, locations, by = "cell_id")
 # Add clusters
 clusters <- clusters[, .(
   cell_id = id,
-  cell_cluster_phenograph = PhenoGraphBasel,
+  cell_cluster_phenograph = PhenoGraph,
   cell_metacluster = cluster
 )]
 cell_metadata <- merge(cell_metadata, clusters, by = "cell_id")
@@ -262,15 +295,16 @@ cell_meta <- cell_meta[, .(
   image_area = area,
   image_filename = FileName_FullStack,
   image_sum_area_cells = sum_area_cells,
-  image_percent_tumor_cells = `%tumorcells`,
-  image_percent_normal_epithelial_cells = `%normalepithelialcells`,
-  image_percent_stroma = `%stroma`,
-  image_percent_inflammatory_cells = `%inflammatorycells`,
+  image_percent_tumor_cells = X.tumorcells,
+  image_percent_normal_epithelial_cells = X.normalepithelialcells,
+  image_percent_stroma = X.stroma,
+  image_percent_inflammatory_cells = X.inflammatorycells,
   patient_id = PID,
   patient_age = age,
   patient_gender = gender,
   patient_status = Patientstatus,
   patient_disease_status = diseasestatus,
+  pateint_menopausal = menopausal,
   patient_DFS_months = DFSmonth,
   patient_OS_months = OSmonth,
   patient_year_sample_collection = Yearofsamplecollection,
@@ -280,16 +314,18 @@ cell_meta <- cell_meta[, .(
   TMA_block_label = TMABlocklabel,
   TMA_UBTMA_location = UBTMAlocation,
   tumor_grade = grade,
+  tumor_type = tumor_type,
+  tumor_subtype = Subtype,
+  tumor_clinical_type = clinical_type,
+  tumor_location = location,
   tumor_size = tumor_size,
   tumor_primary_site = PrimarySite,
   tumor_primary_diagnosis = Ptdiagnosis,
-  tumor_clinical_type = clinical_type,
-  tumor_subtype = Subtype,
   tumor_ER_status = ERStatus,
   tumor_HER2_status = HER2Status,
   tumor_HR_status = HR,
   tumor_PR_status = PRStatus,
-  tumor_ERpos_ductal_ca = `ER+DuctalCa`,
+  tumor_ERpos_ductal_ca = ER.DuctalCa,
   tumor_triple_neg_ductal = TripleNegDuctal,
   tumor_hormone_sensitive = hormonesensitive,
   tumor_hormone_resistant_after_sensitive = hormoneresistantaftersenstive,
@@ -303,16 +339,27 @@ cell_meta <- cell_meta[, .(
   tumor_venous_invasion = Venousinvasion,
   tumor_SN = SN,
   tumor_histology = histology,
-  tumor_pre_surgery_Tx_type = `Pre-surgeryTx`,
-  tumor_post_surgery_Tx_type = `Post-surgeryTx`,
+  tumor_pre_surgery_Tx_type = Pre.surgeryTx,
+  tumor_post_surgery_Tx_type = Post.surgeryTx,
   tumor_post_surgery_Tx = Post_surgeryTx,
   tumor_response = response
 )]
+
+cell_meta[tumor_HER2_status == "+", ]$tumor_HER2_status <- "positive"
+cell_meta[tumor_HER2_status == "-", ]$tumor_HER2_status <- "negative"
+cell_meta[tumor_HER2_status == "", ]$tumor_HER2_status <- NA
 ```
 
-We merge the two cell metadata data frames.
+We specify the cohort (Zurich or Basel), and merge the two cell metadata data 
+frames.
 
 ```{r merge-metadata}
+# Specify the cohort of origin
+cell_meta$patient_cohort <- ""
+cell_meta[grep("BaselTMA", image_name), ]$patient_cohort <- "Basel"
+cell_meta[grep("ZTMA", image_name), ]$patient_cohort <- "Zurich"
+
+# Merg the data frames
 cell_metadata <- merge(cell_metadata, cell_meta,
                        by = "image_name", all.x = TRUE)
 cell_metadata <- DataFrame(cell_metadata)
@@ -342,7 +389,7 @@ We first rename markers for consistency with other datasets.
 # Exclude gas channels
 gas_channels <- c("Hg", "In115", "I127", "Pb", "Xe", "Ar")
 cells <- cells[!grepl(paste(gas_channels, collapse = "|"), cells$channel),
-               . (image_name = core, cell_id = id, channel, counts = mc_counts)]
+               .(image_name = core, cell_id = id, channel, counts = mc_counts)]
 
 # Fix marker and metal names
 cells[, full_name := sub(".*Di ", "", channel)]
@@ -397,10 +444,14 @@ cells[metal == "Gd156", `:=` (full_name = "Estrogen receptor alpha",
                               short_name = "ERa")]
 cells[metal == "Gd158", `:=` (full_name = "Progesterone receptor A/B",
                               short_name = "PGR")]
+cells[metal == "Ho165", `:=` (full_name = "Beta-catenin",
+                              short_name = "CTNNB")]
 cells[metal == "Er167", `:=` (full_name = "E-Cadherin", short_name = "CDH1")]
 cells[metal == "Er168", `:=` (full_name = "Ki-67", short_name = "Ki67")]
 cells[metal == "Tm169", `:=` (full_name = "Epidermal growth factor receptor",
                          short_name = "EGFR")]
+cells[metal == "Yb171", `:=` (full_name = "Transcription factor SOX-9",
+                              short_name = "SOX9")]
 cells[metal == "Yb172", `:=` (full_name = "von Willebrand factor",
                               short_name = "vWF")]
 cells[metal == "Yb174", `:=` (full_name = "Cytokeratin 7",
@@ -411,7 +462,7 @@ cells[metal == "Ir191", `:=` (full_name = "Iridium 191", short_name = "DNA1")]
 cells[metal == "Ir193", `:=` (full_name = "Iridium 193", short_name = "DNA2")]
 
 # Add missing short names
-cells[full_name %in% c("CD68", "p53", "CD44", "CD45", "GATA3", "CD20"),
+cells[full_name %in% c("CD68", "p53", "CD44", "CD45", "GATA3", "CD20", "EpCAM"),
       short_name := full_name]
 
 # Ruthenium channels
@@ -464,8 +515,13 @@ We extract marker expression values from the `cells` table and convert them to a
 We then convert `cell_id` to the {`image_number` `_` `cell_number`} format for consistency with other datasets.
 
 ```{r prepare-counts}
-counts <-  dcast.data.table(cells, "cell_id ~ short_name",
-                            value.var = "counts")
+# Filter "cells" data frame
+cells <- cells[!is.na(cells$short_name), ]
+cells <- cells[cells$image_name %in% cell_metadata$image_name, ]
+
+# Create count matrix
+counts <- dcast.data.table(cells, "cell_id ~ short_name",
+                           value.var = "counts")
 row_names <- counts$cell_id
 counts[, cell_id := NULL]
 counts <- as.matrix(counts, rownames = NULL)
@@ -474,10 +530,11 @@ rownames(counts) <- row_names
 counts <- counts[order(match(rownames(counts), rownames(cell_metadata))),
                  order(match(colnames(counts), rownames(panel)))]
 
-# cell_id
+# Add cell_id
 cell_metadata$cell_id <- paste(cell_metadata$image_number,
                                cell_metadata$cell_number, sep = "_")
 rownames(cell_metadata) <- cell_metadata$cell_id
+
 rownames(counts) <- rownames(cell_metadata)
 ```
 
@@ -494,7 +551,6 @@ sce <- SingleCellExperiment(
   rowData = panel,
   colData = cell_metadata
 )
-mainExpName(sce) <- "JacksonFischer_2020_BreastCancer"
 ```
 
 ### Counts transformations
@@ -506,11 +562,98 @@ We apply two different counts transformations:
 ```{r transform-counts}
 assay(sce, "exprs") <- asinh(counts(sce) / 1)
 
-quant <- apply(assay(sce, "counts"), 1, quantile, probs = 0.99)
+quant <- apply(assay(sce, "counts"), 1, quantile, probs = 0.99, na.rm = TRUE)
 assay(sce, "quant_norm") <- apply(assay(sce, "counts"), 2,
                                   function(x) x / quant)
 assay(sce, "quant_norm")[assay(sce, "quant_norm") > 1] <- 1
 assay(sce, "quant_norm")[assay(sce, "quant_norm") < 0] <- 0
+```
+
+### Subset patients and images
+
+We first subset the Zurich cohort to one image per patient.
+
+```{r subset-sce-zurich}
+sce_zurich <- sce[, sce$patient_cohort == "Zurich"]
+mainExpName(sce_zurich) <- paste(dataset_name, "Zurich", dataset_version,
+    sep = "_")
+
+# Randomly select one image per patient
+coldata_zurich <- as.data.table(colData(sce_zurich))
+set.seed(2)
+image_sub_zurich <- coldata_zurich[
+    coldata_zurich[, .I[sample(.N, 1)], by = patient_id]$V1]$image_name
+
+# Select 100 patients from the Zurich cohort
+sce_zurich <- sce_zurich[, sce_zurich$image_name %in% image_sub_zurich]
+remove(coldata_zurich)
+```
+
+For the Basel cohort, we select a set of a hundred patients as an example 
+dataset. For consistency, the selection is based on a subsetting vector 
+obtained from the first `imcdatasets` version.  
+
+```{r subsetting-vector-basel}
+image_sub_basel <- c("BaselTMA_SP41_257_X3Y1", "BaselTMA_SP41_166_X15Y4",
+                     "BaselTMA_SP41_153_X7Y5", "BaselTMA_SP41_58_X15Y1", 
+                     "BaselTMA_SP41_135_X8Y5", "BaselTMA_SP41_220_X10Y5", 
+                     "BaselTMA_SP41_284_X7Y2", "BaselTMA_SP41_18_X13Y5",
+                     "BaselTMA_SP41_42_X14Y5", "BaselTMA_SP41_141_X11Y2",
+                     "BaselTMA_SP41_177_X16Y5", "BaselTMA_SP41_45_X3Y3",
+                     "BaselTMA_SP41_117_X13Y3", "BaselTMA_SP41_57_X8Y6",
+                     "BaselTMA_SP41_227_X9Y6", "BaselTMA_SP41_234_X10Y6", 
+                     "BaselTMA_SP41_86_X15Y3", "BaselTMA_SP41_214_X15Y6", 
+                     "BaselTMA_SP41_237_X16Y6", "BaselTMA_SP41_61_X3Y4",
+                     "BaselTMA_SP41_186_X5Y4", "BaselTMA_SP41_38_X4Y7",
+                     "BaselTMA_SP41_114_X13Y4", "BaselTMA_SP41_11_X13Y7", 
+                     "BaselTMA_SP41_112_X5Y8", "BaselTMA_SP41_53_X6Y8", 
+                     "BaselTMA_SP41_129_X7Y8", "BaselTMA_SP41_203_X8Y8", 
+                     "BaselTMA_SP41_101_X10Y8", "BaselTMA_SP41_255_X12Y8", 
+                     "BaselTMA_SP41_267_X13Y8", "BaselTMA_SP41_48_X14Y8", 
+                     "BaselTMA_SP41_212_X1Y9", "BaselTMA_SP41_63_X4Y9", 
+                     "BaselTMA_SP42_13_X5Y8", "BaselTMA_SP42_51_X1Y2", 
+                     "BaselTMA_SP42_120_X5Y2", "BaselTMA_SP42_217_X1Y3", 
+                     "BaselTMA_SP42_10_X1Y5", "BaselTMA_SP42_160_X13Y5", 
+                     "BaselTMA_SP42_98_X11Y5", "BaselTMA_SP42_91_X11Y3", 
+                     "BaselTMA_SP42_192_X8Y5", "BaselTMA_SP42_185_X7Y5",
+                     "BaselTMA_SP42_145_X1Y4", "BaselTMA_SP42_16_X3Y4", 
+                     "BaselTMA_SP42_275_X5Y4", "BaselTMA_SP42_89_X4Y6", 
+                     "BaselTMA_SP42_56_X2Y6", "BaselTMA_SP42_130_X1Y6", 
+                     "BaselTMA_SP42_136_X9Y4", "BaselTMA_SP42_158_X12Y6", 
+                     "BaselTMA_SP42_261_X11Y6", "BaselTMA_SP42_174_X9Y6", 
+                     "BaselTMA_SP42_279_X14Y6", "BaselTMA_SP42_152_X15Y6", 
+                     "BaselTMA_SP42_176_X3Y7", "BaselTMA_SP42_99_X5Y7", 
+                     "BaselTMA_SP42_273_X6Y7", "BaselTMA_SP42_5_X8Y7", 
+                     "BaselTMA_SP42_236_X11Y7", "BaselTMA_SP42_169_X3Y8",
+                     "BaselTMA_SP42_184_X6Y8", "BaselTMA_SP42_71_X8Y8",
+                     "BaselTMA_SP42_179_X13Y8", "BaselTMA_SP42_163_X1Y9", 
+                     "BaselTMA_SP42_59_X3Y9", "BaselTMA_SP43_87_X15Y4", 
+                     "BaselTMA_SP43_142_X5Y1", "BaselTMA_SP43_17_X11Y4", 
+                     "BaselTMA_SP43_233_X13Y7", "BaselTMA_SP43_243_X13Y3", 
+                     "BaselTMA_SP43_278_X3Y2", "BaselTMA_SP43_124_X10Y8", 
+                     "BaselTMA_SP43_180_X5Y2", "BaselTMA_SP43_4_X15Y3", 
+                     "BaselTMA_SP43_118_X13Y5", "BaselTMA_SP43_119_X9Y8", 
+                     "BaselTMA_SP43_266_X7Y8", "BaselTMA_SP43_122_X12Y8", 
+                     "BaselTMA_SP43_49_X1Y5", "BaselTMA_SP43_244_X3Y1", 
+                     "BaselTMA_SP43_47_X16Y4", "BaselTMA_SP43_200_X9Y6", 
+                     "BaselTMA_SP43_90_X7Y6", "BaselTMA_SP43_147_X6Y6",
+                     "BaselTMA_SP43_207_X1Y6", "BaselTMA_SP43_93_X15Y5", 
+                     "BaselTMA_SP43_97_X16Y6", "BaselTMA_SP43_66_X15Y6", 
+                     "BaselTMA_SP43_235_X11Y2", "BaselTMA_SP43_107_X4Y7", 
+                     "BaselTMA_SP43_170_X3Y3", "BaselTMA_SP43_209_X11Y1", 
+                     "BaselTMA_SP43_50_X7Y1", "BaselTMA_SP43_43_X5Y5", 
+                     "BaselTMA_SP43_199_X8Y5", "BaselTMA_SP43_115_X4Y8", 
+                     "BaselTMA_SP43_226_X6Y9", "BaselTMA_SP43_269_X5Y9")
+```
+
+```{r subset-sce-basel}
+# Subset the Basel cohort
+sce_basel <- sce[, sce$patient_cohort == "Basel"]
+mainExpName(sce_basel) <- paste(dataset_name, "Basel", dataset_version,
+    sep = "_")
+
+# Select 100 patients based on the subsetting vector above
+sce_basel <- sce_basel[, sce_basel$image_name %in% image_sub_basel]
 ```
 
 ### Save on disk
@@ -518,8 +661,18 @@ assay(sce, "quant_norm")[assay(sce, "quant_norm") < 0] <- 0
 We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-sce}
-saveRDS(sce, file.path(outdir, "sce.rds"))
+# Full dataset
+mainExpName(sce) <- paste(dataset_name, "FULL", dataset_version, sep = "_")
+saveRDS(sce, file.path(outdir, "sce_full.rds"))
 print(sce)
+
+# Subampled Basel cohort
+saveRDS(sce_basel, file.path(outdir, "sce_basel.rds"))
+print(sce_basel)
+
+# Zurich cohort
+saveRDS(sce_zurich, file.path(outdir, "sce_zurich.rds"))
+print(sce_zurich)
 ```
 
 ### Clean up
@@ -536,83 +689,49 @@ unlink(file.path(workdir, "Cluster_labels"), recursive = TRUE)
 ```
 
 
-# **Images and cell masks**
 
-Here, we will download a subset of a hundred images from [@JacksonFischer-2020-BreastCancer], as well as the corresponding cell segmentation masks. Images and masks correspond to the data in the `SingleCellExperiment` object and will be formatted into `CytoImageList` objects.
+# **Images and masks**
 
+Here, we will download multichannel images from [@JacksonFischer-2020-BreastCancer], as well as the corresponding cell segmentation masks. Images and masks correspond to the data in the `SingleCellExperiment` object and will be formatted into `CytoImageList` objects.
 
-## Import images and masks
+## Download images and masks
 
-### Multichannel images
-
-We first download and unzip the image subset.
+We download the zip file containing images and masks.
 
 ```{r import-images, results='hide'}
 # Download images and masks
 url_images <- ("https://zenodo.org/record/4607374/files/OMEandSingleCellMasks.zip?download=1")
 importData(url_images, workdir, "OMEandSingleCellMasks.zip")
-
-# Unzip image folder
-fn <- file.path("OMEnMasks", "ome.zip")
-system2("unzip", args = c("-o", file.path(workdir, fn),
-                          "*BaselTMA_*.tiff",
-                          "-d", workdir),
-        stdout = TRUE)
-file.remove(file.path(workdir, fn))
 ```
 
-Loading all tiffs would require too much memory, so we delete all the `tiff` files that we do not want to keep. We then use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
 
-```{r load-images, results = 'hide', warning=FALSE}
-tiffs_delete <- list.files(file.path(workdir, "ome/"))
-tiffs_delete <-  tiffs_delete[!tiffs_delete %in% unique(sce$image_filename)]
-file.remove(file.path(workdir, "ome/", tiffs_delete))
+## Cell segmentation masks
 
-# Load the images as a CytoImageList object
-images <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
-```
+We will import and process cell segmentation masks to make them compatible with the `cytomapper` package.
 
-### Cell segmentation masks
+### Import masks
 
-We also unzip the associated cell segmentation masks and read them into a `CytoImageList` object.
+We unzip cell segmentation masks and read them into a `CytoImageList` object.
 
 ```{r import-masks, results='hide'}
+# Unzip
 fn <- file.path("OMEnMasks", "Basel_Zuri_masks.zip")
 system2("unzip", args = c("-o", file.path(workdir, fn),
-                          "*BaselTMA_*.tiff",
+                          "*full_maks.tiff",
                           "-d", workdir),
         stdout = TRUE)
+
+# Load all masks
+masks <- loadImages(file.path(workdir, "Basel_Zuri_masks"),
+                    pattern = "_full_maks.tiff")
+
+# Clean-up
+tiffs_delete <- list.files(file.path(workdir, "Basel_Zuri_masks"))
+file.remove(file.path(workdir, "Basel_Zuri_masks", tiffs_delete))
 file.remove(file.path(workdir, fn))
 ```
 
-```{r read-in-masks}
-masks <- loadImages(file.path(workdir, "Basel_Zuri_masks"),
-                    pattern = "_full_maks.tiff")
-```
-
-### Clean-up
-
-We remove the downloaded image and mask `tiff` files to save storage space.
-
-```{r clean-up-images-masks, results='hide'}
-images_to_delete <- list.files(file.path(workdir, "ome"),
-                               pattern = "*.tiff",
-                               full.names = TRUE)
-file.remove(images_to_delete)
-
-# Remove masks
-masks_to_delete <- list.files(file.path(workdir, "Basel_Zuri_masks"),
-                              pattern = "*.tiff",
-                              full.names = TRUE)
-file.remove(masks_to_delete)
-```
-
-
-## Prepare images and masks
-
-We will now process the images and masks to make them compatible with the `cytomapper` package.
-
-### Rescale masks
+### Rescale
 
 The masks are 16-bit images and need to be re-scaled in order to obtain integer cell ids.
 
@@ -626,18 +745,11 @@ masks <- scaleImages(masks, value = (2 ^ 16) - 1)
 range(masks[[1]])
 ```
 
-### Subset and fix masks
-
-We subset the masks to the hundred images contained in the `SingleCellExperimentObject`
-
-```{r subset-masks}
-mcols(masks)$image_filename <- gsub("_full_maks", "_full.tiff", names(masks))
-masks <- masks[mcols(masks)$image_filename %in% unique(sce$image_filename)]
-```
+### Fix cell IDs
 
 Occasionally a single-cell ID is skipped in the masks but in the single-cell data the cell numbers were renamed sequentially. Therefore, the single-cell IDs in the masks also have to renamed sequentially in order to correspond to the cell numbers from the single-cell data.
 
-```{r fix-masks}
+```{r fix-cell-ids}
 # Rename single-cell IDs sequentially in each mask
 for (n in names(masks)){
   imageData(masks[[n]]) = plyr::mapvalues(
@@ -648,64 +760,238 @@ for (n in names(masks)){
 }
 ```
 
-### Add image names and numbers
+### Add mask names
 
-Next, we add image names to the images and masks objects, these names correspond to the `image_name` column in `colData(sce)`. This information is stored in the metadata columns of the `CytoImageList` objects and is used by `cytomapper` to match single cell data, images and masks.
+Next, we add image names to masks objects, these names correspond to the 
+`image_name` column in `colData(sce)`. This information is stored in the 
+metadata columns of the `CytoImageList` objects and is used by `cytomapper` to 
+match single cell data, images and masks.
 
-```{r add-image-names}
-# Images
-mcols(images)$image_filename <- paste0(names(images), ".tiff")
-images <- images[mcols(images)$image_filename %in% sce$image_filename]
-mcols(images) <- merge(
-  mcols(images),
-  unique(colData(sce)[, c("image_filename", "image_name", "image_number")]),
-  by = "image_filename")
+```{r add-mask-names}
+names(masks) <- gsub("_full_maks", "_full.tiff", names(masks))
+mcols(masks)$image_filename <- names(masks)
+masks <- masks[names(masks) %in% sce$image_filename]
 
-# Masks
+# Add image metadata
 mcols(masks) <- merge(
   mcols(masks),
-  unique(colData(sce)[, c("image_filename", "image_name", "image_number")]),
+  unique(colData(sce)[, c(
+      "image_filename", "image_name", "image_number")]),
   by = "image_filename")
+```
 
-print(identical(mcols(masks)$image_name, mcols(images)$image_name))
-names(images) <- mcols(images)$image_name
+### Create cohort-specific subsets
+
+We create two objects containing the masks from the Basel and Zurich cohorts.
+
+We subset the masks to the hundred images contained in the
+`SingleCellExperiment` objects.
+
+```{r subset-masks-cohorts}
+# Basel cohort
+masks_basel <- masks[grep("BaselTMA", names(masks))]
+masks_basel <- masks_basel[names(masks_basel) %in% unique(
+    sce_basel$image_filename)]
+
+names(masks_basel) <- mcols(masks_basel)$image_name
+
+# Zurich cohort
+masks_zurich <- masks[grep("ZTMA", names(masks))]
+masks_zurich <- masks_zurich[names(masks_zurich) %in% unique(
+    sce_zurich$image_filename)]
+
+names(masks_zurich) <- mcols(masks_zurich)$image_name
+
+# All masks
 names(masks) <- mcols(masks)$image_name
-```
-
-### Subset channels
-
-Here, we exclude channels that are not present in the `SingleCellExperiment` object.
-
-```{r subset-channels}
-panel <- rowData(sce)
-panel <- panel[order(panel$channel), ]
-images <- getChannels(images, panel$channel)
-```
-
-### Add channel names
-
-Finally, we will add protein short names as channel names of the `images` object with , corresponding to the row names of the `SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
-
-```{r add-channel-names}
-channelNames(images) <- rownames(panel)
 ```
 
 ### Save on disk
 
-Finally, we will save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
+Finally, we will save the generated `CytoImageList` objects for uploading to `r Biocpkg("ExperimentHub")`.
 
-```{r clean-up-memory, echo=FALSE, results='hide'}
+```{r save-masks}
+# All masks
+saveRDS(masks, file.path(outdir, "masks_full.rds"))
+print(head(masks))
+remove(masks)
+
+# Basel cohort
+saveRDS(masks_basel, file.path(outdir, "masks_basel.rds"))
+print(head(masks_basel))
+
+# Zurich cohort
+saveRDS(masks_zurich, file.path(outdir, "masks_zurich.rds"))
+print(head(masks_zurich))
+```
+
+
+## Multichannel images
+
+We will import and process multichannel images to make them compatible with the `cytomapper` package.
+
+For memory space reasons, we will generate one image subset for the Basel cohort and one for the Zurich cohort. The images will be subsetted to correspond to the single cell data in the `sce_basel` and `sce_zurich` objects. We will first process images from the Basel cohort and then repeat the same steps for the Zurich cohort.
+
+### Import images
+
+We unzip images and read them into a `CytoImageList` object.
+
+```{r unzip-images-basel, results='hide'}
+fn <- file.path("OMEnMasks", "ome.zip")
+system2("unzip", args = c("-o", file.path(workdir, fn),
+                          "*BaselTMA_*.tiff",
+                          "-d", workdir),
+        stdout = TRUE)
+```
+
+Loading all tiffs would require too much memory, so we delete all the `tiff` files that we do not want to keep. We then use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
+
+```{r load-images-basel, results='hide', warning=FALSE}
+tiffs_all <- list.files(file.path(workdir, "ome/"))
+tiff_delete <- tiffs_all[!tiffs_all %in% sce_basel$image_filename]
+file.remove(file.path(workdir, "ome/", tiff_delete))
+
+# Load the images as a CytoImageList object
+images_basel <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
+file.remove(file.path(workdir, "ome/", tiffs_all))
+```
+
+### Add image names and numbers
+
+Next, we add image names to image objects, these names correspond to the 
+`image_name` column in `colData(sce)`. This information is stored in the 
+metadata columns of the `CytoImageList` objects and is used by `cytomapper` 
+to match single cell data, images and masks.
+
+```{r add-image-names-basel}
+mcols(images_basel)$image_filename <- paste0(names(images_basel), ".tiff")
+images_basel <- images_basel[
+    mcols(images_basel)$image_filename %in% sce_basel$image_filename]
+mcols(images_basel) <- merge(
+  mcols(images_basel),
+  unique(colData(sce_basel)[, c(
+      "image_filename", "image_name", "image_number")]),
+  by = "image_filename")
+```
+
+### Subset channels
+
+Here, we exclude image channels that are not present in the `SingleCellExperiment` object.
+
+```{r subset-channels-basel}
+panel <- rowData(sce)
+panel <- panel[order(panel$channel), ]
+
+images_basel <- getChannels(images_basel, panel$channel)
 gc()
 ```
 
-```{r save-masks}
-saveRDS(masks, file.path(outdir, "masks.rds"))
-print(head(masks))
+### Add channel names
+
+Finally, we will add protein short names as channel names of the `images` 
+object. These short names correspond to the row names of the 
+`SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names-basel}
+channelNames(images_basel) <- rownames(panel)
 ```
 
-```{r save-images}
-saveRDS(images, file.path(outdir, "images.rds"))
-print(head(images))
+### Check image names
+
+We make sure that image names and masks names are the same so that they can be matched with `cytomapper`.
+
+```{r check-mask-image-names-basel}
+print(identical(mcols(masks_basel)$image_name,
+                mcols(images_basel)$image_name))
+names(images_basel) <- mcols(images_basel)$image_name
+```
+
+### Save on disk
+
+Finally, we save the generated `CytoImageList` images for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-images-basel}
+saveRDS(images_basel, file.path(outdir, "images_basel.rds"))
+print(head(images_basel))
+
+remove(images_basel)
+gc()
+```
+
+### Zurich cohort
+
+To import and format images from the Zurich cohort, we perform the exact same steps as we just did for the Basel cohort.
+
+Unzip images
+
+```{r unzip-images-zurich, results='hide'}
+system2("unzip", args = c("-o", file.path(workdir, fn),
+                          "*ZTMA*.tiff",
+                          "-d", workdir),
+        stdout = TRUE)
+```
+
+Loading all tiffs would require too much memory, so we delete all the `tiff` files that we do not want to keep. We then use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
+
+```{r load-images-zurich, results='hide', warning=FALSE}
+tiffs_all <- list.files(file.path(workdir, "ome/"))
+tiff_delete <- tiffs_all[!tiffs_all %in% sce_zurich$image_filename]
+file.remove(file.path(workdir, "ome/", tiff_delete))
+
+# Load the images as a CytoImageList object
+images_zurich <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
+file.remove(file.path(workdir, "ome/", tiffs_all))
+```
+
+Next, we add image names to image objects, these names correspond to the 
+`image_name` column in `colData(sce)`. This information is stored in the 
+metadata columns of the `CytoImageList` objects and is used by `cytomapper` 
+to match single cell data, images and masks.
+
+```{r add-image-names-zurich}
+mcols(images_zurich)$image_filename <- paste0(names(images_zurich), ".tiff")
+images_zurich <- images_zurich[
+    mcols(images_zurich)$image_filename %in% sce_zurich$image_filename]
+mcols(images_zurich) <- merge(
+  mcols(images_zurich),
+  unique(colData(sce_zurich)[, c(
+      "image_filename", "image_name", "image_number")]),
+  by = "image_filename")
+```
+
+Here, we exclude image channels that are not present in the `SingleCellExperiment` object.
+
+```{r subset-channels-zurich}
+panel <- rowData(sce)
+panel <- panel[order(panel$channel), ]
+
+images_zurich <- getChannels(images_zurich, panel$channel)
+gc()
+```
+
+We add protein short names as channel names of the `images` 
+object. These short names correspond to the row names of the 
+`SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
+
+```{r add-channel-names-zurich}
+channelNames(images_zurich) <- rownames(panel)
+```
+
+We make sure that image names and masks names are the same so that they can be matched with `cytomapper`.
+
+```{r check-mask-image-names-zurich}
+print(identical(mcols(images_zurich)$image_name,
+                mcols(masks_zurich)$image_name))
+names(images_zurich) <- mcols(images_zurich)$image_name
+```
+
+Finally, we save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-images-zurich}
+saveRDS(images_zurich, file.path(outdir, "images_zurich.rds"))
+print(head(images_zurich))
+
+remove(images_zurich)
 ```
 
 ## Clean up

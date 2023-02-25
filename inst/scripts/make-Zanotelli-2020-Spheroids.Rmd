@@ -40,6 +40,7 @@ library(cytomapper)
 ```
 
 ```{r dataset-version, echo=FALSE}
+dataset_name <- "Zanotelli_2020_Spheroids"
 dataset_version <- "v1"
 cat("Dataset version:", dataset_version)
 ```
@@ -52,9 +53,11 @@ workdir <- tempdir()
 Sys.setenv(workdir = workdir)
 
 # Output directory
-outdir <- file.path(".", "Zanotelli_2020_Spheroids")
-if(!(dir.exists(outdir)))
-    dir.create(outdir)
+dataset_dir <- file.path(".", dataset_name)
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
 
 # Increase timeout period so that large files can be downloaded
 timeout <- getOption('timeout')
@@ -437,7 +440,7 @@ sce <- SingleCellExperiment(
   rowData = panel,
   colData = cell_meta
 )
-mainExpName(sce) <- "Zanotelli_2020_Spheroids"
+mainExpName(sce) <- paste(dataset_name, dataset_version, sep = "_")
 ```
 
 ### Counts transformations

@@ -9,6 +9,7 @@
 #' `masks` for cell segmentation masks. Single cell data are retrieved using 
 #' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
 #' \code{SpatialExperiment} format.
+#' @param version dataset version. By default, the latest version is returned.
 #' @param metadata if FALSE (default), the data object selected in 
 #' \code{data_type} is returned. If TRUE, only the metadata associated to this
 #' object is returned.
@@ -20,7 +21,6 @@
 #' are stored. This path needs to be defined when \code{on_disk = TRUE}.
 #' When files should only temporarily be stored on disk, please set
 #' \code{h5FilesPath = getHDF5DumpDir()}.
-#' @param version dataset version. By default, the latest version is returned.
 #' @param force logical indicating if images should be overwritten when files
 #' with the same name already exist on disk.
 #'
@@ -180,22 +180,23 @@
 #' @export
 Zanotelli_2020_Spheroids <- function (
     data_type = c("sce", "spe", "images", "masks"),
+    version = "latest",
     metadata = FALSE,
     on_disk = FALSE,
     h5FilesPath = NULL,
-    version = "latest",
     force = FALSE
 ) {
     available_versions <- c("v0", "v1")
     dataset_name <- "Zanotelli_2020_Spheroids"
     dataset_version <- ifelse(version == "latest",
         utils::tail(available_versions, n=1), version)
+    full_dataset <- FALSE
 
     .checkArguments(data_type, metadata, dataset_version, available_versions,
-        on_disk, h5FilesPath, force)
+        full_dataset, on_disk, h5FilesPath, force)
 
     cur_dat <- .loadDataObject(data_type, metadata, dataset_name,
-        dataset_version, on_disk, h5FilesPath, force)
+        dataset_version, full_dataset, on_disk, h5FilesPath, force)
 
     return(cur_dat)
 }
