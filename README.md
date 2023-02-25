@@ -130,6 +130,10 @@ respectively.
 diabetes.    
   - Documentation: [Damond_2019_Pancreas](https://bodenmillergroup.github.io/imcdatasets/reference/Damond_2019_Pancreas.html).  
   - Publication: [Damond et al. _Cell Metab_ (2019) 29(3):755-768.e5](https://doi.org/10.1016/j.cmet.2018.11.014).
+* __HochSchulz_2022_Melanoma__: Metastatic melanoma samples, including a panel
+with co-detection of protein and RNA targets.  
+  - Documentation: [HochSchulz_2022_Melanoma](https://bodenmillergroup.github.io/imcdatasets/reference/HochSchulz_2022_Melanoma.html).
+  - Publication: [Hoch, Schulz et al. _Sci Immunol_ (2022) 70(7):abk1692](https://doi.org/10.1126/sciimmunol.abk1692)
 * __JacksonFischer_2020_BreastCancer__: Tumour tissue from patients with breast
 cancer.  
   - Documentation: [JacksonFischer_2020_BreastCancer](https://bodenmillergroup.github.io/imcdatasets/reference/JacksonFischer_2020_BreastCancer.html).
@@ -138,7 +142,6 @@ cancer.
 lines.  
   - Documentation: [Zanotelli_2020_Spheroids](https://bodenmillergroup.github.io/imcdatasets/reference/Zanotelli_2020_Spheroids.html).   
   - Publication: [Zanotelli et al. _Mol Syst Biol_ (2020) 16:e9798](https://doi.org/10.15252/msb.20209798).  
-
 * __IMMUcan_2022_CancerExample__: Example data from the
 [IMMUcan](https://immucan.eu/) project.   
     - Documentation: [IMMUcan_2022_CancerExample](https://bodenmillergroup.github.io/imcdatasets/reference/IMMUcan_2022_CancerExample.html).  
@@ -167,14 +170,15 @@ Guidelines about contributions and dataset formatting are provided in a
 
 ## Citation
 
-Damond N, Eling N, Fischer J (2023). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.7.2, https://github.com/BodenmillerGroup/imcdatasets.
+Damond N, Eling N, Fischer J, Hoch T (2023). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
+R package version 1.7.3, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 
 * [Nicolas Damond](https://github.com/ndamond) (author, maintainer)  
 * [Nils Eling](https://github.com/nilseling) (contributor)  
 * [Jana Fischer](https://github.com/JanaFischer) (contributor)  
+* [Tobias Hoch](https://github.com/toobiwankenobi) (contributor)  
 
 ## References
 
