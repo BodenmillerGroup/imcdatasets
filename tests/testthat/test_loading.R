@@ -23,6 +23,7 @@ check_intersect <- function(sce, img, msk) {
 
 datasets <- list(
     "Damond_2019_Pancreas",
+    "HochSchulz_2022_Melanoma",
     "JacksonFischer_2020_BreastCancer",
     "Zanotelli_2020_Spheroids",
     "IMMUcan_2022_CancerExample"
