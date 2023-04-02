@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.3</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@ Zurich<br><a class="author_email" href="mailto:#"></a><a href="mailto:nils.eling
       </address>
                   
             <h4 data-toc-skip class="date">Created: 02 November 2020;
-Compiled: 25 February 2023</h4>
+Compiled: 2 April 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/HEAD/vignettes/imcdatasets.Rmd" class="external-link"><code>vignettes/imcdatasets.Rmd</code></a></small>
       <div class="hidden name"><code>imcdatasets.Rmd</code></div>
@@ -171,6 +171,15 @@ that enables to load the dataset.</p>
 <td align="left"><span class="citation">Damond et al. (2019)</span></td>
 </tr>
 <tr class="even">
+<td align="left"><code><a href="../reference/HochSchulz_2022_Melanoma.html">HochSchulz_2022_Melanoma()</a></code></td>
+<td align="left">Human</td>
+<td align="left">Metastatic melanoma</td>
+<td align="right">325881</td>
+<td align="right">50</td>
+<td align="right">41</td>
+<td align="left"><span class="citation">Hoch et al. (2022)</span></td>
+</tr>
+<tr class="odd">
 <td align="left"><code><a href="../reference/JacksonFischer_2020_BreastCancer.html">JacksonFischer_2020_BreastCancer()</a></code></td>
 <td align="left">Human</td>
 <td align="left">Primary breast tumour</td>
@@ -180,7 +189,7 @@ that enables to load the dataset.</p>
 <td align="left"><span class="citation">Jackson et al.
 (2020)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/Zanotelli_2020_Spheroids.html">Zanotelli_2020_Spheroids()</a></code></td>
 <td align="left">Human</td>
 <td align="left">Cell line spheroids</td>
@@ -190,7 +199,7 @@ that enables to load the dataset.</p>
 <td align="left"><span class="citation">Zanotelli et al.
 (2020)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/IMMUcan_2022_CancerExample.html">IMMUcan_2022_CancerExample()</a></code></td>
 <td align="left">Human</td>
 <td align="left">Primary tumor</td>
@@ -357,81 +366,80 @@ objects.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] imcdatasets_1.7.2           SpatialExperiment_1.9.3    </span></span>
+<span><span class="co">##  [1] imcdatasets_1.7.3           SpatialExperiment_1.9.5    </span></span>
 <span><span class="co">##  [3] cytomapper_1.11.1           EBImage_4.41.1             </span></span>
-<span><span class="co">##  [5] SingleCellExperiment_1.21.0 SummarizedExperiment_1.29.1</span></span>
+<span><span class="co">##  [5] SingleCellExperiment_1.21.1 SummarizedExperiment_1.29.1</span></span>
 <span><span class="co">##  [7] Biobase_2.59.0              GenomicRanges_1.51.4       </span></span>
-<span><span class="co">##  [9] GenomeInfoDb_1.35.13        IRanges_2.33.0             </span></span>
-<span><span class="co">## [11] S4Vectors_0.37.3            BiocGenerics_0.45.0        </span></span>
-<span><span class="co">## [13] MatrixGenerics_1.11.0       matrixStats_0.63.0         </span></span>
+<span><span class="co">##  [9] GenomeInfoDb_1.35.16        IRanges_2.33.0             </span></span>
+<span><span class="co">## [11] S4Vectors_0.37.4            BiocGenerics_0.45.3        </span></span>
+<span><span class="co">## [13] MatrixGenerics_1.11.1       matrixStats_0.63.0         </span></span>
 <span><span class="co">## [15] BiocStyle_2.27.1           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] RColorBrewer_1.1-3            rstudioapi_0.14              </span></span>
 <span><span class="co">##   [3] jsonlite_1.8.4                magrittr_2.0.3               </span></span>
-<span><span class="co">##   [5] ggbeeswarm_0.7.1              magick_2.7.3                 </span></span>
-<span><span class="co">##   [7] rmarkdown_2.20                fs_1.6.0                     </span></span>
+<span><span class="co">##   [5] ggbeeswarm_0.7.1              magick_2.7.4                 </span></span>
+<span><span class="co">##   [7] rmarkdown_2.21                fs_1.6.1                     </span></span>
 <span><span class="co">##   [9] zlibbioc_1.45.0               ragg_1.2.5                   </span></span>
-<span><span class="co">##  [11] vctrs_0.5.2                   memoise_2.0.1                </span></span>
-<span><span class="co">##  [13] DelayedMatrixStats_1.21.0     RCurl_1.98-1.9               </span></span>
-<span><span class="co">##  [15] terra_1.7-3                   svgPanZoom_0.3.4             </span></span>
-<span><span class="co">##  [17] htmltools_0.5.4               curl_5.0.0                   </span></span>
-<span><span class="co">##  [19] AnnotationHub_3.7.0           raster_3.6-14                </span></span>
-<span><span class="co">##  [21] Rhdf5lib_1.21.0               rhdf5_2.43.0                 </span></span>
+<span><span class="co">##  [11] vctrs_0.6.1                   memoise_2.0.1                </span></span>
+<span><span class="co">##  [13] DelayedMatrixStats_1.21.0     RCurl_1.98-1.12              </span></span>
+<span><span class="co">##  [15] terra_1.7-18                  svgPanZoom_0.3.4             </span></span>
+<span><span class="co">##  [17] htmltools_0.5.5               curl_5.0.0                   </span></span>
+<span><span class="co">##  [19] AnnotationHub_3.7.3           raster_3.6-20                </span></span>
+<span><span class="co">##  [21] Rhdf5lib_1.21.0               rhdf5_2.43.2                 </span></span>
 <span><span class="co">##  [23] sass_0.4.5                    bslib_0.4.2                  </span></span>
-<span><span class="co">##  [25] htmlwidgets_1.6.1             desc_1.4.2                   </span></span>
-<span><span class="co">##  [27] cachem_1.0.6                  mime_0.12                    </span></span>
+<span><span class="co">##  [25] htmlwidgets_1.6.2             desc_1.4.2                   </span></span>
+<span><span class="co">##  [27] cachem_1.0.7                  mime_0.12                    </span></span>
 <span><span class="co">##  [29] lifecycle_1.0.3               pkgconfig_2.0.3              </span></span>
 <span><span class="co">##  [31] Matrix_1.5-3                  R6_2.5.1                     </span></span>
-<span><span class="co">##  [33] fastmap_1.1.0                 GenomeInfoDbData_1.2.9       </span></span>
+<span><span class="co">##  [33] fastmap_1.1.1                 GenomeInfoDbData_1.2.10      </span></span>
 <span><span class="co">##  [35] shiny_1.7.4                   digest_0.6.31                </span></span>
-<span><span class="co">##  [37] colorspace_2.1-0              AnnotationDbi_1.61.0         </span></span>
+<span><span class="co">##  [37] colorspace_2.1-0              AnnotationDbi_1.61.2         </span></span>
 <span><span class="co">##  [39] rprojroot_2.0.3               dqrng_0.3.0                  </span></span>
-<span><span class="co">##  [41] ExperimentHub_2.7.0           textshaping_0.3.6            </span></span>
-<span><span class="co">##  [43] RSQLite_2.2.20                beachmat_2.15.0              </span></span>
+<span><span class="co">##  [41] ExperimentHub_2.7.1           textshaping_0.3.6            </span></span>
+<span><span class="co">##  [43] RSQLite_2.3.0                 beachmat_2.15.0              </span></span>
 <span><span class="co">##  [45] filelock_1.0.2                fansi_1.0.4                  </span></span>
-<span><span class="co">##  [47] nnls_1.4                      httr_1.4.4                   </span></span>
+<span><span class="co">##  [47] nnls_1.4                      httr_1.4.5                   </span></span>
 <span><span class="co">##  [49] abind_1.4-5                   compiler_4.3.0               </span></span>
 <span><span class="co">##  [51] withr_2.5.0                   bit64_4.0.5                  </span></span>
-<span><span class="co">##  [53] tiff_0.1-11                   BiocParallel_1.33.9          </span></span>
+<span><span class="co">##  [53] tiff_0.1-11                   BiocParallel_1.33.12         </span></span>
 <span><span class="co">##  [55] viridis_0.6.2                 DBI_1.1.3                    </span></span>
 <span><span class="co">##  [57] highr_0.10                    HDF5Array_1.27.0             </span></span>
 <span><span class="co">##  [59] R.utils_2.12.2                rappdirs_0.3.3               </span></span>
 <span><span class="co">##  [61] DelayedArray_0.25.0           rjson_0.2.21                 </span></span>
 <span><span class="co">##  [63] tools_4.3.0                   vipor_0.4.5                  </span></span>
 <span><span class="co">##  [65] interactiveDisplayBase_1.37.0 beeswarm_0.4.0               </span></span>
-<span><span class="co">##  [67] httpuv_1.6.8                  R.oo_1.25.0                  </span></span>
-<span><span class="co">##  [69] glue_1.6.2                    rhdf5filters_1.11.0          </span></span>
+<span><span class="co">##  [67] httpuv_1.6.9                  R.oo_1.25.0                  </span></span>
+<span><span class="co">##  [69] glue_1.6.2                    rhdf5filters_1.11.2          </span></span>
 <span><span class="co">##  [71] promises_1.2.0.1              grid_4.3.0                   </span></span>
-<span><span class="co">##  [73] generics_0.1.3                gtable_0.3.1                 </span></span>
+<span><span class="co">##  [73] generics_0.1.3                gtable_0.3.3                 </span></span>
 <span><span class="co">##  [75] R.methodsS3_1.8.2             sp_1.6-0                     </span></span>
-<span><span class="co">##  [77] utf8_1.2.2                    XVector_0.39.0               </span></span>
-<span><span class="co">##  [79] BiocVersion_3.17.1            pillar_1.8.1                 </span></span>
-<span><span class="co">##  [81] stringr_1.5.0                 limma_3.55.2                 </span></span>
-<span><span class="co">##  [83] later_1.3.0                   dplyr_1.0.10                 </span></span>
-<span><span class="co">##  [85] BiocFileCache_2.7.1           lattice_0.20-45              </span></span>
+<span><span class="co">##  [77] utf8_1.2.3                    XVector_0.39.0               </span></span>
+<span><span class="co">##  [79] BiocVersion_3.17.1            pillar_1.9.0                 </span></span>
+<span><span class="co">##  [81] stringr_1.5.0                 limma_3.55.6                 </span></span>
+<span><span class="co">##  [83] later_1.3.0                   dplyr_1.1.1                  </span></span>
+<span><span class="co">##  [85] BiocFileCache_2.7.2           lattice_0.20-45              </span></span>
 <span><span class="co">##  [87] bit_4.0.5                     tidyselect_1.2.0             </span></span>
-<span><span class="co">##  [89] locfit_1.5-9.7                Biostrings_2.67.0            </span></span>
-<span><span class="co">##  [91] scuttle_1.9.4                 knitr_1.41                   </span></span>
-<span><span class="co">##  [93] gridExtra_2.3                 bookdown_0.32                </span></span>
-<span><span class="co">##  [95] edgeR_3.41.2                  svglite_2.1.1                </span></span>
-<span><span class="co">##  [97] xfun_0.36                     shinydashboard_0.7.2         </span></span>
-<span><span class="co">##  [99] DropletUtils_1.19.2           stringi_1.7.12               </span></span>
+<span><span class="co">##  [89] locfit_1.5-9.7                Biostrings_2.67.2            </span></span>
+<span><span class="co">##  [91] scuttle_1.9.4                 knitr_1.42                   </span></span>
+<span><span class="co">##  [93] gridExtra_2.3                 bookdown_0.33                </span></span>
+<span><span class="co">##  [95] edgeR_3.41.6                  svglite_2.1.1                </span></span>
+<span><span class="co">##  [97] xfun_0.38                     shinydashboard_0.7.2         </span></span>
+<span><span class="co">##  [99] DropletUtils_1.19.3           stringi_1.7.12               </span></span>
 <span><span class="co">## [101] fftwtools_0.9-11              yaml_2.3.7                   </span></span>
-<span><span class="co">## [103] evaluate_0.20                 codetools_0.2-18             </span></span>
-<span><span class="co">## [105] tibble_3.1.8                  BiocManager_1.30.19          </span></span>
-<span><span class="co">## [107] cli_3.6.0                     xtable_1.8-4                 </span></span>
+<span><span class="co">## [103] evaluate_0.20                 codetools_0.2-19             </span></span>
+<span><span class="co">## [105] tibble_3.2.1                  BiocManager_1.30.20          </span></span>
+<span><span class="co">## [107] cli_3.6.1                     xtable_1.8-4                 </span></span>
 <span><span class="co">## [109] systemfonts_1.0.4             munsell_0.5.0                </span></span>
 <span><span class="co">## [111] jquerylib_0.1.4               Rcpp_1.0.10                  </span></span>
-<span><span class="co">## [113] dbplyr_2.3.0                  png_0.1-8                    </span></span>
+<span><span class="co">## [113] dbplyr_2.3.2                  png_0.1-8                    </span></span>
 <span><span class="co">## [115] parallel_4.3.0                ellipsis_0.3.2               </span></span>
-<span><span class="co">## [117] pkgdown_2.0.7                 ggplot2_3.4.0                </span></span>
-<span><span class="co">## [119] assertthat_0.2.1              blob_1.2.3                   </span></span>
-<span><span class="co">## [121] jpeg_0.1-10                   sparseMatrixStats_1.11.1     </span></span>
-<span><span class="co">## [123] bitops_1.0-7                  viridisLite_0.4.1            </span></span>
-<span><span class="co">## [125] scales_1.2.1                  crayon_1.5.2                 </span></span>
-<span><span class="co">## [127] purrr_1.0.1                   rlang_1.0.6                  </span></span>
-<span><span class="co">## [129] KEGGREST_1.39.0</span></span></code></pre>
+<span><span class="co">## [117] pkgdown_2.0.7                 ggplot2_3.4.1                </span></span>
+<span><span class="co">## [119] blob_1.2.4                    jpeg_0.1-10                  </span></span>
+<span><span class="co">## [121] sparseMatrixStats_1.11.1      bitops_1.0-7                 </span></span>
+<span><span class="co">## [123] viridisLite_0.4.1             scales_1.2.1                 </span></span>
+<span><span class="co">## [125] crayon_1.5.2                  purrr_1.0.1                  </span></span>
+<span><span class="co">## [127] rlang_1.1.0                   KEGGREST_1.39.0</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -448,6 +456,12 @@ Giesen, C., H. A. O. Wang, D. Schapiro, N. Zivanovic, A. Jacobs, B.
 Hattendorf, P. J. Schüffler, et al. 2014. <span>“Highly Multiplexed
 Imaging of Tumor Tissues with Subcellular Resolution by Mass
 Cytometry.”</span> <em>Nat. Methods</em> 11 (4): 417–22.
+</div>
+<div id="ref-HochSchulz-2022-Melanoma" class="csl-entry">
+Hoch, T., D. Schulz, N. Eling, M. Martinez Gomez, M. P. Levesque, and B.
+Bodenmiller. 2022. <span>“Multiplexed Imaging Mass Cytometry of the
+Chemokine Milieus in Melanoma Characterizes Features of the Response to
+Immunotherapy.”</span> <em>Sci. Immunol.</em> 70 (7): abk1692.
 </div>
 <div id="ref-JacksonFischer-2020-BreastCancer" class="csl-entry">
 Jackson, H. W., J. R. Fischer, V. R. T. Zanotelli, R. H. Ali, R.
