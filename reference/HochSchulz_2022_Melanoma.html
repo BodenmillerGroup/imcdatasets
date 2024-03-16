@@ -23,7 +23,7 @@ from 69 patients with metastatic melanoma."><!-- mathjax --><script src="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
       </span>
     </div>
 
@@ -142,53 +142,53 @@ with the same name already exist on disk.</p></dd>
     <h2>Value</h2>
     
 
-<p>A <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object with single cell data, a
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> object with single cell data, a 
-<a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing multichannel images, or a
-<a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing cell segmentation masks.</p>
+<p>A SingleCellExperiment object with single cell data, a
+SpatialExperiment object with single cell data, a 
+CytoImageList object containing multichannel images, or a
+CytoImageList object containing cell segmentation masks.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>This is an Imaging Mass Cytometry (IMC) dataset from Hoch, Schulz et al. 
 (2022):</p><ul><li><p><code>images</code> contains fifty 38-channel
-    images in the form of a <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
+    images in the form of a CytoImageList class object.</p></li>
 <li><p><code>masks</code> contains the cell segmentation
     masks associated with the images, in the form of a
-    <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
+    CytoImageList class object.</p></li>
 <li><p><code>sce</code> contains the single cell data extracted from the 
     multichannel images using the cell segmentation masks, as well as the 
     associated metadata, in the form of a 
-    <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object.</p></li>
+    SingleCellExperiment object.</p></li>
 <li><p><code>spe</code> same single cell data as for <code>sce</code>, but in the
-    <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> format.</p></li>
+    SpatialExperiment format.</p></li>
 </ul><p>All data are downloaded from ExperimentHub and cached for local re-use.</p>
 <p>Mapping between the three data objects is performed via variables located in
-their metadata columns: <code>mcols()</code> for the <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a>
-objects and <code>ColData()</code> for the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects. Mapping at the image level can be 
+their metadata columns: <code>mcols()</code> for the CytoImageList
+objects and <code>ColData()</code> for the SingleCellExperiment and 
+SpatialExperiment objects. Mapping at the image level can be 
 performed with the <code>image_name</code> or <code>image_number</code> variables. 
 Mapping between cell segmentation masks and single cell data is performed 
 with the <code>cell_number</code> variable, the values of which correspond to the 
 intensity values of the <code>masks</code> object. For practical
 examples, please refer to the "Accessing IMC datasets" vignette.</p>
-<p>The <code>assay</code> slots of the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
+<p>The <code>assay</code> slots of the SingleCellExperiment and 
+SpatialExperiment objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
 <li><p><code>exprs</code> contains arsinh-transformed counts, with cofactor 1.</p></li>
 <li><p><code>scaled_counts</code> contains scaled counts.</p></li>
 <li><p><code>scaled_exprs</code> contains scaled asinh-transformed counts.</p></li>
 </ul><p>The marker-associated metadata, including antibody information and metal 
 tags are stored in the <code>rowData</code> of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> / <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+SingleCellExperiment / SpatialExperiment 
 objects.</p>
 <p>The cell-associated metadata are stored in the <code>colData</code> of the
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+SingleCellExperiment and SpatialExperiment 
 objects. These metadata include various information about cells, milieu, 
 samples, and patients. For instance, cell types can be retrieved with 
 <code>colData(sce)$cell_type</code> and cell clusters with 
 <code>colData(sce)$cell_cluster</code>.</p>
 <p>Neighborhood information, defined here as cells that are localized next to 
 each other, is stored as a <code>SelfHits</code> object in the <code>colPairs</code> 
-slot of the <code>SingleCellExperiment</code> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+slot of the <code>SingleCellExperiment</code> and SpatialExperiment 
 objects.</p>
 <p>For more information, please refer to the Hoch, Schulz, et al. publication.</p>
 <p>Dataset versions: a <code>version</code> argument can be passed to the function to 
@@ -236,7 +236,7 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
@@ -257,9 +257,9 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-03-29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-10-24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7824</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
@@ -282,7 +282,7 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>

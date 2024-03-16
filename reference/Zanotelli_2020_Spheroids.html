@@ -20,7 +20,7 @@ spheroids generated from different cell lines."><!-- mathjax --><script src="htt
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">imcdatasets</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.7.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.1</span>
       </span>
     </div>
 
@@ -121,31 +121,31 @@ with the same name already exist on disk.</p></dd>
     <h2>Value</h2>
     
 
-<p>A <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object with single cell data, a
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> object with single cell data, a 
-<a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing multichannel images, or a
-<a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> object containing cell segmentation masks.</p>
+<p>A SingleCellExperiment object with single cell data, a
+SpatialExperiment object with single cell data, a 
+CytoImageList object containing multichannel images, or a
+CytoImageList object containing cell segmentation masks.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al. 
 (2020), consisting of three data objects:</p><ul><li><p><code>images</code> contains 517 multichannel images, each containing 51 
-    channels, in the form of a <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
+    channels, in the form of a CytoImageList class object.</p></li>
 <li><p><code>masks</code> contains the cell segmentation
     masks associated with the images, in the form of a
-    <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a> class object.</p></li>
+    CytoImageList class object.</p></li>
 <li><p><code>sce</code> contains the single cell data extracted from the 
     multichannel images using the cell segmentation masks, as well as the 
     associated metadata, in the form of a
-    <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a>. This represents a total of 229,047 
+    SingleCellExperiment. This represents a total of 229,047 
     cells x 51 channels.</p></li>
 <li><p><code>spe</code> same single cell data as for <code>sce</code>, but in the
-    <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> format.</p></li>
+    SpatialExperiment format.</p></li>
 </ul><p>All data are downloaded from ExperimentHub and cached for local re-use.</p>
 <p>Mapping between the three data objects is performed via variables located in
-their metadata columns: <code>mcols()</code> for the <a href="https://rdrr.io/pkg/cytomapper/man/CytoImageList.html" class="external-link">CytoImageList</a>
-objects and <code>ColData()</code> for the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects. Mapping at the image level can be 
+their metadata columns: <code>mcols()</code> for the CytoImageList
+objects and <code>ColData()</code> for the SingleCellExperiment and 
+SpatialExperiment objects. Mapping at the image level can be 
 performed with the <code>image_name</code> or <code>image_number</code> variables. 
 Mapping between cell segmentation masks and single cell data is performed 
 with the <code>cell_number</code> variable, the values of which correspond to the 
@@ -153,7 +153,7 @@ intensity values of the <code>masks</code> object. For practical examples, pleas
 refer to the "Accessing IMC datasets" vignette.</p>
 <p>This dataset was obtained as following (the names of the experimental
 variables, located in the <code>colData</code> of the
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+SingleCellExperiment and SpatialExperiment 
 objects, are indicated in parentheses): <em>i)</em> Cells from four different 
 cell lines (<code>cell_line</code>) were seeded at three different densities 
 (<code>treatment_concentration</code>, relative densities) and grown for either 72
@@ -180,22 +180,22 @@ the publication (https://doi.org/10.15252/msb.20209798) and to the
 original dataset repository (https://doi.org/10.5281/zenodo.4271910).</p>
 <p>The marker-associated metadata, including antibody information and metal 
 tags are stored in the <code>rowData</code> of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+SingleCellExperiment and SpatialExperiment 
 objects. The channels with names starting with "BC_" are the channels used 
 for barcoding. Post-transcriptional modification of the protein targets are 
 indicated in brackets.</p>
-<p>The <code>assay</code> slots of the <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> and 
-<a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
+<p>The <code>assay</code> slots of the SingleCellExperiment and 
+SpatialExperiment objects contain three assays:</p><ul><li><p><code>counts</code> contains raw mean ion counts per cell.</p></li>
 <li><p><code>exprs</code> contains arsinh-transformed counts, with cofactor 1.</p></li>
 <li><p><code>quant_norm</code> contains counts censored at the 99th percentile 
     and scaled 0-1.</p></li>
 </ul><p>In addition, the <code>altExp</code> slot of the 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object contains another 
-<a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a> object where the counts matrix represents
+SingleCellExperiment object contains another 
+SingleCellExperiment object where the counts matrix represents
  raw mean ion counts for cells neighboring the current cell.</p>
 <p>Neighborhood information, defined here as cells that are localized next to 
 each other, is stored as a <code>SelfHits</code> object in the <code>colPairs</code> 
-slot of the <code>SingleCellExperiment</code> and <a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html" class="external-link">SpatialExperiment</a> 
+slot of the <code>SingleCellExperiment</code> and SpatialExperiment 
 objects. Cells in the <code>SelfHits</code> 
 object are represented by unique integers that map to the 
 <code>cell_number_absolute</code> column of <code>colData(sce)</code>.</p>
@@ -231,7 +231,7 @@ cell state in 3D spheroids
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">Zanotelli_2020_Spheroids</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
@@ -250,9 +250,9 @@ cell state in 3D spheroids
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">Zanotelli_2020_Spheroids</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-03-29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2023-10-24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7731</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
@@ -273,7 +273,7 @@ cell state in 3D spheroids
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">Zanotelli_2020_Spheroids</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-03-29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2023-10-24</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>
