@@ -76,3 +76,7 @@ Changes in version 1.7.2 (2023-02-25):
 Changes in version 1.7.3 (2023-02-26):
 
 + Added HochSchulz_2022_Melanoma dataset.
+
+Changes in version 1.11.1 (2024-03-16):
+
++ Removed defunct functions
