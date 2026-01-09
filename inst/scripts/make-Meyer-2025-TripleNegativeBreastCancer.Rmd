@@ -18,7 +18,6 @@ knitr::opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE)
 knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
 ```
 
-
 # **Introduction**
 
 This script downloads single-cell data, multichannel images and cell segmentation masks from the triple-negative breast cancer Imaging Mass Cytometry (IMC) dataset described in the following publication:  
@@ -61,7 +60,6 @@ timeout <- getOption('timeout')
 options(timeout = 1000)
 ```
 
-
 # **Single cell data**
 
 We will download single-cell data corresponding from
@@ -86,7 +84,6 @@ importAndReadData <- function(url, output_dir, filename) {
   readRDS(file_path)
 }
 ```
-
 
 ## Update SingleCellExperiment
 
@@ -429,7 +426,6 @@ rowData_new <- rowData_new[, ..keep_vector]
 rownames(rowData_new) <- rowData_new$short_name
 ```
 
-
 ### assays 
 
 We adjust the `assay` slots of the `SingleCellExperiment` to match the updated `colData` and `rowData` information. 
@@ -470,7 +466,6 @@ sce_new <- SingleCellExperiment(
   colPairs = neighborhood
 )
 ```
-
 
 ### Subset
 
@@ -520,7 +515,6 @@ remove(colData, colData_new, counts, exprs, min_max, neighborhood, rowData, rowD
 We will download multichannel images and corresponding cell segmentation masks from
 [@Meyer-2025-TripleNegativeBreastCancer] from [zenodo](https://zenodo.org/records/15304181). Images and masks are stored as `CytoImageList` objects. The subsetted objects contain 125 images/masks from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication and corresponds to the subsetted `SingleCellExperiment` object. Due to memory space limitations, multichannel images for the full cohort are not available. 
 
-
 ## Download
 
 ```{r import-images-masks}
@@ -538,7 +532,6 @@ We will download multichannel images and corresponding cell segmentation masks f
 # masks <- importAndReadData(url_masks, workdir, "masks.rds")
 ```
 
-
 ```{r}
 # TODO: This chunk will be removed when record number is added
 images <- readRDS("/mnt/central_nas/tnbc_volume/TNBC/data_analysis/images_TNBC_new.rds")
@@ -554,7 +547,6 @@ images_sub <- images[mcols(images)$sample_id %in% sce_new_sub$image_name]
 images_sub <- CytoImageList(images_sub, on_disk = FALSE)
 #saveRDS(images_sub, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/images_sub.rds")
 ```
-
 
 ### mcols
 
@@ -590,16 +582,13 @@ Finally, we will save the generated `CytoImageList` objects for uploading to `r 
 # Masks and masks subset
 saveRDS(masks, file.path(outdir, "masks_full.rds"))
 print(head(masks))
-#remove(masks)
 
 saveRDS(masks_sub, file.path(outdir, "masks.rds"))
 print(head(masks_sub))
-#remove(masks_sub)
 
 # Image subset
 saveRDS(images_sub, file.path(outdir, "images.rds"))
 print(head(images_sub))
-#remove(images_sub)
 ```
 
 ## Clean up
@@ -613,12 +602,10 @@ remove(images, images_sub, masks, masks_sub, sce_new, sce_new_sub)
 options(timeout = timeout)
 ```
 
-
 # **Session information**
 
 ```{r session-info}
 sessionInfo()
 ```
-
 
 # **References**

@@ -1,24 +1,22 @@
-#' Obtain the HochSchulz_2022_Melanoma dataset
+#' Obtain the Meyer_2025_TripleNegativeBreastCancer dataset
 #'
-#' Obtain the HochSchulz_2022_Melanoma dataset, which is composed of two 
-#' panels (rna and protein) that were acquired on consecutive sections. Each 
-#' dataset (panel) is composed of three data objects: single cell data, 
-#' multichannel images and cell segmentation masks.
-#' The data was obtained by imaging mass cytometry (IMC) of a tissue microarray
-#' (TMA) with multiple cores of formalin-fixed paraffin-embedded (FFPE) tissue
-#' from 69 patients with metastatic melanoma.
+#' Obtain the Meyer_2025_TripleNegativeBreastCancer dataset. The dataset 
+#' is composed of three data objects: single cell data, multichannel images 
+#' and cell segmentation masks. The data was obtained by imaging mass cytometry 
+#' (IMC) of a tissue microarray (TMA) with multiple cores of 
+#' formalin-fixed paraffin-embedded (FFPE) tissue from 215 patients with 
+#' triple-negative breast cancer.
 #'
 #' @param data_type type of object to load, `images` for multichannel images or
 #' `masks` for cell segmentation masks. Single cell data are retrieved using 
 #' either `sce` for the \code{SingleCellExperiment} format or `spe` for the  
 #' \code{SpatialExperiment} format.
-#' @param panel which panel should be returned? Can be set to "rna" (default) 
-#' or "protein".
-#' @param full_dataset if FALSE (default), a subset corresponding to the 50 
-#' images containing the most B cells is returned. If TRUE, the full dataset 
-#' (corresponding to 166 images) is returned. Due to memory space limitations, 
-#' this option is only available for single cell data and masks, not for 
-#' \code{data_type = "images"}.
+#' @param full_dataset if FALSE (default), a subset corresponding to 
+#' to 125 images from 60 patients sampled across proposed patient groups is 
+#' returned. This includes all images visually presented in the publication.  
+#' If TRUE, the full dataset (corresponding to 450 images) is returned. 
+#' Due to memory space limitations, this option is only available for single 
+#' cell data and masks, not for \code{data_type = "images"}.
 #' @param version dataset version. By default, the latest version is returned.
 #' @param metadata if FALSE (default), the data object selected in 
 #' \code{data_type} is returned. If TRUE, only the metadata associated to this
@@ -35,10 +33,9 @@
 #' with the same name already exist on disk.
 #'
 #' @details
-#' This is an Imaging Mass Cytometry (IMC) dataset from Hoch, Schulz et al. 
-#' (2022):
+#' This is an Imaging Mass Cytometry (IMC) dataset from Meyer et al. (2025):
 #' \itemize{
-#'     \item \code{images} contains fifty 38-channel
+#'     \item \code{images} contains 125 39-channel
 #'     images in the form of a \linkS4class{CytoImageList} class object.
 #'     \item \code{masks} contains the cell segmentation
 #'     masks associated with the images, in the form of a
@@ -68,8 +65,7 @@
 #' \itemize{
 #'     \item \code{counts} contains raw mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
-#'     \item \code{scaled_counts} contains scaled counts.
-#'     \item \code{scaled_exprs} contains scaled asinh-transformed counts.
+#'     \item \code{min_max} contains 0-1 normalized .
 #' }
 #'
 #' The marker-associated metadata, including antibody information and metal 
@@ -79,17 +75,17 @@
 #'
 #' The cell-associated metadata are stored in the \code{colData} of the
 #' \linkS4class{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
-#' objects. These metadata include various information about cells, milieu, 
-#' samples, and patients. For instance, cell types can be retrieved with 
-#' \code{colData(sce)$cell_type} and cell clusters with 
-#' \code{colData(sce)$cell_cluster}. 
+#' objects. These metadata include various information about cells, tumors 
+#' and patients. For instance, cell metacluster can be retrieved with 
+#' \code{colData(sce)$cell_metacluster} and patient groups with 
+#' \code{colData(sce)$patient_patientgroup}. 
 #' 
 #' Neighborhood information, defined here as cells that are localized next to 
 #' each other, is stored as a \code{SelfHits} object in the \code{colPairs} 
 #' slot of the \code{SingleCellExperiment} and \linkS4class{SpatialExperiment} 
 #' objects.
 #'
-#' For more information, please refer to the Hoch, Schulz, et al. publication.
+#' For more information, please refer to the Meyer et al. publication.
 #' 
 #' Dataset versions: a \code{version} argument can be passed to the function to 
 #' specify which dataset version should be retrieved.
@@ -99,26 +95,16 @@
 #' 
 #' File sizes:
 #' \itemize{
-#'     \item \code{`images_rna`}: size in memory = 13.9 Gb, 
-#'     size on disk = 954 Mb.
-#'     \item \code{`masks_rna`}: size in memory = 347 Mb, 
-#'     size on disk = 11 Mb.
-#'     \item \code{`sce_rna`}: size in memory = 774 Mb, 
-#'     size on disk = 401 Mb.
-#'     \item \code{`masks_full_rna`}: size in memory = 1.1 Gb, 
-#'     size on disk = 30 Mb.
-#'     \item \code{`sce_full_rna`}: size in memory = 2.0 Gb, 
-#'     size on disk = 1.1 Gb.
-#'     \item \code{`images_protein`}: size in memory = 16.8 Gb, 
-#'     size on disk = 1.2 Gb.
-#'     \item \code{`masks_protein`}: size in memory = 374 Mb, 
-#'     size on disk = 12 Mb.
-#'     \item \code{`sce_protein`}: size in memory = 856 Mb, 
-#'     size on disk = 531 Mb.
-#'     \item \code{`masks_full_protein`}: size in memory = 1.2 Gb, 
-#'     size on disk = 35 Mb.
-#'     \item \code{`sce_full_protein`}: size in memory = 2.2 Gb, 
-#'     size on disk = 1.4 Gb.
+#'     \item \code{`images`}: size in memory = 20.9 Gb, 
+#'     size on disk = 1.6 Gb.
+#'     \item \code{`masks`}: size in memory = 269 Mb, 
+#'     size on disk = 8 Mb.
+#'     \item \code{`masks_full`}: size in memory = 942 Mb, 
+#'     size on disk = 29 Mb.
+#'     \item \code{`sce`}: size in memory = 451 Mb, 
+#'     size on disk = 241 Mb.
+#'     \item \code{`sce_full`}: size in memory = 1.6 Gb, 
+#'     size on disk = 866 Mb.
 #' }
 #'
 #' When storing images on disk, these need to be first fully read into memory
@@ -126,34 +112,34 @@
 #' is slower than directly keeping them in memory. However, downstream analysis
 #' will lose its memory overhead when storing images on disk.
 #'
-#' Original source: Hoch, Schulz et al. (2022):
-#' https://doi.org/10.1126/sciimmunol.abk1692
+#' Original source: Meyer et al. (2025):
+#' https://doi.org/10.1016/j.ccell.2025.06.019
 #'
-#' Original link to raw data: https://doi.org/10.5281/zenodo.5994136.
+#' Original link to raw data: https://zenodo.org/records/15304181.
 #'
 #' @return A \linkS4class{SingleCellExperiment} object with single cell data, a
 #' \linkS4class{SpatialExperiment} object with single cell data, a 
 #' \linkS4class{CytoImageList} object containing multichannel images, or a
 #' \linkS4class{CytoImageList} object containing cell segmentation masks.
 #'
-#' @author Nicolas Damond
+#' @author Lasse Meyer
 #'
 #' @references
-#' Hoch, Schulz et al. (2022). Multiplexed imaging mass cytometry of the 
-#' chemokine milieus in melanoma characterizes features of the response to 
-#' immunotherapy \emph{Sci Immunol} 7(70):eabk1692.
+#' Meyer, Jackson et al. (2025). A stratification system for breast cancer 
+#' based on basoluminal tumor cells and spatial tumor architecture 
+#' \emph{Cancer Cell} 43(9):1637–1655.e9.
 #'
 #' @examples
 #' # Load single cell data
-#' sce <- HochSchulz_2022_Melanoma(data_type = "sce")
+#' sce <- Meyer_2025_TripleNegativeBreastCancer(data_type = "sce")
 #' print(sce)
 #' 
 #' # Display metadata
-#' HochSchulz_2022_Melanoma(data_type = "sce", metadata = TRUE)
+#' Meyer_2025_TripleNegativeBreastCancer(data_type = "sce", metadata = TRUE)
 #' 
 #' # Load masks on disk
 #' library(HDF5Array)
-#' masks <- HochSchulz_2022_Melanoma(data_type = "masks", on_disk = TRUE,
+#' masks <- Meyer_2025_TripleNegativeBreastCancer(data_type = "masks", on_disk = TRUE,
 #' h5FilesPath = getHDF5DumpDir())
 #' print(head(masks))
 #'
@@ -168,9 +154,8 @@
 #' @importFrom DelayedArray DelayedArray
 #'
 #' @export
-HochSchulz_2022_Melanoma <- function (
+Meyer_2025_TripleNegativeBreastCancer <- function (
     data_type = c("sce", "spe", "images", "masks"),
-    panel = "rna",
     full_dataset = FALSE,
     version = "latest",
     metadata = FALSE,
@@ -178,38 +163,11 @@ HochSchulz_2022_Melanoma <- function (
     h5FilesPath = NULL,
     force = FALSE
 ) {
-    available_versions <- c("v1")
-    dataset_name <- "HochSchulz_2022_Melanoma"
-    dataset_version <- ifelse(version == "latest",
-        utils::tail(available_versions, n=1), version)
-    
-    .checkArguments(data_type, metadata, dataset_version, available_versions,
-        full_dataset, on_disk, h5FilesPath, force)
-    
-    if (!panel %in% c("rna", "protein"))
-        stop('"panel" should be either "rna" or "protein"')
-    dataset_name_panel <- paste(dataset_name, panel, sep = " - ")
-    
-    cur_dat <- .loadDataObject(data_type, metadata, dataset_name_panel,
-        dataset_version, full_dataset, on_disk, h5FilesPath, force)
-    
-    return(cur_dat)
-}
-
-IMMUcan_2022_CancerExample <- function (
-    data_type = c("sce", "spe", "images", "masks"),
-    version = "latest",
-    metadata = FALSE,
-    on_disk = FALSE,
-    h5FilesPath = NULL,
-    force = FALSE
-) {
   available_versions <- c("v1")
-  dataset_name <- "IMMUcan_2022_CancerExample"
+  dataset_name <- "Meyer_2025_TripleNegativeBreastCancer"
   dataset_version <- ifelse(version == "latest",
                             utils::tail(available_versions, n=1), version)
-  full_dataset <- FALSE
-  
+
   .checkArguments(data_type, metadata, dataset_version, available_versions,
                   full_dataset, on_disk, h5FilesPath, force)
   

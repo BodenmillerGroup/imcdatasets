@@ -119,6 +119,35 @@ df_list <- list(
         Notes = c("")
     ),
     
+    # Meyer_2025_TripleNegativeBreastCancer
+    data.frame(
+      Title = sprintf(
+        "Meyer_2025_TripleNegativeBreastCancer - %s - %s",
+        rep(c("sce", "images", "masks")),
+        rep(c("v1"), 1)),
+      FunctionCall = sprintf(
+        "Meyer_2025_TripleNegativeBreastCancer(data_type = '%s",
+        paste0(rep(c("sce'", "images'", "masks'"), 1),
+               rep(c(")"), each = 6))),
+      Description = sprintf(
+        "%s for the Meyer_2025_TripleNegativeBreastCancer IMC dataset",
+        c("Single cell data", "Multichannel images", "Cell masks")),
+      BiocVersion = rep(c("3.17"), each=6),
+      DatasetVersion = rep(c("v1"), each=3),
+      SourceUrl = "https://zenodo.org/records/15304181",
+      SourceVersion = "Jan 09 2026",
+      RDataClass = rep(c("SingleCellExperiment",
+                         rep("CytoImageList", 2)), 1),
+      RDataPath = file.path(
+        "imcdatasets", "Meyer_2025_TripleNegativeBreastCancer", "v1",
+        paste0(sprintf("%s%s%s",
+                       rep(c("sce", "images", "masks"), 2),
+                       rep(c("", "_full"), 1, each = 3), ".rds"))),
+      DataType = rep(c("sce", "images", "masks"), 1),
+      DatasetType = rep(c("matched subset", "full dataset"), 1, each = 3),
+      Notes = c("")
+    ),
+    
     # JacksonFischer_2020_BreastCancer
     data.frame(
         Title = sprintf("JacksonFischer_2020_BreastCancer%s - %s - %s%s",
