@@ -21,14 +21,11 @@ knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
 
 # **Introduction**
 
-This script downloads TODO images (around two images per patient) from 215 patients, as well as the associated single-cell data and cell segmentation masks from the triple-negative breast cancer Imaging Mass Cytometry (IMC) dataset described in the following publication:  
+This script downloads single-cell data, multichannel images and cell segmentation masks from the triple-negative breast cancer Imaging Mass Cytometry (IMC) dataset described in the following publication:  
 
 [Meyer et al. A stratification system for breast cancer based on basoluminal tumor cells and spatial tumor architecture, Cancer Cell (2025)](https://doi.org/10.1016/j.ccell.2025.06.019).  
 
-Raw data is provided on **zenodo** (IMC: <https://zenodo.org/records/10890543>, IF: <https://zenodo.org/records/10942403>, R data: <https://zenodo.org/records/15304181>) and **GEO** (scRNA-seq organoid data - GEO Series number: GSE298343). Here, we will download a [SingleCellExperiment](https://bioconductor.org/packages//SingleCellExperiment.html) object from [zenodo](https://zenodo.org/records/15304181). 
-
-We will then download the corresponding multichannel IMC images and cell segmentation masks and format them into `CytoImageList` objects using the [cytomapper](https://bioconductor.org/packages/cytomapper) package.
-
+Raw data is provided on **zenodo** (IMC: <https://zenodo.org/records/10890543>, IF: <https://zenodo.org/records/10942403>, R data: <https://zenodo.org/records/15304181>) and **GEO** (scRNA-seq organoid data - GEO Series number: GSE298343). Here, we will download [SingleCellExperiment](https://bioconductor.org/packages//SingleCellExperiment.html) and [CytoImageList](https://bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html) objects from [zenodo](https://zenodo.org/records/15304181). 
 
 # **Settings**
 
@@ -90,22 +87,24 @@ importAndReadData <- function(url, output_dir, filename) {
 }
 ```
 
-### Object download
 
-TODO: The first zip folder contains the main single-cell, sample and patient metadata. The single-cell locations and cluster labels are downloaded as separate zip folders because they were uploaded to zenodo separately at a later time point.
+## Update SingleCellExperiment
 
-```{r}
+### Download
+
+Here, we download a `SingleCellExperiment` object from zenodo that contains all single-cell, sample and patient metadata. 
+
+```{r download-sce}
 # Download SCE
+# TODO: Update record
 url_sce <- "https://zenodo.org/record/15396067/files/sce_ALL.rds?download=1"
 
 sce <- importAndReadData(url_sce, workdir, "sce_ALL.rds")
 ```
 
-## Update SingleCellExperiment
-
 ### colData
 
-```{r}
+```{r format-col}
 colData <- as.data.table(colData(sce))
 ```
 
@@ -113,7 +112,7 @@ Here, we will rename and select columns of the `colData` entry in the downloaded
 
 Columns are renamed for consistency with the other datasets.
 
-```{r}
+```{r rename-col}
 # Rename columns
 colData_new <- colData[, .(
   image_name = sample_id,        
@@ -167,7 +166,7 @@ rownames(colData_new) <- colData_new$cell_id
 
 ### rowData
 
-```{r}
+```{r format-row}
 rowData <- as.data.table(rowData(sce))
 ```
 
@@ -175,7 +174,7 @@ Here, we will rename and select columns of the `rowData` entry in the downloaded
 
 Columns are renamed for consistency with the other datasets.
 
-```{r}
+```{r rename-row}
 rowData_new <- rowData
 
 rowData_new$metal <- rowData_new$channel
@@ -433,7 +432,9 @@ rownames(rowData_new) <- rowData_new$short_name
 
 ### assays 
 
-```{r}
+We adjust the `assay` slots of the `SingleCellExperiment` to match the updated `colData` and `rowData` information. 
+
+```{r assay}
 # Raw mean ion counts per cell
 counts <- assay(sce, "counts")
 
@@ -449,14 +450,18 @@ colnames(counts) <- colnames(exprs) <- colnames(min_max) <- rownames(colData_new
 
 ### colPairs 
 
-```{r}
+We extract the `colPairs` slot of the `SingleCellExperiment` with the steinbock-based neighborhood graph. 
+
+```{r colpair}
 # steinbock based neighborhood graph based on pixel expansion
 neighborhood <- colPairs(sce)[1]
 ```
 
 ### Combine
 
-```{r}
+We generate the final `SingleCellExperiment` object.
+
+```{r final-sce}
 # Create final SCE object based on updated entries
 sce_new <- SingleCellExperiment(
   assays = list(counts = counts, exprs = exprs, min_max = min_max),
@@ -469,11 +474,9 @@ sce_new <- SingleCellExperiment(
 
 ### Subset
 
-TODO: We also save subsets of the `SingleCellExperiment` objects. 
+We also save subsets of the `SingleCellExperiment` objects. The subset corresponds to 125 images from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication. 
 
-The subset corresponds to 125 images from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication. 
-
-```{r}
+```{r subset-sce}
 # Patients selected 
 patients_keep <- c("B07.17017", "B08.40119", "B12.26323", "B06.22442", "B06.38699", 
 "B08.24635", "B09.04541", "B08.38569", "B09.09794", "B16.33745", 
@@ -492,11 +495,9 @@ patients_keep <- c("B07.17017", "B08.40119", "B12.26323", "B06.22442", "B06.3869
 sce_new_sub <- sce_new[,sce_new$patient_id %in% patients_keep]
 ```
 
-
-
 ### Save on disk 
 
-We save the `SingleCellExperiment` object for upload to `r Biocpkg("ExperimentHub")`.
+We save the `SingleCellExperiment` objects for upload to `r Biocpkg("ExperimentHub")`.
 
 ```{r save-sce}
 # Full dataset
@@ -508,312 +509,105 @@ saveRDS(sce_new_sub, file.path(outdir, "sce.rds"))
 print(sce_new_sub)
 ```
 
-
-
 ### Clean up 
 
-```{r}
+```{r clean-sce, results='hide'}
 remove(colData, colData_new, counts, exprs, min_max, neighborhood, rowData, rowData_new, sce, keep_vector, url_sce, patients_keep)
 ```
 
-
-# CONTINUE HERE 
-
 # **Images and masks**
 
-TODO Here, we will download multichannel images from [@JacksonFischer-2020-BreastCancer], as well as the corresponding cell segmentation masks. Images and masks correspond to the data in the `SingleCellExperiment` object and will be formatted into `CytoImageList` objects.
+We will download multichannel images and corresponding cell segmentation masks from
+[@Meyer-2025-TripleNegativeBreastCancer] from [zenodo](https://zenodo.org/records/15304181). Images and masks are stored as `CytoImageList` objects. The subsetted objects contain 125 images/masks from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication and corresponds to the subsetted `SingleCellExperiment` object. Due to memory space limitations, multichannel images for the full cohort are not available. 
 
-## Download images and masks
 
-We download the zip file containing images and masks.
+## Download
 
-```{r import-images, results='hide'}
-# TODO: Download images and masks
-#url_images <- ("https://zenodo.org/record/4607374/files/OMEandSingleCellMasks.zip?download=1")
-#importData(url_images, workdir, "OMEandSingleCellMasks.zip")
+```{r import-images-masks}
+# # Download image subset
+# # TODO: Add record number
+# url_images_sub <- "https://zenodo.org/record/?/files/images_sub.rds?download=1"
+# images_sub <- importAndReadData(url_images_sub, workdir, "images_sub.rds")
+# 
+# # Download masks and mask subset
+# # TODO: Add record number
+# url_masks_sub <- "https://zenodo.org/record/?/files/masks_sub.rds?download=1"
+# masks_sub <- importAndReadData(url_masks_sub, workdir, "masks_sub.rds")
+# 
+# url_masks <- "https://zenodo.org/record/?/files/masks.rds?download=1"
+# masks <- importAndReadData(url_masks, workdir, "masks.rds")
 ```
 
+
 ```{r}
+# TODO: This chunk will be removed when record number is added
 images <- readRDS("/mnt/central_nas/tnbc_volume/TNBC/data_analysis/images_TNBC_new.rds")
 masks <- readRDS("/mnt/central_nas/tnbc_volume/TNBC/data_analysis/masks_segtest_4.rds")
+
+masks <- masks[mcols(masks)$sample_id %in% sce_new$image_name]
+#saveRDS(masks, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/masks.rds")
+
+masks_sub <- masks[mcols(masks)$sample_id %in% sce_new_sub$image_name]
+#saveRDS(masks_sub, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/masks_sub.rds")
+
+images_sub <- images[mcols(images)$sample_id %in% sce_new_sub$image_name]
+images_sub <- CytoImageList(images_sub, on_disk = FALSE)
+#saveRDS(images_sub, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/images_sub.rds")
 ```
 
 
-## Cell segmentation masks
+### mcols
 
-```{r}
+We will adjust and rename the `mcols` entries of the `CytoImageList` objects for consistency with the other datasets.
 
+```{r mcols}
+mcols(images_sub)$image_name <- mcols(images_sub)$sample_id
+mcols(masks_sub)$image_name <- mcols(masks_sub)$sample_id
+mcols(masks)$image_name <- mcols(masks)$sample_id
 
-mcols(images)
+mcols(images_sub)$sample_id <- mcols(masks_sub)$sample_id <- mcols(masks)$sample_id <- NULL 
+mcols(images_sub)$PID <- mcols(masks_sub)$PID <- mcols(masks)$PID <- NULL 
 
-
-images_sub <- images[mcols(images)$sample_id %in% sce_new$image_name]
-images_sub_onDisk <- CytoImageList(images_sub, on_disk = FALSE)
-
-masks_sub <- masks[mcols(masks)$sample_id %in% sce_new$image_name]
-
-
-
-
-channelNames(images)
-
-#images_onDisk <- CytoImageList(images, on_disk = FALSE)
-
-imagesimagesTRUE
+mcols(images_sub)$patient_id <- sce_new_sub$patient_id[match(mcols(images_sub)$image_name, sce_new_sub$image_name)]
+mcols(masks_sub)$patient_id <- sce_new_sub$patient_id[match(mcols(masks_sub)$image_name, sce_new_sub$image_name)]
+mcols(masks)$patient_id <- sce_new$patient_id[match(mcols(masks)$image_name, sce_new$image_name)]
 ```
 
+### channelNames
 
+We will adjust `channelNames` of the `CytoImageList` image subset to match the `SingleCellExperiment` object.
 
-
-
-## Multichannel images 
-
-```{r}
-
+```{r channelnames}
+# Update channelNames, so they match the SCE object
+channelNames(images_sub) <- rownames(sce_new_sub)
 ```
 
-### Add mask names
-
-Next, we add image names to masks objects, these names correspond to the 
-`image_name` column in `colData(sce)`. This information is stored in the 
-metadata columns of the `CytoImageList` objects and is used by `cytomapper` to 
-match single cell data, images and masks.
-
-```{r add-mask-names}
-names(masks) <- gsub("_full_maks", "_full.tiff", names(masks))
-mcols(masks)$image_filename <- names(masks)
-masks <- masks[names(masks) %in% sce$image_filename]
-
-# Add image metadata
-mcols(masks) <- merge(
-  mcols(masks),
-  unique(colData(sce)[, c(
-      "image_filename", "image_name", "image_number")]),
-  by = "image_filename")
-```
-
-### Create cohort-specific subsets
-
-We create two objects containing the masks from the Basel and Zurich cohorts.
-
-We subset the masks to the hundred images contained in the
-`SingleCellExperiment` objects.
-
-```{r subset-masks-cohorts}
-# Basel cohort
-masks_basel <- masks[grep("BaselTMA", names(masks))]
-masks_basel <- masks_basel[names(masks_basel) %in% unique(
-    sce_basel$image_filename)]
-
-names(masks_basel) <- mcols(masks_basel)$image_name
-
-# Zurich cohort
-masks_zurich <- masks[grep("ZTMA", names(masks))]
-masks_zurich <- masks_zurich[names(masks_zurich) %in% unique(
-    sce_zurich$image_filename)]
-
-names(masks_zurich) <- mcols(masks_zurich)$image_name
-
-# All masks
-names(masks) <- mcols(masks)$image_name
-```
-
-### Save on disk
+## Save on disk
 
 Finally, we will save the generated `CytoImageList` objects for uploading to `r Biocpkg("ExperimentHub")`.
 
-```{r save-masks}
-# All masks
+```{r save-images-masks}
+# Masks and masks subset
 saveRDS(masks, file.path(outdir, "masks_full.rds"))
 print(head(masks))
-remove(masks)
+#remove(masks)
 
-# Basel cohort
-saveRDS(masks_basel, file.path(outdir, "masks_basel.rds"))
-print(head(masks_basel))
+saveRDS(masks_sub, file.path(outdir, "masks.rds"))
+print(head(masks_sub))
+#remove(masks_sub)
 
-# Zurich cohort
-saveRDS(masks_zurich, file.path(outdir, "masks_zurich.rds"))
-print(head(masks_zurich))
-```
-
-
-## Multichannel images
-
-We will import and process multichannel images to make them compatible with the `cytomapper` package.
-
-For memory space reasons, we will generate one image subset for the Basel cohort and one for the Zurich cohort. The images will be subsetted to correspond to the single cell data in the `sce_basel` and `sce_zurich` objects. We will first process images from the Basel cohort and then repeat the same steps for the Zurich cohort.
-
-### Import images
-
-We unzip images and read them into a `CytoImageList` object.
-
-```{r unzip-images-basel, results='hide'}
-fn <- file.path("OMEnMasks", "ome.zip")
-system2("unzip", args = c("-o", file.path(workdir, fn),
-                          "*BaselTMA_*.tiff",
-                          "-d", workdir),
-        stdout = TRUE)
-```
-
-Loading all tiffs would require too much memory, so we delete all the `tiff` files that we do not want to keep. We then use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
-
-```{r load-images-basel, results='hide', warning=FALSE}
-tiffs_all <- list.files(file.path(workdir, "ome/"))
-tiff_delete <- tiffs_all[!tiffs_all %in% sce_basel$image_filename]
-file.remove(file.path(workdir, "ome/", tiff_delete))
-
-# Load the images as a CytoImageList object
-images_basel <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
-file.remove(file.path(workdir, "ome/", tiffs_all))
-```
-
-### Add image names and numbers
-
-Next, we add image names to image objects, these names correspond to the 
-`image_name` column in `colData(sce)`. This information is stored in the 
-metadata columns of the `CytoImageList` objects and is used by `cytomapper` 
-to match single cell data, images and masks.
-
-```{r add-image-names-basel}
-mcols(images_basel)$image_filename <- paste0(names(images_basel), ".tiff")
-images_basel <- images_basel[
-    mcols(images_basel)$image_filename %in% sce_basel$image_filename]
-mcols(images_basel) <- merge(
-  mcols(images_basel),
-  unique(colData(sce_basel)[, c(
-      "image_filename", "image_name", "image_number")]),
-  by = "image_filename")
-```
-
-### Subset channels
-
-Here, we exclude image channels that are not present in the `SingleCellExperiment` object.
-
-```{r subset-channels-basel}
-panel <- rowData(sce)
-panel <- panel[order(panel$channel), ]
-
-images_basel <- getChannels(images_basel, panel$channel)
-gc()
-```
-
-### Add channel names
-
-Finally, we will add protein short names as channel names of the `images` 
-object. These short names correspond to the row names of the 
-`SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
-
-```{r add-channel-names-basel}
-channelNames(images_basel) <- rownames(panel)
-```
-
-### Check image names
-
-We make sure that image names and masks names are the same so that they can be matched with `cytomapper`.
-
-```{r check-mask-image-names-basel}
-print(identical(mcols(masks_basel)$image_name,
-                mcols(images_basel)$image_name))
-names(images_basel) <- mcols(images_basel)$image_name
-```
-
-### Save on disk
-
-Finally, we save the generated `CytoImageList` images for uploading to `r Biocpkg("ExperimentHub")`.
-
-```{r save-images-basel}
-saveRDS(images_basel, file.path(outdir, "images_basel.rds"))
-print(head(images_basel))
-
-remove(images_basel)
-gc()
-```
-
-### Zurich cohort
-
-To import and format images from the Zurich cohort, we perform the exact same steps as we just did for the Basel cohort.
-
-Unzip images
-
-```{r unzip-images-zurich, results='hide'}
-system2("unzip", args = c("-o", file.path(workdir, fn),
-                          "*ZTMA*.tiff",
-                          "-d", workdir),
-        stdout = TRUE)
-```
-
-Loading all tiffs would require too much memory, so we delete all the `tiff` files that we do not want to keep. We then use the `loadImages` function of the `cytomapper` package to read the images into a `CytoImageList` object.
-
-```{r load-images-zurich, results='hide', warning=FALSE}
-tiffs_all <- list.files(file.path(workdir, "ome/"))
-tiff_delete <- tiffs_all[!tiffs_all %in% sce_zurich$image_filename]
-file.remove(file.path(workdir, "ome/", tiff_delete))
-
-# Load the images as a CytoImageList object
-images_zurich <- loadImages(file.path(workdir, "ome/"), pattern = "_full.tiff")
-file.remove(file.path(workdir, "ome/", tiffs_all))
-```
-
-Next, we add image names to image objects, these names correspond to the 
-`image_name` column in `colData(sce)`. This information is stored in the 
-metadata columns of the `CytoImageList` objects and is used by `cytomapper` 
-to match single cell data, images and masks.
-
-```{r add-image-names-zurich}
-mcols(images_zurich)$image_filename <- paste0(names(images_zurich), ".tiff")
-images_zurich <- images_zurich[
-    mcols(images_zurich)$image_filename %in% sce_zurich$image_filename]
-mcols(images_zurich) <- merge(
-  mcols(images_zurich),
-  unique(colData(sce_zurich)[, c(
-      "image_filename", "image_name", "image_number")]),
-  by = "image_filename")
-```
-
-Here, we exclude image channels that are not present in the `SingleCellExperiment` object.
-
-```{r subset-channels-zurich}
-panel <- rowData(sce)
-panel <- panel[order(panel$channel), ]
-
-images_zurich <- getChannels(images_zurich, panel$channel)
-gc()
-```
-
-We add protein short names as channel names of the `images` 
-object. These short names correspond to the row names of the 
-`SingleCellExperiment` object and to the `short_name` column of `rowData(sce)`.
-
-```{r add-channel-names-zurich}
-channelNames(images_zurich) <- rownames(panel)
-```
-
-We make sure that image names and masks names are the same so that they can be matched with `cytomapper`.
-
-```{r check-mask-image-names-zurich}
-print(identical(mcols(images_zurich)$image_name,
-                mcols(masks_zurich)$image_name))
-names(images_zurich) <- mcols(images_zurich)$image_name
-```
-
-Finally, we save the generated `CytoImageList` images and masks objects for uploading to `r Biocpkg("ExperimentHub")`.
-
-```{r save-images-zurich}
-saveRDS(images_zurich, file.path(outdir, "images_zurich.rds"))
-print(head(images_zurich))
-
-remove(images_zurich)
+# Image subset
+saveRDS(images_sub, file.path(outdir, "images.rds"))
+print(head(images_sub))
+#remove(images_sub)
 ```
 
 ## Clean up
 
-Remove all files from the temporary working directory.
-
-```{r clean-up, results='hide'}
-downloaded_files <- list.files(workdir)
-downloaded_files <- downloaded_files[!downloaded_files %in% "BiocStyle"]
-unlink(file.path(workdir, downloaded_files), recursive = TRUE)
+```{r clean-rest, results='hide'}
+# Remove all environment variables
+# TODO: Remove images from this list
+remove(images, images_sub, masks, masks_sub, sce_new, sce_new_sub)
 
 # Reset original timeout value
 options(timeout = timeout)
