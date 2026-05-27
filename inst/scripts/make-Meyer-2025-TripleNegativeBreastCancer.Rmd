@@ -93,8 +93,7 @@ Here, we download a `SingleCellExperiment` object from zenodo that contains all 
 
 ```{r download-sce}
 # Download SCE
-# TODO: Update record
-url_sce <- "https://zenodo.org/record/15396067/files/sce_ALL.rds?download=1"
+url_sce <- "https://zenodo.org/record/20414755/files/sce_ALL.rds?download=1"
 
 sce <- importAndReadData(url_sce, workdir, "sce_ALL.rds")
 ```
@@ -518,34 +517,16 @@ We will download multichannel images and corresponding cell segmentation masks f
 ## Download
 
 ```{r import-images-masks}
-# # Download image subset
-# # TODO: Add record number
-# url_images_sub <- "https://zenodo.org/record/?/files/images_sub.rds?download=1"
-# images_sub <- importAndReadData(url_images_sub, workdir, "images_sub.rds")
-# 
-# # Download masks and mask subset
-# # TODO: Add record number
-# url_masks_sub <- "https://zenodo.org/record/?/files/masks_sub.rds?download=1"
-# masks_sub <- importAndReadData(url_masks_sub, workdir, "masks_sub.rds")
-# 
-# url_masks <- "https://zenodo.org/record/?/files/masks.rds?download=1"
-# masks <- importAndReadData(url_masks, workdir, "masks.rds")
-```
+# Download image subset
+url_images_sub <- "https://zenodo.org/record/20414755/files/images_sub.rds?download=1"
+images_sub <- importAndReadData(url_images_sub, workdir, "images_sub.rds")
 
-```{r}
-# TODO: This chunk will be removed when record number is added
-images <- readRDS("/mnt/central_nas/tnbc_volume/TNBC/data_analysis/images_TNBC_new.rds")
-masks <- readRDS("/mnt/central_nas/tnbc_volume/TNBC/data_analysis/masks_segtest_4.rds")
+# Download masks and mask subset
+url_masks_sub <- "https://zenodo.org/record/20414755/files/masks_sub.rds?download=1"
+masks_sub <- importAndReadData(url_masks_sub, workdir, "masks_sub.rds")
 
-masks <- masks[mcols(masks)$sample_id %in% sce_new$image_name]
-#saveRDS(masks, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/masks.rds")
-
-masks_sub <- masks[mcols(masks)$sample_id %in% sce_new_sub$image_name]
-#saveRDS(masks_sub, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/masks_sub.rds")
-
-images_sub <- images[mcols(images)$sample_id %in% sce_new_sub$image_name]
-images_sub <- CytoImageList(images_sub, on_disk = FALSE)
-#saveRDS(images_sub, "/mnt/central_nas/tnbc_volume/TNBC/data_analysis/00_final_files/OTHER/images_sub.rds")
+url_masks <- "https://zenodo.org/record/20414755/files/masks.rds?download=1"
+masks <- importAndReadData(url_masks, workdir, "masks.rds")
 ```
 
 ### mcols
@@ -595,8 +576,7 @@ print(head(images_sub))
 
 ```{r clean-rest, results='hide'}
 # Remove all environment variables
-# TODO: Remove images from this list
-remove(images, images_sub, masks, masks_sub, sce_new, sce_new_sub)
+remove(images_sub, masks, masks_sub, sce_new, sce_new_sub)
 
 # Reset original timeout value
 options(timeout = timeout)
