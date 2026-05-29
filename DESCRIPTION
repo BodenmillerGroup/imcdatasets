@@ -57,3 +57,4 @@ BugReports: https://github.com/BodenmillerGroup/imcdatasets/issues
 BiocType: ExperimentData
 RoxygenNote: 7.2.3
 Encoding: UTF-8
+Config/Bioconductor/UnsupportedPlatforms: windows
