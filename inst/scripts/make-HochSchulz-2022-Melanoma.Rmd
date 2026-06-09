@@ -76,6 +76,7 @@ url_data <- "https://zenodo.org/record/5994136/files/data_for_analysis.zip"
 zip_name <- "sceFiles"
 
 system2("curl", args = c(
+  "-L",
   "-o", 
   file.path(workdir, paste0(zip_name, ".zip")), 
   url_data,
@@ -480,6 +481,7 @@ Here, we download a subset of 50 images from the [zenodo repository](https://zen
 ```{r download-images-protein, message=FALSE}
 # Download the zipped folder image and unzip it
 system2("curl", args = c(
+  "-L",
   "-o", 
   file.path(workdir, "ImageSubset.zip"), 
   "https://zenodo.org/record/6004986/files/full_data.zip?download=1",
