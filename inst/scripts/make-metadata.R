@@ -8,7 +8,7 @@ df_base <- data.frame(
     Species = "Homo sapiens",
     TaxonomyId = 9606,
     DataProvider = "University of Zurich",
-    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>",
+    Maintainer = "Nicolas Damond <nicolas.damond@dqbm.uzh.ch>, Nathan Steenbuck <nathan.steenbuck@uzh.ch>",
     stringsAsFactors = FALSE
 )
 
@@ -37,12 +37,14 @@ df_list <- list(
         SourceVersion = "Apr 04 2020",
         RDataClass = rep(c("SingleCellExperiment",
                            rep("CytoImageList", 2)), 3),
+        LocationPrefix = rep(c("https://zenodo.org/"), 9),
         RDataPath = file.path(
-            "imcdatasets", "Damond_2019_Pancreas",
-            rep(c(rep("v1", 2), "v0"), each = 3),
+            "records", 
+            rep(c(rep("20623726", 2), "20623362"), each = 3),
+            "files",
             paste0(rep(c("sce", "images", "masks"), 3),
                    rep(c("", "_full", ""), each = 3),
-                   rep(c(".rds"), 9))),
+                   rep(c(".rds"), 9))), #v0
         DataType = rep(c("sce", "images", "masks"), 3),
         DatasetType = rep(c("matched subset", "full dataset",
                             "matched subset"), each = 3),
@@ -73,8 +75,11 @@ df_list <- list(
         SourceVersion = "Feb 07 2022",
         RDataClass = rep(c("SingleCellExperiment",
             rep("CytoImageList", 2)), 4),
-        RDataPath = file.path(
-            "imcdatasets", "HochSchulz_2022_Melanoma", "v1",
+        LocationPrefix = rep(c("https://zenodo.org/"), 12),
+        RDataPath = 
+            file.path("records",
+            "20623014",
+            "files",
             paste0(sprintf("%s%s_%s",
                 rep(c("sce", "images", "masks"), 4),
                 rep(c("", "_full"), 2, each = 3),
@@ -103,9 +108,11 @@ df_list <- list(
         SourceVersion = "Sep 14 2022",
         RDataClass = rep(c("SingleCellExperiment",
                            rep("CytoImageList", 2)), 1),
+        LocationPrefix = rep(c("https://zenodo.org/"), 3),
         RDataPath = file.path(
-            "imcdatasets", "IMMUcan_2022_CancerExample",
-            rep(c("v1"), each = 3),
+            "records",
+            "20624292",
+            "files",
             rep(c("sce.rds", "images.rds", "masks.rds"), 1)),
         DataType = rep(c("sce", "images", "masks"), 1),
         DatasetType = rep(c("matched subset"), 3),
@@ -138,9 +145,11 @@ df_list <- list(
         SourceVersion = "Nov 04 2019",
         RDataClass = rep(c("SingleCellExperiment",
                            rep("CytoImageList", 2)), 5),
+        LocationPrefix = rep(c("https://zenodo.org/"), 15),
         RDataPath = file.path(
-            "imcdatasets", "JacksonFischer_2020_BreastCancer",
-            rep(c(rep("v2", 3), "v1", "v0"), each = 3),
+            "records",
+            rep(c(rep("20621983", 3), "20621819", "20621736"), each = 3),
+            "files",
             paste0(sprintf("%s%s%s",
                            rep(c("sce", "images", "masks"), 5),
                            rep(c("_basel", "_zurich", "", "", ""), each = 3),
@@ -171,9 +180,11 @@ df_list <- list(
         SourceVersion = "Aug 20 2020",
         RDataClass = rep(c("SingleCellExperiment",
                            rep("CytoImageList", 2)), 2),
+        LocationPrefix = rep(c("https://zenodo.org/"), 6),
         RDataPath = file.path(
-            "imcdatasets", "Zanotelli_2020_Spheroids",
-            rep(c("v1", "v0"), each = 3),
+            "records",
+            rep(c("20624243", "20623997"), each = 3),
+            "files",
             rep(c("sce.rds", "images.rds", "masks.rds"), 2)),
         DataType = rep(c("sce", "images", "masks"), 2),
         DatasetType = rep(c("full and matched dataset"), 6),
