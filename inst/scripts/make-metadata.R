@@ -138,8 +138,11 @@ df_list <- list(
       SourceVersion = "Jan 09 2026",
       RDataClass = rep(c("SingleCellExperiment",
                          rep("CytoImageList", 2)), 1),
+      LocationPrefix = rep(c("https://zenodo.org/"), 3),
       RDataPath = file.path(
-        "imcdatasets", "Meyer_2025_TripleNegativeBreastCancer", "v1",
+        "records",
+        "20541924",
+        "files",
         paste0(sprintf("%s%s%s",
                        rep(c("sce", "images", "masks"), 2),
                        rep(c("", "_full"), 1, each = 3), ".rds"))),
