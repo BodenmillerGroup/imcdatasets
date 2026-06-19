@@ -122,16 +122,18 @@ df_list <- list(
     # Meyer_2025_TripleNegativeBreastCancer
     data.frame(
       Title = sprintf(
-        "Meyer_2025_TripleNegativeBreastCancer - %s - %s",
+        "Meyer_2025_TripleNegativeBreastCancer - %s - %s%s",
         rep(c("sce", "images", "masks")),
-        rep(c("v1"), 1)),
+        rep(c("v1"), 1),
+        rep(c("", " - full"), each = 3)),
       FunctionCall = sprintf(
         "Meyer_2025_TripleNegativeBreastCancer(data_type = '%s",
         paste0(rep(c("sce'", "images'", "masks'"), 1),
-               rep(c(")"), each = 6))),
+               rep(c(")", ", full_dataset = TRUE)"), 1, each = 3))),
       Description = sprintf(
-        "%s for the Meyer_2025_TripleNegativeBreastCancer IMC dataset",
-        c("Single cell data", "Multichannel images", "Cell masks")),
+        "%s (%s) for the Meyer_2025_TripleNegativeBreastCancer IMC dataset",
+        c("Single cell data", "Multichannel images", "Cell masks"),
+        rep(c("subset", "full dataset"), 1, each = 3)),
       BiocVersion = rep(c("3.23"), each=6),
       DatasetVersion = rep(c("v1"), each=3),
       SourceUrl = "https://zenodo.org/records/15304181",
