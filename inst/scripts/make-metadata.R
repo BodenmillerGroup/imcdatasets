@@ -132,7 +132,7 @@ df_list <- list(
       Description = sprintf(
         "%s for the Meyer_2025_TripleNegativeBreastCancer IMC dataset",
         c("Single cell data", "Multichannel images", "Cell masks")),
-      BiocVersion = rep(c("3.17"), each=6),
+      BiocVersion = rep(c("3.23"), each=6),
       DatasetVersion = rep(c("v1"), each=3),
       SourceUrl = "https://zenodo.org/records/15304181",
       SourceVersion = "Jan 09 2026",
