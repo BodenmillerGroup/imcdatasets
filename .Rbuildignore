@@ -1,6 +1,16 @@
+^renv$
+^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.git$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^\.github$
+^inst/extdata/Damond_2019_Pancreas$
+^inst/extdata/HochSchulz_2022_Melanoma$
+^inst/extdata/IMMUcan_2022_CancerExample$
+^inst/extdata/JacksonFischer_2020_BreastCancer$
+^inst/extdata/Meyer_2025_TripleNegativeBreastCancer$
+^inst/extdata/Zanotelli_2020_Spheroids$
+^CLAUDE\.md$
