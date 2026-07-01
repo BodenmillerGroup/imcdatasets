@@ -1,0 +1,591 @@
+---
+title: "Preparation of the Meyer et al dataset"
+author: "Lasse Meyer"
+date: "Created: 22 December 2025; Compiled: `r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('imcdatasets')`"
+output:
+  BiocStyle::html_document:
+    titlecaps: false
+    toc_float: true
+editor_options:
+  chunk_output_type: inline
+bibliography: "`r system.file('scripts', 'ref.bib', package='imcdatasets')`"
+---
+
+```{r style, echo=FALSE, results='hide', message=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_knit$set(root.dir = file.path("..", "extdata"))
+```
+
+# **Introduction**
+
+This script downloads single-cell data, multichannel images and cell segmentation masks from the triple-negative breast cancer Imaging Mass Cytometry (IMC) dataset described in the following publication:  
+
+[Meyer et al. A stratification system for breast cancer based on basoluminal tumor cells and spatial tumor architecture, Cancer Cell (2025)](https://doi.org/10.1016/j.ccell.2025.06.019).  
+
+Raw data is provided on **zenodo** (IMC: <https://zenodo.org/records/10890543>, IF: <https://zenodo.org/records/10942403>, R data: <https://zenodo.org/records/15304181>) and **GEO** (scRNA-seq organoid data - GEO Series number: GSE298343). Here, we will download [SingleCellExperiment](https://bioconductor.org/packages//SingleCellExperiment.html) and [CytoImageList](https://bioconductor.org/packages/release/bioc/vignettes/cytomapper/inst/doc/cytomapper.html) objects from [zenodo](https://zenodo.org/records/15304181). 
+
+# **Settings**
+
+```{r libraries, include = FALSE}
+library(data.table)
+library(S4Vectors)
+library(SingleCellExperiment)
+library(cytomapper)
+```
+
+```{r dataset-version, echo=FALSE}
+dataset_name <- "Meyer_2025_TripleNegativeBreastCancer"
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
+```
+
+Setting the working and output directories
+
+```{r directories}
+# Temporary directory to unzip files
+workdir <- tempdir()
+Sys.setenv(workdir = workdir)
+
+# Output directory
+dataset_dir <- file.path(".", dataset_name)
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
+
+# Increase timeout period so that large files can be downloaded
+timeout <- getOption('timeout')
+options(timeout = 1000)
+```
+
+# **Single cell data**
+
+We will download single-cell data corresponding from
+[@Meyer-2025-TripleNegativeBreastCancer] from 
+[zenodo](https://zenodo.org/records/15304181).
+
+## Download SingleCellExperiment object
+
+### Import function
+
+Function to download and read RDS files.
+
+```{r import-function}
+importAndReadData <- function(url, output_dir, filename) {
+  # Create full path
+  file_path <- file.path(output_dir, filename)
+  
+  # Download the RDS file
+  download.file(url, destfile = file_path, mode = "wb")
+  
+  # Read and return the RDS object
+  readRDS(file_path)
+}
+```
+
+## Update SingleCellExperiment
+
+### Download
+
+Here, we download a `SingleCellExperiment` object from zenodo that contains all single-cell, sample and patient metadata. 
+
+```{r download-sce}
+# Download SCE
+url_sce <- "https://zenodo.org/record/20414755/files/sce_ALL.rds?download=1"
+
+sce <- importAndReadData(url_sce, workdir, "sce_ALL.rds")
+```
+
+### colData
+
+```{r format-col}
+colData <- as.data.table(colData(sce))
+```
+
+Here, we will rename and select columns of the `colData` entry in the downloaded `SingleCellExperiment` object, which will constitute the final version. 
+
+Columns are renamed for consistency with the other datasets.
+
+```{r rename-col}
+# Rename columns
+colData_new <- colData[, .(
+  image_name = sample_id,        
+  image_width = width_px,
+  image_height = height_px,
+  image_TMA_number = TMANr,
+  image_n = n_samples, 
+  image_tissue_area = tissue_area,
+  
+  cell_number = ObjectNumber,
+  cell_id = cell_id,
+  cell_x = Pos_X,
+  cell_y = Pos_Y,
+  cell_area = area,
+  cell_major_axis_length = major_axis_length,
+  cell_minor_axis_length = minor_axis_length,
+  cell_eccentricity = eccentricity,
+  cell_n_neighbors = n_neighbors,
+  cell_category_tumor_nontumor = analysis_cat,
+  cell_metacluster = metacluster_combined,
+  cell_CD8Tcell_spatialpattern = CD8Tcell_type,
+  cell_Bcell_patch = patch_B_cell,
+  cell_Ki67_status = GMM_Ki67,
+  
+  patient_id = PID,
+  patient_age = age,
+  patient_age_bin = age_bin,
+  patient_OS_status = status_OS,
+  patient_OS_months = OS_months,
+  patient_DFS_status = status_DFS,
+  patient_DFS_months = DFS_months,
+  patient_pretreatment = pretreatment,
+  patient_Bcell_score = B_cell_score,
+  patient_CD8Tcell_spatialgroup = spatial_CD8_pheno,
+  patient_CK5CK7_group = CK5_7_group_name,
+  patient_patientgroup = BL_CD8_group_merg,
+  patient_riskgroup = PID_group_risk,
+  
+  tumor_size_cm = tumor_size_cm,
+  tumor_grade = grade,
+  tumor_PTNM_T = pT,
+  tumor_PTNM_T_simple = pT_simple, 
+  tumor_PTNM_N = pN,
+  tumor_PTNM_N_simple = pN_simple,
+  tumor_PTNM_M = pM,
+  tumor_PTNM_M_simple = pM_simple
+)]
+
+rownames(colData_new) <- colData_new$cell_id
+```
+
+### rowData
+
+```{r format-row}
+rowData <- as.data.table(rowData(sce))
+```
+
+Here, we will rename and select columns of the `rowData` entry in the downloaded `SingleCellExperiment` object, which will constitute the final version. 
+
+Columns are renamed for consistency with the other datasets.
+
+```{r rename-row}
+rowData_new <- rowData
+
+rowData_new$metal <- rowData_new$channel
+rowData_new$channel <- rownames(rowData_new)
+rowData_new$channel_ilastik <- rowData_new$ilastik
+rowData_new$channel_deepcell <- rowData_new$deepcell
+rowData_new$channel_astir <- rowData_new$use_astir
+rowData_new$channel_cluster_TME <- rowData_new$TME_cluster_channel
+rowData_new$channel_cluster_tumor <- rowData_new$tumor_cluster_channel
+rowData_new$channel_cluster_combined <- rowData_new$cluster_channel_combined
+
+# Update metal and protein info
+rowData_new[clean_target == "HistoneH3", `:=` (
+  name = "Histone H3", 
+  full_name = "Histone H3",
+  short_name = "H3"
+  )]
+
+rowData_new[clean_target == "H3K27me3", `:=`(
+  name = "H3K27me3",
+  full_name = "trimethyl-Histone H3 [K27]",
+  short_name = "trime_H3"
+  )]
+
+rowData_new[clean_target == "CK5", `:=`(
+  name = "CK5",
+  full_name = "Cytokeratin 5",
+  short_name = "CK5"
+  )]
+
+rowData_new[clean_target == "Fibronectin", `:=`(
+  name = "Fibronectin",
+  full_name = "Fibronectin",
+  short_name = "Fibronectin"
+  )]
+
+rowData_new[clean_target == "HLADR", `:=`(
+  name = "HLADR",
+  full_name = "HLADR",
+  short_name = "HLADR"
+  )]
+
+rowData_new[clean_target == "CK8_18", `:=`(
+  name = "CK8/18",
+  full_name = "Cytokeratin 8/18",
+  short_name = "CK8_18"
+  )]
+
+rowData_new[clean_target == "CD15", `:=`(
+  name = "CD15",
+  full_name = "CD15",
+  short_name = "CD15"
+  )]
+
+rowData_new[clean_target == "CD68", `:=`(
+  name = "CD68",
+  full_name = "CD68",
+  short_name = "CD68"
+  )]
+
+rowData_new[clean_target == "KRT14", `:=`(
+  name = "CK14",
+  full_name = "Cytokeratin 14",
+  short_name = "CK14"
+  )]
+
+rowData_new[clean_target == "SMA", `:=`(
+  name = "SMA",
+  full_name = "Smooth muscle actin",
+  short_name = "SMA"
+  )]
+
+rowData_new[clean_target == "Vimentin", `:=`(
+  name = "Vimentin",
+  full_name = "Vimentin",
+  short_name = "Vimentin"
+  )]
+
+rowData_new[clean_target == "cMYC", `:=`(
+  name = "cMYC",
+  full_name = "cMYC",
+  short_name = "cMYC"
+  )]
+
+rowData_new[clean_target == "HER2", `:=`(
+  name = "HER2",
+  full_name = "Epidermal growth factor receptor-2",
+  short_name = "HER2"
+  )]
+
+rowData_new[clean_target == "CD3", `:=`(
+  name = "CD3",
+  full_name = "CD3",
+  short_name = "CD3"
+  )]
+
+rowData_new[clean_target == "pH3", `:=`(
+  name = "p-H3",
+  full_name = "phospho-Histone H3 [S28]",
+  short_name = "p_H3"
+  )]
+
+rowData_new[clean_target == "CD11c", `:=`(
+  name = "CD11c",
+  full_name = "CD11c",
+  short_name = "CD11c"
+  )]
+
+rowData_new[clean_target == "Bcl2", `:=`(
+  name = "Bcl2",
+  full_name = "Bcl2",
+  short_name = "Bcl2"
+  )]
+
+rowData_new[clean_target == "ER", `:=`(
+  name = "ER",
+  full_name = "Estrogen receptor",
+  short_name = "ER"
+  )]
+
+rowData_new[clean_target == "PR", `:=`(
+  name = "PR",
+  full_name = "Progesterone receptor",
+  short_name = "PR"
+  )]
+
+rowData_new[clean_target == "p53", `:=`(
+  name = "p53",
+  full_name = "p53",
+  short_name = "p53"
+  )]
+
+rowData_new[clean_target == "CD44", `:=`(
+  name = "CD44",
+  full_name = "CD44",
+  short_name = "CD44"
+  )]
+
+rowData_new[clean_target == "AR", `:=`(
+  name = "AR",
+  full_name = "Androgen receptor",
+  short_name = "AR"
+  )]
+
+rowData_new[clean_target == "CD45", `:=`(
+  name = "CD45",
+  full_name = "CD45",
+  short_name = "CD45"
+  )]
+
+rowData_new[clean_target == "GATA3", `:=`(
+  name = "GATA3",
+  full_name = "GATA3",
+  short_name = "GATA3"
+  )]
+
+rowData_new[clean_target == "CD20", `:=`(
+  name = "CD20",
+  full_name = "CD20",
+  short_name = "CD20"
+  )]
+
+rowData_new[clean_target == "CD8a", `:=`(
+  name = "CD8a",
+  full_name = "CD8 alpha",
+  short_name = "CD8a"
+  )]
+
+rowData_new[clean_target == "CAIX", `:=`(
+  name = "CAIX",
+  full_name = "Carbonic anhydrase IX",
+  short_name = "CA9"
+  )]
+
+rowData_new[clean_target == "Ecad", `:=`(
+  name = "Ecad",
+  full_name = "E-Cadherin/P-Cadherin",
+  short_name = "Ecad"
+  )]
+
+rowData_new[clean_target == "Ki67", `:=`(
+  name = "Ki67",
+  full_name = "Ki67",
+  short_name = "Ki67"
+  )]
+
+rowData_new[clean_target == "EGFR", `:=`(
+  name = "EGFR",
+  full_name = "Epidermal growth factor receptor",
+  short_name = "EGFR"
+  )]
+
+rowData_new[clean_target == "S6", `:=`(
+  name = "p-S6",
+  full_name = "phospho-S6 [S235/S236]",
+  short_name = "p_S6"
+  )]
+
+rowData_new[clean_target == "CD4", `:=`(
+  name = "CD4",
+  full_name = "CD4",
+  short_name = "CD4"
+  )]
+
+rowData_new[clean_target == "CD31_vWF", `:=`(
+  name = "CD31/vWF",
+  full_name = "CD31 + von Willebrand factor",
+  short_name = "CD31_vWF"
+  )]
+
+rowData_new[clean_target == "p_mTOR", `:=`(
+  name = "p-mTOR",
+  full_name = "phospho-mTOR [S2448]",
+  short_name = "p_mTOR"
+  )]
+
+rowData_new[clean_target == "CK7", `:=`(
+  name = "CK7",
+  full_name = "Cytokeratin 7",
+  short_name = "CK7"
+  )]
+
+rowData_new[clean_target == "panCK", `:=`(
+  name = "panCK",
+  full_name = "Pan-cytokeratin",
+  short_name = "panCK"
+  )]
+
+rowData_new[clean_target == "c_Cas3_PARP", `:=`(
+  name = "cCas3/PARP",
+  full_name = "cleaved-Caspase3 + cleaved-PARP",
+  short_name = "cCASP3_cPARP"
+  )]
+
+rowData_new[clean_target == "DNA_1", `:=`(
+  name = "DNA1",
+  full_name = "Iridium 191",
+  short_name = "DNA1"
+  )]
+
+rowData_new[clean_target == "DNA_2", `:=`(
+  name = "DNA2",
+  full_name = "Iridium 193",
+  short_name = "DNA2"
+  )]
+
+# Keep specific columns
+keep_vector <- c("channel", "metal", "name", "full_name", "short_name", "channel_ilastik", "channel_deepcell", "channel_astir", "channel_cluster_TME", "channel_cluster_tumor", "channel_cluster_combined")
+
+rowData_new <- rowData_new[, ..keep_vector]
+
+rownames(rowData_new) <- rowData_new$short_name
+```
+
+### assays 
+
+We adjust the `assay` slots of the `SingleCellExperiment` to match the updated `colData` and `rowData` information. 
+
+```{r assay}
+# Raw mean ion counts per cell
+counts <- assay(sce, "counts")
+
+# Arcsinh-transformed counts (cofactor of 1)
+exprs <- assay(sce, "exprs")
+
+# Min-max normalized arcsinh-transformed counts
+min_max <- assay(sce, "min_max")
+
+rownames(counts) <- rownames(exprs) <- rownames(min_max) <- rownames(rowData_new)
+colnames(counts) <- colnames(exprs) <- colnames(min_max) <- rownames(colData_new)
+```
+
+### colPairs 
+
+We extract the `colPairs` slot of the `SingleCellExperiment` with the steinbock-based neighborhood graph. 
+
+```{r colpair}
+# steinbock based neighborhood graph based on pixel expansion
+neighborhood <- colPairs(sce)[1]
+```
+
+### Combine
+
+We generate the final `SingleCellExperiment` object.
+
+```{r final-sce}
+# Create final SCE object based on updated entries
+sce_new <- SingleCellExperiment(
+  assays = list(counts = counts, exprs = exprs, min_max = min_max),
+  rowData = rowData_new,
+  colData = colData_new,
+  colPairs = neighborhood
+)
+```
+
+### Subset
+
+We also save subsets of the `SingleCellExperiment` objects. The subset corresponds to 125 images from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication. 
+
+```{r subset-sce}
+# Patients selected 
+patients_keep <- c("B07.17017", "B08.40119", "B12.26323", "B06.22442", "B06.38699", 
+"B08.24635", "B09.04541", "B08.38569", "B09.09794", "B16.33745", 
+"B09.30766", "B12.01576", "B06.11749", "B08.36428", "B11.17149", 
+"B13.59896", "B07.11296", "B12.15315", "B07.22827", "B09.42460", 
+"B05.41292", "B10.59762", "B16.21103", "B12.39340", "B08.28600", 
+"B05.34236", "B06.25613", "B10.23573", "B12.05893", "B07.47034", 
+"B12.35711", "B16.78991", "B17.15400", "B12.04518", "B07.29298", 
+"B11.03307", "B07.45135", "B10.34352", "B06.02565", "B10.18650", 
+"B10.03716", "B14.30715", "B08.33039", "B16.74059", "B07.41959", 
+"B10.46561", "B08.42871", "B16.23579", "B10.02341", "B13.06581", 
+"B10.45389", "B10.21451", "B17.16725", "B09.18572", "B12.50460", 
+"B13.06577", "B07.08412", "B15.54100", "B08.07613", "B11.57286"
+)
+
+sce_new_sub <- sce_new[,sce_new$patient_id %in% patients_keep]
+```
+
+### Save on disk 
+
+We save the `SingleCellExperiment` objects for upload to `r Biocpkg("ExperimentHub")`.
+
+```{r save-sce}
+# Full dataset
+saveRDS(sce_new, file.path(outdir, "sce_full.rds"))
+print(sce_new)
+
+# Subset
+saveRDS(sce_new_sub, file.path(outdir, "sce.rds"))
+print(sce_new_sub)
+```
+
+### Clean up 
+
+```{r clean-sce, results='hide'}
+remove(colData, colData_new, counts, exprs, min_max, neighborhood, rowData, rowData_new, sce, keep_vector, url_sce, patients_keep)
+```
+
+# **Images and masks**
+
+We will download multichannel images and corresponding cell segmentation masks from
+[@Meyer-2025-TripleNegativeBreastCancer] from [zenodo](https://zenodo.org/records/15304181). Images and masks are stored as `CytoImageList` objects. The subsetted objects contain 125 images/masks from 60 patients sampled across proposed patient groups. This includes all images visually presented in the publication and corresponds to the subsetted `SingleCellExperiment` object. Due to memory space limitations, multichannel images for the full cohort are not available. 
+
+## Download
+
+```{r import-images-masks}
+# Download image subset
+url_images_sub <- "https://zenodo.org/record/20414755/files/images_sub.rds?download=1"
+images_sub <- importAndReadData(url_images_sub, workdir, "images_sub.rds")
+
+# Download masks and mask subset
+url_masks_sub <- "https://zenodo.org/record/20414755/files/masks_sub.rds?download=1"
+masks_sub <- importAndReadData(url_masks_sub, workdir, "masks_sub.rds")
+
+url_masks <- "https://zenodo.org/record/20414755/files/masks.rds?download=1"
+masks <- importAndReadData(url_masks, workdir, "masks.rds")
+```
+
+### mcols
+
+We will adjust and rename the `mcols` entries of the `CytoImageList` objects for consistency with the other datasets.
+
+```{r mcols}
+mcols(images_sub)$image_name <- mcols(images_sub)$sample_id
+mcols(masks_sub)$image_name <- mcols(masks_sub)$sample_id
+mcols(masks)$image_name <- mcols(masks)$sample_id
+
+mcols(images_sub)$sample_id <- mcols(masks_sub)$sample_id <- mcols(masks)$sample_id <- NULL 
+mcols(images_sub)$PID <- mcols(masks_sub)$PID <- mcols(masks)$PID <- NULL 
+
+mcols(images_sub)$patient_id <- sce_new_sub$patient_id[match(mcols(images_sub)$image_name, sce_new_sub$image_name)]
+mcols(masks_sub)$patient_id <- sce_new_sub$patient_id[match(mcols(masks_sub)$image_name, sce_new_sub$image_name)]
+mcols(masks)$patient_id <- sce_new$patient_id[match(mcols(masks)$image_name, sce_new$image_name)]
+```
+
+### channelNames
+
+We will adjust `channelNames` of the `CytoImageList` image subset to match the `SingleCellExperiment` object.
+
+```{r channelnames}
+# Update channelNames, so they match the SCE object
+channelNames(images_sub) <- rownames(sce_new_sub)
+```
+
+## Save on disk
+
+Finally, we will save the generated `CytoImageList` objects for uploading to `r Biocpkg("ExperimentHub")`.
+
+```{r save-images-masks}
+# Masks and masks subset
+saveRDS(masks, file.path(outdir, "masks_full.rds"))
+print(head(masks))
+
+saveRDS(masks_sub, file.path(outdir, "masks.rds"))
+print(head(masks_sub))
+
+# Image subset
+saveRDS(images_sub, file.path(outdir, "images.rds"))
+print(head(images_sub))
+```
+
+## Clean up
+
+```{r clean-rest, results='hide'}
+# Remove all environment variables
+remove(images_sub, masks, masks_sub, sce_new, sce_new_sub)
+
+# Reset original timeout value
+options(timeout = timeout)
+```
+
+# **Session information**
+
+```{r session-info}
+sessionInfo()
+```
+
+# **References**

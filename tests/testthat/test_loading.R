@@ -26,7 +26,8 @@ datasets <- list(
     "HochSchulz_2022_Melanoma",
     "JacksonFischer_2020_BreastCancer",
     "Zanotelli_2020_Spheroids",
-    "IMMUcan_2022_CancerExample"
+    "IMMUcan_2022_CancerExample",
+    "Meyer_2025_TripleNegativeBreastCancer"
 )
 
 testDatasetWorks <- function(x) {
