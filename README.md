@@ -22,13 +22,13 @@ workflows. The data objects are hosted on Bioconductor's
 ### Release version
 
 The [release version](https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html)
-of `imcdatasets` requires *R* version >= 4.3 and *Bioconductor* version >= 3.18.  
+of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.23.  
 
 The current release of *Bioconductor* should be installed:
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install(version = "3.18")
+BiocManager::install(version = "3.23")
 ```
 Then, `imcdatasets` can be installed from *Bioconductor*:
 ```{r}
@@ -38,7 +38,7 @@ BiocManager::install("imcdatasets")
 ### Development version
 
 The [development version](https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html)
-of `imcdatasets` requires *R* version >= 4.4 and *Bioconductor* version >= 3.19.  
+of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.24.  
 
 The development version of *Bioconductor* should be installed:
 ```{r}
@@ -115,7 +115,7 @@ data can be associated to segmentation masks.
 The three data objects can be mapped using the _image names_ contained in the
 metadata of each object. Details are available in the vignette (see above).
 
-For more information about the `SingleCellExperiment`, `SpatialCellExperiment`,
+For more information about the `SingleCellExperiment`, `SpatialExperiment`,
 and `CytoImageList` objects, please refer to the
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment),
 [SpatialExperiment](https://bioconductor.org/packages/SpatialExperiment),
