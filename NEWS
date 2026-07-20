@@ -81,7 +81,7 @@ Changes in version 1.11.1 (2024-03-16):
 
 + Removed defunct functions
 
-Changes in version 1.11.2 (2026-06-29):
+Changes in version 1.21.2 (2026-06-29):
 
 + Datasets are now stored on Zenodo instead of Bioconductor AWS lake.
 + Added Meyer_2025_TripleNegativeBreastCancer dataset.

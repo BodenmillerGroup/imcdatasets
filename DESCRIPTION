@@ -26,7 +26,7 @@ Authors@R:
 License: GPL-3 + file LICENSE
 NeedsCompilation: no
 Depends:
-    R (>= 4.4.0),
+    R (>= 4.6.0),
     SingleCellExperiment,
     SpatialExperiment,
     cytomapper,

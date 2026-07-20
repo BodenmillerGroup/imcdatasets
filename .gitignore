@@ -4,6 +4,13 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rprofile
+.Renviron
+CLAUDE.md
+renv.lock
+.claude
+..Rcheck
+renv
 *.zip
 *.rds
 *.tiff
