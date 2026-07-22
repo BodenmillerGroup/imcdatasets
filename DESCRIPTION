@@ -55,7 +55,9 @@ biocViews:
     ReproducibleResearch,
     Tissue
 VignetteBuilder: knitr
-URL: https://github.com/BodenmillerGroup/imcdatasets
+URL:
+    https://github.com/BodenmillerGroup/imcdatasets,
+    https://bodenmillergroup.github.io/imcdatasets/
 BugReports: https://github.com/BodenmillerGroup/imcdatasets/issues
 BiocType: ExperimentData
 Encoding: UTF-8

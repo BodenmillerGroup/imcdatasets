@@ -174,7 +174,7 @@ Guidelines about contributions and dataset formatting are provided in a
 ## Citation
 
 Damond N, Steenbuck N, Eling N, Fischer J, Hoch T, Meyer L (2026). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.11.2, https://github.com/BodenmillerGroup/imcdatasets.
+R package version 1.21.2, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 
