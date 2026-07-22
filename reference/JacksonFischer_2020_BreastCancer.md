@@ -196,8 +196,10 @@ Nicolas Damond
 ``` r
 # Load single cell data
 sce <- JacksonFischer_2020_BreastCancer(data_type = "sce")
-#> snapshotDate(): 2026-07-16
 #> see ?imcdatasets and browseVignettes('imcdatasets') for documentation
+#> downloading 1 resources
+#> retrieving 1 resource
+#> 
 #> loading from cache
 print(sce)
 #> class: SingleCellExperiment 
@@ -214,9 +216,8 @@ print(sce)
 
 # Display metadata
 JacksonFischer_2020_BreastCancer(data_type = "sce", metadata = TRUE)
-#> snapshotDate(): 2026-07-16
 #> ExperimentHub with 1 record
-#> # snapshotDate(): 2026-07-16
+#> # snapshotDate(): 2026-04-21
 #> # names(): EH7834
 #> # package(): imcdatasets
 #> # $dataprovider: University of Zurich
@@ -239,8 +240,10 @@ JacksonFischer_2020_BreastCancer(data_type = "sce", metadata = TRUE)
 library(HDF5Array)
 masks <- JacksonFischer_2020_BreastCancer(data_type = "masks", on_disk = 
 TRUE, h5FilesPath = getHDF5DumpDir())
-#> snapshotDate(): 2026-07-16
 #> see ?imcdatasets and browseVignettes('imcdatasets') for documentation
+#> downloading 1 resources
+#> retrieving 1 resource
+#> 
 #> loading from cache
 print(head(masks))
 #> CytoImageList containing 6 image(s)

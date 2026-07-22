@@ -45,7 +45,7 @@ from 69 patients with metastatic melanoma."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Obtain the HochSchulz_2022_Melanoma dataset</h1>
-      <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/HEAD/R/HochSchulz_2022_Melanoma.R" class="external-link"><code>R/HochSchulz_2022_Melanoma.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/add-github-actions/R/HochSchulz_2022_Melanoma.R" class="external-link"><code>R/HochSchulz_2022_Melanoma.R</code></a></small>
       <div class="d-none name"><code>HochSchulz_2022_Melanoma.Rd</code></div>
     </div>
 
@@ -222,8 +222,10 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> downloading 1 resources</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> retrieving 1 resource</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> class: SingleCellExperiment </span>
@@ -243,9 +245,8 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2026-07-16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2026-04-21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH7824</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
@@ -268,8 +269,10 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">HochSchulz_2022_Melanoma</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> downloading 1 resources</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> retrieving 1 resource</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CytoImageList containing 6 image(s)</span>
@@ -287,7 +290,7 @@ immunotherapy <em>Sci Immunol</em> 7(70):eabk1692.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -174,59 +174,20 @@ Lasse Meyer
 ``` r
 # Load single cell data
 sce <- Meyer_2025_TripleNegativeBreastCancer(data_type = "sce")
-#> snapshotDate(): 2026-07-16
-#> see ?imcdatasets and browseVignettes('imcdatasets') for documentation
-#> loading from cache
+#> Error in .local(x, i, j = j, ...): 'i' must be length 1
 print(sce)
-#> class: SingleCellExperiment 
-#> dim: 39 257680 
-#> metadata(0):
-#> assays(3): counts exprs min_max
-#> rownames(39): H3 trime_H3 ... DNA1 DNA2
-#> rowData names(11): channel metal ... channel_cluster_tumor
-#>   channel_cluster_combined
-#> colnames(257680): ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42_1
-#>   ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42_2 ...
-#>   ZTMA249.3_ZTMA249_ID_99_AX3Y13_321_1552
-#>   ZTMA249.3_ZTMA249_ID_99_AX3Y13_321_1553
-#> colData names(41): image_name image_width ... tumor_PTNM_M
-#>   tumor_PTNM_M_simple
-#> reducedDimNames(0):
-#> mainExpName: NULL
-#> altExpNames(0):
+#> Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'print': object 'sce' not found
 
 # Display metadata
 Meyer_2025_TripleNegativeBreastCancer(data_type = "sce", metadata = TRUE)
-#> snapshotDate(): 2026-07-16
-#> ExperimentHub with 1 record
-#> # snapshotDate(): 2026-07-16
-#> # names(): EH10436
-#> # package(): imcdatasets
-#> # $dataprovider: University of Zurich
-#> # $species: Homo sapiens
-#> # $rdataclass: SingleCellExperiment
-#> # $rdatadateadded: 2026-06-25
-#> # $title: Meyer_2025_TripleNegativeBreastCancer - sce - v1
-#> # $description: Single cell data (subset) for the Meyer_2025_TripleNegativeB...
-#> # $taxonomyid: 9606
-#> # $genome: NA
-#> # $sourcetype: Zip
-#> # $sourceurl: https://zenodo.org/records/15304181
-#> # $sourcesize: NA
-#> # $tags: c("Homo_sapiens_Data", "ImmunoOncologyData",
-#> #   "ReproducibleResearch", "SingleCellData", "SpatialData",
-#> #   "TechnologyData", "Tissue") 
-#> # retrieve record with 'object[["EH10436"]]' 
+#> ExperimentHub with 0 records
+#> # snapshotDate(): 2026-04-21
 
 # Load masks on disk
 library(HDF5Array)
 masks <- Meyer_2025_TripleNegativeBreastCancer(data_type = "masks", on_disk = TRUE,
 h5FilesPath = getHDF5DumpDir())
-#> snapshotDate(): 2026-07-16
-#> see ?imcdatasets and browseVignettes('imcdatasets') for documentation
-#> loading from cache
+#> Error in .local(x, i, j = j, ...): 'i' must be length 1
 print(head(masks))
-#> CytoImageList containing 6 image(s)
-#> names(6): ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42 ZTMA174.1_ZTMA174_B06.11749_6_AX6Y1_81 ZTMA174.1_ZTMA174_B06.25613_11_AX3Y2_56 ZTMA174.1_ZTMA174_B06.25613_12_AX4Y2_13 ZTMA174.1_ZTMA174_B06.38699_14_AX6Y2_36 ZTMA174.1_ZTMA174_B07.08412_19_AX3Y3_46 
-#> Each image contains 1 channel
+#> Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'print': error in evaluating the argument 'x' in selecting a method for function 'head': object 'masks' not found
 ```

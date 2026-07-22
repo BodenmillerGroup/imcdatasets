@@ -43,7 +43,7 @@ triple-negative breast cancer."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Obtain the Meyer_2025_TripleNegativeBreastCancer dataset</h1>
-      <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/HEAD/R/Meyer_2025_TripleNegativeBreastCancer.R" class="external-link"><code>R/Meyer_2025_TripleNegativeBreastCancer.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/BodenmillerGroup/imcdatasets/blob/add-github-actions/R/Meyer_2025_TripleNegativeBreastCancer.R" class="external-link"><code>R/Meyer_2025_TripleNegativeBreastCancer.R</code></a></small>
       <div class="d-none name"><code>Meyer_2025_TripleNegativeBreastCancer.Rd</code></div>
     </div>
 
@@ -202,61 +202,22 @@ based on basoluminal tumor cells and spatial tumor architecture
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load single cell data</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">Meyer_2025_TripleNegativeBreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(x, i, j = j, ...):</span> 'i' must be length 1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class: SingleCellExperiment </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 39 257680 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> assays(3): counts exprs min_max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(39): H3 trime_H3 ... DNA1 DNA2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(11): channel metal ... channel_cluster_tumor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   channel_cluster_combined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(257680): ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42_1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42_2 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ZTMA249.3_ZTMA249_ID_99_AX3Y13_321_1552</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ZTMA249.3_ZTMA249_ID_99_AX3Y13_321_1553</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(41): image_name image_width ... tumor_PTNM_M</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   tumor_PTNM_M_simple</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'print': object 'sce' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Display metadata</span></span></span>
 <span class="r-in"><span><span class="fu">Meyer_2025_TripleNegativeBreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"sce"</span>, metadata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 1 record</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2026-07-16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # names(): EH10436</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # package(): imcdatasets</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $dataprovider: University of Zurich</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $species: Homo sapiens</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $rdataclass: SingleCellExperiment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $rdatadateadded: 2026-06-25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $title: Meyer_2025_TripleNegativeBreastCancer - sce - v1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $description: Single cell data (subset) for the Meyer_2025_TripleNegativeB...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $taxonomyid: 9606</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $genome: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $sourcetype: Zip</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $sourceurl: https://zenodo.org/records/15304181</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $sourcesize: NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # $tags: c("Homo_sapiens_Data", "ImmunoOncologyData",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> #   "ReproducibleResearch", "SingleCellData", "SpatialData",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> #   "TechnologyData", "Tissue") </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # retrieve record with 'object[["EH10436"]]' </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ExperimentHub with 0 records</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # snapshotDate(): 2026-04-21</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load masks on disk</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">masks</span> <span class="op">&lt;-</span> <span class="fu">Meyer_2025_TripleNegativeBreastCancer</span><span class="op">(</span>data_type <span class="op">=</span> <span class="st">"masks"</span>, on_disk <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>h5FilesPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/HDF5Array/man/dump-management.html" class="external-link">getHDF5DumpDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> snapshotDate(): 2026-07-16</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> see ?imcdatasets and browseVignettes('imcdatasets') for documentation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> loading from cache</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .local(x, i, j = j, ...):</span> 'i' must be length 1</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">masks</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CytoImageList containing 6 image(s)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> names(6): ZTMA174.1_ZTMA174_B06.02565_3_AX3Y1_42 ZTMA174.1_ZTMA174_B06.11749_6_AX6Y1_81 ZTMA174.1_ZTMA174_B06.25613_11_AX3Y2_56 ZTMA174.1_ZTMA174_B06.25613_12_AX4Y2_13 ZTMA174.1_ZTMA174_B06.38699_14_AX6Y2_36 ZTMA174.1_ZTMA174_B07.08412_19_AX3Y3_46 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Each image contains 1 channel</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'print': error in evaluating the argument 'x' in selecting a method for function 'head': object 'masks' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -269,7 +230,7 @@ based on basoluminal tumor cells and spatial tumor architecture
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

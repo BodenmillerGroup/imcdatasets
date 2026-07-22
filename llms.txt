@@ -168,7 +168,7 @@ vignette](https://bodenmillergroup.github.io/imcdatasets/articles/Guidelines_Con
 
 Damond N, Steenbuck N, Eling N, Fischer J, Hoch T, Meyer L (2026).
 *imcdatasets: Collection of publicly available imaging mass cytometry
-(IMC) datasets.* R package version 1.11.2,
+(IMC) datasets.* R package version 1.21.2,
 <https://github.com/BodenmillerGroup/imcdatasets>.
 
 ## Authors
