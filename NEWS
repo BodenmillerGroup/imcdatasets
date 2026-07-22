@@ -1,87 +1,90 @@
-Changes in version 0.1.0 (2020-11-02):
+# imcdatasets 1.21.3
 
-+ Initial commit
-+ Creation of the imcdatasets package
-+ Added data from Damond et al (2019) Cell Metab 29(3):755-768
++ Added the `SteenbuckDamond_2026_T1D` dataset.
 
-Changes in version 0.99.0 (2020-11-12):
+# imcdatasets 1.21.2
 
-+ Extended vignette
-+ Added function documentation
-+ Added dataset documentation
-+ Formatted the package for Bioconductor submission
+* Datasets are now stored on Zenodo instead of the Bioconductor AWS lake.
+* Added the `Meyer_2025_TripleNegativeBreastCancer` dataset.
 
-Changes in version 0.99.6 (2021-03-23):
+# imcdatasets 1.11.1
 
-+ Added data from Jackson, Fischer et al (2020) Nature 578:615–620
+* Removed defunct functions.
 
-Changes in version 0.99.7 (2021-03-24):
+# imcdatasets 1.7.3
 
-+ Improved documentation
-+ pkgdown website
+* Added the `HochSchulz_2022_Melanoma` dataset.
 
-Changes in version 0.99.8 (2021-04-15):
+# imcdatasets 1.7.2
 
-+ Allow on disk storage of images and masks
+* Added the `IMMUcan_2022_CancerExample` dataset.
+* Used the `IMMUcan_2022_CancerExample` dataset in the vignette.
 
-Changes in version 0.99.9 (2021-04-20):
+# imcdatasets 1.7.1
 
-+ Added data from Zanotelli et al (2020) Mol Syst Biol 16:e9798
+* Added the full dataset (masks and single-cell data) for `JacksonFischer_2020_BreastCancer`.
+* Added the "Zurich" cohort for the `JacksonFischt.
+* Added full datasets (masks and single-cell data) for the `Damond_2019_Pancreas` dataset.
+* Made deprecated functions (`DamondPancreas2019Da`, and `ZanotelliSpheroids2020Data`) defunct.
 
-Changes in version 1.0.0 (2021-05-19):
+# imcdatasets 1.5.4
 
-+ First release version in Bioconductor
+* Added the possibility to retrieve single cell data in the SpatialExperiment format.
 
-Changes in version 1.1.1 (2021-05-25):
+# imcdatasets 1.5.3
 
-+ Added documentation (dataset list in README, print out examples in help pages)
+* Updated all datasets to have consistent object formatting.
+* Added dataset versioning.
+* Added new dataset-loading functions and deprecated the old ones.
+* Added a new vignette with guidelines for contribution and dataset formatting.
 
-Changes in version 1.4.1 (2022-06-29):
+# imcdatasets 1.5.2
 
-+ Added deprecation note for .onLoad functions
+* Updated wrapper functions.
+* Updated test functions.
+* Updated biocViews and documentation.
+* Added a `LICENSE` file.
 
-Changes in version 1.5.2 (2022-07-04):
+# imcdatasets 1.4.1
 
-+ Updated wrapper functions
-+ Updated test functions
-+ Updated BiocViews and documentation
-+ Added LICENSE file
+* Added a deprecation note for `.onLoad` functio
 
-Changes in version 1.5.3 (2022-10-19):
+# imcdatasets 1.1.1
 
-+ Updated all datasets to have consistent object formatting.
-+ Added dataset versioning.
-+ Added new dataset loading functions and deprecated the old ones.
-+ New vignette with guidelines for contribution and dataset formatting.
+* Added documentation (dataset list in `README`,es).
 
-Changes in version 1.5.4 (2022-10-21):
+# imcdatasets 1.0.0
 
-+ Possibility to retrieve single cell data in the SpatialExperiment format.
+* First release version in Bioconductor.
 
-Changes in version 1.7.1 (2023-01-31):
+# imcdatasets 0.99.9
 
-+ Added full dataset (masks and single cell data) for the JacksonFischer
-dataset.
-+ Added "Zurich" cohort for the JacksonFischer dataset.
-+ Added full datasets (masks and single cell data) for the Damond... dataset.
-+ Make deprecated functions (`DamondPancreas2019Data`,
-`JacksonFischer2020Data`, and `ZanotelliSpheroids2020Data`) defunct.
+* Added data from Zanotelli et al. (2020) *Mol Syst Biol* 16:e9798
 
-Changes in version 1.7.2 (2023-02-25):
+# imcdatasets 0.99.8
 
-+ Added IMMUcan_2022_CancerExample dataset.
-+ Using the IMMUcan_2022_CancerExample dataset in the vignette.
+* Allowed on-disk storage of images and masks.
+
+# imcdatasets 0.99.7
+
+* Improved documentation.
+* Added a pkgdown website.
+
+# imcdatasets 0.99.6
+
+* Added data from Jackson, Fischer et al. (2020) *Nature* 578:615-620.
+
+# imcdatasets 0.99.0
+
+* Extended the vignette.
+* Added function documentation.
+* Added dataset documentation.
+* Formatted the package for Bioconductor submiss
+
+# imcdatasets 0.1.0
+
+* Initial commit.
+* Created the imcdatasets package.
+* Added data from Damond et al. (2019) *Cell Met* 29(3):755-768
 
 
-Changes in version 1.7.3 (2023-02-26):
-
-+ Added HochSchulz_2022_Melanoma dataset.
-
-Changes in version 1.11.1 (2024-03-16):
-
-+ Removed defunct functions
-
-Changes in version 1.21.2 (2026-06-29):
-
-+ Datasets are now stored on Zenodo instead of Bioconductor AWS lake.
-+ Added Meyer_2025_TripleNegativeBreastCancer dataset.

@@ -1,0 +1,754 @@
+
+# **Single cell data**
+
+# **Introduction**
+
+This script downloads single-cell data, multichannel images and cell segmentation masks from a  
+ Imaging Mass Cytometry (IMC) dataset investigating type 1 diabetes pathogenesis.
+[Steenbuck, Damond et al. Imaging mass cytometry reveals functional and immunological changes during type 1 diabetes progression in human pancreata, Nature Metabolism, 2026](https://doi.org/10.1038/s42255-026-01559-z).  
+
+In the study, we acquired one Islet panel and Immune panel.
+IMC data is provided on **Zenodo** and spread across multiple repositories, see below for details: 
+- SingleCellExperiment objects containing single-cell data and metadata + cell segmentation masks: https://zenodo.org/records/14968076
+- Images: Islet: https://zenodo.org/records/15919088 + Immune: https://zenodo.org/records/15074971
+
+# **Settings**
+
+```{r libraries, include = FALSE}
+library(BiocStyle)
+library(data.table)
+library(S4Vectors)
+library(SingleCellExperiment)
+library(cytomapper)
+library(ExperimentHub)
+```
+
+```{r dataset-version, echo=FALSE}
+dataset_name <- "SteenbuckDamond_2026_Pancreas"
+dataset_version <- "v1"
+cat("Dataset version:", dataset_version)
+```
+
+Setting the working and output directories
+
+```{r directories}
+# Temporary directory to unzip files
+# workdir <- tempdir()
+# workdir <- setwd("/mnt/central_nas/projects/type1_diabetes/nathan/T1D_Vol")
+workdir <- getwd()
+Sys.setenv(workdir = workdir)
+
+# Output directory
+dataset_dir <- file.path(".", dataset_name)
+if(!(dir.exists(dataset_dir))) dir.create(dataset_dir)
+
+outdir <- file.path(dataset_dir, dataset_version)
+if(!(dir.exists(outdir))) dir.create(outdir)
+
+# Increase timeout period so that large files can be downloaded
+timeout <- getOption('timeout')
+options(timeout = 1000)
+```
+
+# **Single cell data**
+
+We will download single-cell data corresponding to
+[@SteenbuckDamond_2026_Pancreas] from 
+[Zenodo](https://zenodo.org/records/14968076).
+
+## Download SpatialExperimentobjects
+
+Here, we download `SpatialExperiment` objects from zenodo that contain all single-cell, sample and patient metadata.
+Per panel, we download one `SpatialExperiment` object. 
+
+### Import function
+
+Function to download and read RDS files.
+
+```{r import-function}
+importAndReadData <- function(url, output_dir, filename) {
+  # Create full path
+  file_path <- file.path(output_dir, filename)
+  
+  # Download the RDS file
+  if (!file.exists(file_path)) {
+    download.file(url, destfile = file_path, mode = "wb")
+  }
+  
+  # Read and return the RDS object
+  readRDS(file_path)
+}
+```
+
+### Download SCEs
+
+```{r download-sce}
+# Download SCE.
+url_sce_islet <- "https://zenodo.org/records/14968076/files/spe_Islet_full.rds"
+url_sce_immune <- "https://zenodo.org/records/14968076/files/spe_Immune_full.rds"
+
+url_sces <- c(url_sce_islet, url_sce_immune)
+names(url_sces) <- c("Islet", "Immune")
+sce_list <- purrr::imap(url_sces, function(url, name) importAndReadData(url, workdir, paste0("sce_", name, ".rds")))
+```
+
+Remove remaining Pancreatitis images.
+
+```{r remove-pancreatitis}
+sce_list[[1]] <- sce_list[[1]][, sce_list[[1]]$donor_type != "Pancreatitis"]
+sce_list[[2]] <- sce_list[[2]][, sce_list[[2]]$donor_type != "Pancreatitis"]
+```
+
+## colData
+
+The colData entry of the SingleCellExperiment object is a DataFrame that contains observation metadata; 
+i.e., cells, slides, tissue, patients, …. 
+It is recommended that all column names have a prefix that indicates the level of observation 
+(e.g. cell_, slide_ , tissue_, patient_, tumor_).
+
+The following columns are required:
+- `image_name` and/or `image_number`: unique image (ablated ROI) name, respectively number. Should map to the image_name/image_number column(s) in the metadata of the images and masks objects.
+- `cell_number`: integer representing cell numbers. Should map to the values of cell segmentation masks.
+- `cell_id`: a unique cell identifier defined as {image_number _ cell_number} (e.g., 7_138).
+- `cell_x` and `cell_y`: position of the cell centroid on the image. These columns are used as SpatialCoords when converting to a SpatialExperiment object.
+- In addition, colnames(sce) should be set as colData(sce)$cell_id.
+
+```{r format-col}
+colData_list <- lapply(sce_list, function(sce) data.table::as.data.table(colData(sce)))
+colData_list
+```
+ 
+### colData: Patient-level metadata
+
+-> ADD patient_ prefix to all patient-level metadata columns.
+```{r coldata-patient-level}
+# Add patient_ prefix to patient-level metadata columns
+patient_columns <- c("case_id", "batch", "donor_type", "case_number",
+                     "number_of_AAbs", "GADA", "IA2A", "mIAA", "ZnT8A", 
+                     "age", "diabetes_duration", "gender", "race", "BMI", "HbA1c", "C_peptide",
+                     "age_group", "age_years", "height_cm", "weight_kg", 
+                     "transit_time_minutes", "ICU_time_days", "cause_of_death", 
+                     "case_recovery_type", "drug_use", "class_weight") 
+
+# check that all patient-specific columns are present:
+lapply(colData_list, function(dt) {
+  missing_columns <- setdiff(patient_columns, colnames(dt))
+  if(length(missing_columns) > 0) {
+    warning(paste("Missing patient-level metadata columns in colData:", paste(missing_columns, collapse = ", ")))
+  }
+})
+
+colData_list <- lapply(colData_list, function(dt) {
+  data.table::setnames(dt, old = patient_columns, new = paste0("patient_", patient_columns))
+})
+```
+
+### colData: cell-level metadata
+
+Split into 4 categories:
+- cell-level metadata columns that should be kept as is (e.g. cell_area)
+- cell-level metadata columns that should be renamed with a cell_ prefix (e.g. pseudotime_beta -> cell_pseudotime_beta).
+- cell-level metadata columns that should be added (cell_x + cell_y).
+- cell-level metadata columns that should be removed from colData (e.g. Pheno1_fastMNN_case_id etc.).
+
+```{r coldata-cell-level}
+cell_columns_present <- c("cell_area", "cell_number", "cell_major_axis_length", "cell_minor_axis_length", 
+                          "cell_eccentricity", "cell_id", "cell_type", "cell_category")
+
+cell_columns_to_rename <- c("pseudotime_beta", "distance_to_islet", "periislet", "islet_closest", "islet_parent")
+
+cell_columns_to_add <- c("cell_x", "cell_y")
+
+cell_column_to_remove <-c("...1", "Pheno1_fastMNN_case_id", "Leiden1_fastMNN_case_id", "Pheno1_harmony_batch",            
+                          "Leiden1_harmony_batch", "Pheno1_scaled", "Leiden1_scaled", 
+                          "CellType_Pheno1_scaled", "CellType_Pheno1_fastMNN_case_id", 
+                          "CellType_Pheno1_harmony_batch", "CellType_Leiden1_scaled", 
+                          "CellType_Leiden1_harmony_batch", "CellType_Leiden1_fastMNN_case_id",
+                          "Leiden2_scaled", "Pheno2_scaled", 
+                          "Leiden2_fastMNN_case_id", "Pheno2_fastMNN_case_id", 
+                          "CellType_Pheno2_scaled", "CellType_Pheno2_fastMNN_case_id", 
+                          "CellType_Leiden2_scaled", "CellType_Leiden2_fastMNN_case_id")
+
+
+# Check if cell columns are present. 
+# Note: distance_to_islet + periislet only in Immune panel and pseudotime_beta only in Islet panel.
+lapply(colData_list, function(dt) {
+  missing_columns <- setdiff(c(cell_columns_present, cell_columns_to_rename), colnames(dt))
+  if(length(missing_columns) > 0) {
+    warning(paste("Missing cell-level metadata columns in colData:", paste(missing_columns, collapse = ", ")))
+  }
+})
+
+# RENAME: Add cell_ prefix to specified columns
+colData_list <- lapply(colData_list, function(dt) {
+  data.table::setnames(dt, old = cell_columns_to_rename, new = paste0("cell_", cell_columns_to_rename), skip_absent = TRUE)
+})
+
+# ADD: write colPairs$cell_x and cell_y to colData.
+colData_list <- lapply(seq_along(colData_list), function(x) {
+  dt <- colData_list[[x]]
+  if(!("cell_x" %in% colnames(dt)) && "cell_x" %in% colnames(SpatialExperiment::spatialCoords(sce_list[[x]]))) {
+    dt[, cell_x := SpatialExperiment::spatialCoords(sce_list[[x]])[, "cell_x"]]
+  }
+  if(!("cell_y" %in% colnames(dt)) && "cell_y" %in% colnames(SpatialExperiment::spatialCoords(sce_list[[x]]))) {
+    dt[, cell_y := SpatialExperiment::spatialCoords(sce_list[[x]])[, "cell_y"]]
+  }
+  return(dt)
+})
+
+# REMOVE: columns that should not be included in colData
+# NOTE: these partially do not exist in colData_list[["Immune"]].
+colData_list <- lapply(colData_list, function(dt) {
+  dt[, (cell_column_to_remove) := NULL]
+  return(dt)
+})
+```
+
+### colData: image-level metadata
+
+- as-is columns:
+- rename columns.
+
+```{r coldata-image-level}
+image_columns_present <- c("image_x", "image_y", "image_number", "image_fullname", "image_id")
+image_columns_to_rename <- c("image_width_px" = "width_px", "image_height_px" = "height_px", "image_name" = "sample_id")
+
+# Check if image columns are present
+lapply(colData_list, function(dt) {
+  missing_columns <- setdiff(c(image_columns_present, image_columns_to_rename), colnames(dt))
+  if(length(missing_columns) > 0) {
+    warning(paste("Missing image-level metadata columns in colData:", paste(missing_columns, collapse = ", ")))
+  }
+})
+
+# Rename specified columns
+colData_list <- lapply(colData_list, function(dt) {
+  data.table::setnames(dt, old = image_columns_to_rename, new = names(image_columns_to_rename))
+})
+```
+
+Others + Islet:
+- islet_area
+- islet_y
+- islet_x
+- islet_eccentricity
+- islet_major_axis_length
+- islet_minor_axis_length
+- islet_id
+- panel
+-> Leave as is.
+
+### Final check:
+
+Check that required columns are present in colData and that colnames(sce) is set as colData(sce)$cell_id.
+```{r image-names-colData}
+# Check that all required columns are present in colData
+required_columns <- c("image_name", "cell_number", "cell_id", "cell_x", "cell_y")
+# check for colData_list
+lapply(colData_list, function(dt) {
+  missing_columns <- setdiff(required_columns, colnames(dt))
+  if(length(missing_columns) > 0) {
+    stop(paste("Missing required columns in colData:", paste(missing_columns, collapse = ", ")))
+  }
+})
+
+# Write the updated colData back to the SCE objects
+for(i in seq_along(sce_list)) {
+  colData(sce_list[[i]]) <- DataFrame(colData_list[[i]])
+  # check that colnames(sce) is set as colData(sce)$cell_id
+  if(!all(colnames(sce_list[[i]]) == colData(sce_list[[i]])$cell_id)) {
+    stop("colnames(sce) must be set as colData(sce)$cell_id")
+  }
+}
+```
+
+### Add missing information:
+
+#### ICI vs IDIs.
+Select ICI/IDIs on Islet panel and write to both colDatas.
+ICI = Insulin-containing Islets (= contains beta-cells).
+IDI = Insulin-deficient Islet (= contains beta-cells).
+
+```{r ici_idis}
+ici_ids <- colData(sce_list[[1]]) |> 
+  tibble::as_tibble() |> 
+  dplyr::select(image_id, cell_type, patient_donor_type, islet_id, cell_islet_closest, cell_distance_to_islet) |>
+  dplyr::filter(cell_type == "Beta") |> 
+  dplyr::filter(cell_distance_to_islet >= 0) |>
+  dplyr::distinct(image_id) |> 
+  dplyr::pull(image_id)
+
+immune_ici_ids <- gsub("Islet", "Immune", ici_ids)
+sce_list[[1]]$image_ici_idi <- ifelse(sce_list[[1]]$image_id %in% ici_ids, "ICI", "IDI")
+sce_list[[2]]$image_ici_idi <- ifelse(sce_list[[2]]$image_id %in% immune_ici_ids, "ICI", "IDI")
+```
+
+#### Insulitic ROIs.
+Select Insulitic Images on Immune panel and write to both colDatas.
+
+```{r insulitic-rois}
+insulitic_ids <- colData(sce_list[[2]]) |> 
+  tibble::as_tibble() |> 
+  dplyr::select(image_id, cell_type, patient_donor_type, islet_id, cell_islet_closest, cell_distance_to_islet) |>
+  dplyr::filter(cell_type %in% c("T_DN", "T_CD8", "T_CD4")) |> 
+  dplyr::filter(cell_distance_to_islet >= -5) |>
+  dplyr::count(patient_donor_type, image_id, cell_islet_closest) |> 
+  dplyr::arrange(desc(n)) |> 
+  dplyr::filter(n >= 6) |> 
+  dplyr::distinct(image_id) |> 
+  dplyr::pull(image_id)
+
+(head(insulitic_ids)); (length(insulitic_ids))
+islet_insulitic <- gsub("Immune", "Islet", insulitic_ids)
+
+sce_list[[1]]$image_insulitic <- ifelse(sce_list[[1]]$image_id %in% islet_insulitic, "Insulitic", "NonInsulitic")
+sce_list[[2]]$image_insulitic <- ifelse(sce_list[[2]]$image_id %in% insulitic_ids, "Insulitic", "NonInsulitic")
+```
+
+## colPairs
+
+Neighborhood information, such as a list of cells that are localized next to each other, can be stored as a SelfHits object in the colPair slot of the SingleCellExperiment object.
+-> Done.
+
+```{r}
+(colPairs(sce_list[[1]]))
+(colPairs(sce_list[[2]]))
+```
+
+## rowData
+
+The rowData entry of the SingleCellExperiment is a DataFrame that contains marker (protein, RNA, probe) information.
+
+The following columns are required in the rowData entry:
+- `channel`: a unique integer that maps to the channels of the associated multichannel images.
+  - Rename 1:47
+- `metal`: the metal isotope used for detection, formatted as { ChemicalSymbol IsotopeMass} (e.g., Y89, In115, Yb176, Bi209).
+- `name`: marker name used in the publication that describes the dataset.
+- `full_name`: full marker name.
+- `short_name`: abbreviated marker name, preferably following the official UniProt nomenclature.
+
+For the `full_name` and `short_name` columns, the following guidelines apply:
+- In `short_name`, all dashes, dots and spaces should removed or replaced with underscores.
+
+For post-translationally modified proteins:
+- Prefix the `full_name` with the modification type (e.g., phospho-, methyl-) and suffix it with the modified aminoacids (e.g., [S28]).
+- Prefix the `short_name` with an abbreviation of the modification type (e.g., p_, me_) 
+and do not indicate the modified aminoacids, unless there is a possible confusion with another target in the dataset.
+
+```{r}
+rowData(sce_list[[1]])[, "channel"] <- 1:nrow(rowData(sce_list[[1]]))
+# Edit PTMs and other marker names in rowData of the SCE objects.
+rowData(sce_list[[1]])["ERN1", "short_name"] <- "p_IRE1a"
+rowData(sce_list[[1]])["ERN1", "name"] <- "p-IRE1-alpha"
+rowData(sce_list[[1]])["HBP", "name"] <- "Hyaluronic-Acid"
+rowData(sce_list[[1]])["PDL1", "name"] <- "PDL1"
+rowData(sce_list[[1]])[, "full_name"] <- rowData(sce_list[[1]])[, "name"]
+
+# Full names
+rowData(sce_list[[1]])["ERN1", "full_name"] <- "phospho-IRE1-alpha[S724]"
+
+rowData(sce_list[[1]])["CFTR", "full_name"] <- "Cystic Fibrosis Transmembrane Conductance Regulator"
+rowData(sce_list[[1]])["XBP1", "full_name"] <- "X-box Binding Protein 1"
+rowData(sce_list[[1]])["B2M", "full_name"] <- "Beta-2-Microglobulin"
+rowData(sce_list[[1]])["PCSK1", "full_name"] <- "Proprotein Convertase Subtilisin/Kexin Type 1"
+rowData(sce_list[[1]])["ProINS", "full_name"] <- "Proinsulin (Insulin precursor)"
+rowData(sce_list[[1]])["ProGCG", "full_name"] <- "Proglucagon (Glucagon precursor)"
+rowData(sce_list[[1]])["TXNIP", "full_name"] <- "Thioredoxin-Interacting Protein"
+rowData(sce_list[[1]])["WFS1", "full_name"] <- "Wolframin ER Transmembrane Glycoprotein"
+rowData(sce_list[[1]])["PDL1", "full_name"] <- "Programmed death-ligand 1"
+rowData(sce_list[[1]])["NFkB", "full_name"] <- "Nuclear factor kappa-light-chain-enhancer of activated B-cells"
+rowData(sce_list[[1]])["NKX2_2", "full_name"] <- "Homeobox protein Nkx-2.2"
+rowData(sce_list[[1]])["ARX", "full_name"] <- "Aristaless Related Homeobox"
+rowData(sce_list[[1]])["CD9", "full_name"] <- "CD9 (Tetraspanin)"
+rowData(sce_list[[1]])["CAIX", "full_name"] <- "Carbonic Anhydrase IX"
+rowData(sce_list[[1]])["IAPP", "full_name"] <- "Islet Amyloid Polypeptide (Amylin)"
+rowData(sce_list[[1]])["ATPIF1", "full_name"] <- "ATPase Inhibitory Factor 1"
+rowData(sce_list[[1]])["NKX6_1", "full_name"] <- "Homeobox protein Nkx-6.1"
+rowData(sce_list[[1]])["PAX6", "full_name"] <- "Paired box protein Pax-6"
+rowData(sce_list[[1]])["CD155", "full_name"] <- "Poliovirus Receptor (PVR)"
+rowData(sce_list[[1]])["MX1", "full_name"] <- "Interferon-induced GTP-binding protein Mx1"
+rowData(sce_list[[1]])["HLA_ABC", "full_name"] <- "Human Leukocyte Antigen Class I (HLA-A, HLA-B, HLA-C)"
+rowData(sce_list[[1]])["ADAR", "full_name"] <- "Adenosine Deaminase Acting on RNA 1-A"
+rowData(sce_list[[1]])["PCSK2", "full_name"] <- "Proprotein Convertase Subtilisin/Kexin Type 2"
+rowData(sce_list[[1]])["PPY", "full_name"] <- "Pancreatic Polypeptide"
+rowData(sce_list[[1]])["DNA1", "full_name"] <- "Ir191"
+rowData(sce_list[[1]])["DNA3", "full_name"] <- "Ir193"
+
+# For Immune panel:
+rowData(sce_list[[2]])[, "channel"] <- 1:nrow(rowData(sce_list[[2]]))
+rowData(sce_list[[2]])["CD3e", "name"] <- "CD3e"
+rowData(sce_list[[2]])["PD1", "name"] <- "PD1"
+rowData(sce_list[[2]])[, "full_name"] <- rowData(sce_list[[2]])[, "name"]
+
+# Full names. 
+rowData(sce_list[[2]])["MPO", "full_name"] <- "Myeloperoxidase"
+rowData(sce_list[[2]])["SMA", "full_name"] <- "Alpha-Smooth Muscle Actin (ACTA2)"
+rowData(sce_list[[2]])["CD16", "full_name"] <- "Fc Gamma Receptor III (FCGR3A / FCGR3B)"
+rowData(sce_list[[2]])["CD11b", "full_name"] <- "Integrin Alpha M (ITGAM, part of Mac-1)"
+rowData(sce_list[[2]])["HLA_DR", "full_name"] <- "Major Histocompatibility Complex Class II, DR"
+rowData(sce_list[[2]])["CD20", "full_name"] <- "B-Lymphocyte Antigen CD20 (MS4A1)"
+rowData(sce_list[[2]])["CD45RA", "full_name"] <- "Protein Tyrosine Phosphatase Receptor Type C Isoform RA (PTPRC)"
+rowData(sce_list[[2]])["CD56", "full_name"] <- "Neural Cell Adhesion Molecule 1 (NCAM1)"
+rowData(sce_list[[2]])["CD54", "full_name"] <- "Intercellular Adhesion Molecule 1 (ICAM-1)"
+rowData(sce_list[[2]])["CD11c", "full_name"] <- "Integrin Alpha X (ITGAX)"
+rowData(sce_list[[2]])["ATP5A", "full_name"] <- "ATP Synthase F1 Subunit Alpha"
+rowData(sce_list[[2]])["CD73", "full_name"] <- "Ecto-5-Nucleotidase (NT5E)"
+rowData(sce_list[[2]])["GranB", "full_name"] <- "Granzyme B (GZMB)"
+rowData(sce_list[[2]])["LDHA", "full_name"] <- "Lactate Dehydrogenase A"
+rowData(sce_list[[2]])["TMEM173", "full_name"] <- "Transmembrane Protein 173 (STING1)"
+rowData(sce_list[[2]])["CD45RO", "full_name"] <- "Protein Tyrosine Phosphatase Receptor Type C Isoform RO (PTPRC)"
+rowData(sce_list[[2]])["HK1", "full_name"] <- "Hexokinase 1 (HK1)"
+rowData(sce_list[[2]])["CD8a", "full_name"] <- "CD8 alpha (CD8A)"
+rowData(sce_list[[2]])["FoxP3", "full_name"] <- "Forkhead Box Protein P3"
+rowData(sce_list[[2]])["Arg1", "full_name"] <- "Arginase 1 (ARG1)"
+rowData(sce_list[[2]])["CD103", "full_name"] <- "Integrin Alpha E (ITGAE)"
+rowData(sce_list[[2]])["CD204", "full_name"] <- "Macrophage Scavenger Receptor 1 (MSR1)"
+rowData(sce_list[[2]])["TIM3", "full_name"] <- "T-cell Immunoglobulin and Mucin-domain Containing-3 (HAVCR2)"
+rowData(sce_list[[2]])["CD303", "full_name"] <- "C-type Lectin Domain Family 4 Member C (CLEC4C, BDCA-2)"
+rowData(sce_list[[2]])["CD206", "full_name"] <- "Mannose Receptor C-Type 1 (MRC1)"
+rowData(sce_list[[2]])["CD66b", "full_name"] <- "Carcinoembryonic Antigen-related Cell Adhesion Molecule 8 (CEACAM8)"
+rowData(sce_list[[2]])["CD15", "full_name"] <- "Lewis X Antigen (SSEA-1, carbohydrate epitope)"
+```
+
+
+## Assays
+
+The `assays` slot of the `SingleCellExperiment` contains counts matrices representing marker expression levels 
+per cell and channel.
+
+It should at least contain a counts matrix with `raw` ion counts. 
+The assays slot can also contain additional matrices with commonly used counts transformations, 
+or counts transformations that were used in the publication that describes the dataset. 
+All counts transformations must be documented in the .R function used to load the dataset. 
+
+Common examples include:
+    `exprs`: asinh-transformed counts. For IMC, a cofactor of 1 is typically used.
+    `quant_norm`: counts censored (e.g., at the 99th percentile) and scaled from 0 to 1. Here, named as `scaled`.
+
+```{r}
+assayNames(sce_list[[1]])
+assayNames(sce_list[[2]])
+```
+
+## Subsample-Images.
+
+### ADD missing colData-information.
+
+Generate fine-grained approximate disease stages.
+
+keep only: 
+- Stage 1: Control, 
+- Stage 2: sAAb+_NonInsulitic_ICI, 
+- Stage 3: mAAb+_NonInsulitic_ICI, 
+- Stage 4: Onset_NonInsulitic_ICI, 
+- Stage 5: mAAb+_Insulitic_ICI, Onset_Insulitic_ICI, 
+- Stage 6: mAAb+_Insulitic_IDI, Onset_Insulitic_IDI
+- Stage 7: mAAb+_NonInsulitic_IDI, Onset_NonInsulitic_IDI
+- Stage 8: LongDuration_NonInsulitic_IDI
+
+
+```{r recode-stages}
+tt <- colData(sce_list[[1]])[, c("image_name", "patient_donor_type", "image_insulitic", "image_ici_idi")] |> 
+  tibble::as_tibble() |> 
+  dplyr::distinct(image_name, patient_donor_type, image_insulitic, image_ici_idi)
+  
+tt <- tt |> 
+  dplyr::mutate(stages = paste(patient_donor_type, image_insulitic, image_ici_idi, sep = "_"))  |> 
+  dplyr::distinct(image_name, stages) |>
+  dplyr::filter(stages %in% c("NoDiabetes_NonInsulitic_ICI", 
+                              "sAAb+_NonInsulitic_ICI", 
+                              "mAAb+_NonInsulitic_ICI", 
+                              "RecentOnset_NonInsulitic_ICI", 
+                              "mAAb+_Insulitic_ICI", "RecentOnset_Insulitic_ICI", 
+                              "mAAb+_Insulitic_IDI", "RecentOnset_Insulitic_IDI",
+                              "mAAb+_NonInsulitic_IDI", "RecentOnset_NonInsulitic_IDI",
+                              "LongDuration_NonInsulitic_IDI")) |> 
+  dplyr::mutate(stages = dplyr::case_when(
+    stages %in% c("mAAb+_Insulitic_ICI", "RecentOnset_Insulitic_ICI") ~ "mAAb+/RecentOnset_Insulitic_ICI",
+    stages %in% c("mAAb+_Insulitic_IDI", "RecentOnset_Insulitic_IDI") ~ "mAAb+/RecentOnset_Insulitic_IDI",
+    stages %in% c("mAAb+_NonInsulitic_IDI", "RecentOnset_NonInsulitic_IDI") ~ "mAAb+/RecentOnset_NonInsulitic_IDI",
+    TRUE ~ stages
+  ))
+tt |> dplyr::count(stages)
+```
+
+
+### Subssample SCEs.
+
+```{r select-sce-list}
+# From each stage select 15 images.
+set.seed(222)
+sub_images_islet <- tt |> 
+  dplyr::group_by(stages) |> 
+  dplyr::slice_sample(n = 15, replace = FALSE) |> 
+  dplyr::ungroup()  |> 
+  dplyr::pull(image_name)
+
+sub_images_immune <- gsub("Islet", "Immune", sub_images_islet)
+
+sce_list_sub <- lapply(sce_list, function(sce) sce[, sce$image_name %in% sub_images_islet | sce$image_name %in% sub_images_immune])
+# set colnames()
+colnames(sce_list_sub[[1]]) <- sce_list_sub[[1]]$cell_id
+colnames(sce_list_sub[[2]]) <- sce_list_sub[[2]]$cell_id
+```
+
+### Retrieve Image-names
+
+```{r image-names}
+sce_list_sub[[1]]$image_name |> unique() -> image_names_islet
+sce_list_sub[[2]]$image_name |> unique() -> image_names_immune
+
+sce_list[[1]]$image_name |> unique() -> image_names_islet_full
+sce_list[[2]]$image_name |> unique() -> image_names_immune_full
+```
+
+```{r}
+# Coerce to SingleCellExperiment
+sce_list[[1]] <- as(sce_list[[1]], "SingleCellExperiment")
+sce_list[[2]] <- as(sce_list[[2]], "SingleCellExperiment")
+```
+
+## Add NICHE-information.
+
+```{r add-niche-information}
+run <- TRUE
+if (run) {
+  fn  <- "/mnt/central_nas/projects/type1_diabetes/nathan/T1D_Vol/temp_analysis/analysis/16_Neighborhood_cells_Immune/CN_annot.rds"
+  tt <- readRDS(fn)
+
+  cl_temp <- SummarizedExperiment::colData(sce_list[[2]]) |> 
+    tibble::as_tibble() |> 
+    dplyr::left_join(tt, by = "cell_id") |> 
+    S4Vectors::DataFrame()
+  
+  SummarizedExperiment::colData(sce_list[[2]]) <- cl_temp
+}
+```
+
+## Save.
+
+We save the `SingleCellExperiment` object for upload to `ExperimentHub`.
+
+```{r save-sces}
+# Save the updated SCE objects as RDS files
+names(sce_list) <- c("islet", "immune")
+lapply(names(sce_list), function(name) {
+    message(file.path(outdir, paste0("sce_full_", name, ".rds")))
+    saveRDS(sce_list[[name]], file.path(outdir, paste0("sce_full_", name, ".rds")))
+})
+```
+
+We also save the subsampled SCE objects as RDS files for upload to "ExperimentHub".
+```{r save-sces-sub}  
+sce_list_sub <- lapply(sce_list, function(sce) sce[, sce$image_name %in% sub_images_islet | sce$image_name %in% sub_images_immune])
+# set colnames()
+colnames(sce_list_sub[[1]]) <- sce_list_sub[[1]]$cell_id
+colnames(sce_list_sub[[2]]) <- sce_list_sub[[2]]$cell_id
+
+# Save the updated SCE objects as RDS files
+names(sce_list_sub) <- c("islet", "immune")
+lapply(names(sce_list_sub), function(name) {
+  message(file.path(outdir, paste0("sce_", name, ".rds")))
+  saveRDS(sce_list_sub[[name]], file.path(outdir, paste0("sce_", name, ".rds")))
+})
+
+message(colnames(colData(sce_list_sub[[2]])))
+```
+
+
+### Clean-Up:
+```{r clean-up}
+rm(sce_list, colData_list)
+```
+
+
+# Cell Masks:
+
+Are located at https://zenodo.org/records/14968076/files/mask_cells.zip
+
+## Download and unzip cell segmentation masks.
+```{r download-cell-masks}
+url_masks <- "https://zenodo.org/records/14968076/files/mask_cells.zip"
+dest_dir <- file.path(workdir, "mask_cells.zip")
+exdir <- file.path(workdir, "mask_cells")
+
+if (!file.exists(dest_dir)) {
+  download.file(url_masks, destfile = dest_dir, mode = "wb")
+}
+if (!dir.exists(exdir)) {
+  unzip(dest_dir, exdir = exdir, overwrite = TRUE)
+}
+```
+
+## Create a CytoImageList object: Masks.
+
+Cell segmentation masks are stored in a CytoImageList object named masks.
+
+The values of the masks should be integers mapping to the cell_number column of colData(sce). 
+This information is used by cytomapper to associate `single cell data` and `cell segmentation masks`.
+
+The metadata slot `(mcols(masks))` must contain an `image_name` column that maps to the image_name column of `colData(sce)`, 
+and to the image_name column of `mcols(images)`. 
+
+This information is used by cytomapper to associate:
+- multichannel images
+- cell segmentation masks
+- `single cell data`.
+
+```{r create-cytoimagelist-masks}
+temp_dir <- tempdir()
+workdir_masks <- file.path(workdir, "mask_cells", "mask_cells")
+panels <- c("islet", "immune")
+
+# Create a CytoImageList object for each panel
+mask_list <- lapply(panels, function(panel) {
+  # List all files in the directory for the current panel
+  # panel <- "Islet"
+  panel_dir <- file.path(workdir_masks, panel, "whole-cell")
+  mask_files <- list.files(panel_dir, full.names = TRUE)
+
+  # Create a CytoImageList object from the mask files
+  tt <- cytomapper::loadImages(mask_files, pattern = "\\.tiff$", on_disk = FALSE)
+  names(tt) <- gsub("_ROI_", "_", names(tt))
+  return(tt)
+})
+```
+
+Scale Masks to Integer Values.
+```{r scale-masks}
+image_names_full <- list("islet" = image_names_islet_full, "immune" = image_names_immune_full)
+
+mask_list_2 <- lapply(seq_along(mask_list), function(i) {
+  # i <- 2
+  mask_sublist <- mask_list[[i]]
+  mask_sublist <- cytomapper::getImages(mask_sublist, names(cytomapper::getImages(mask_sublist)) %in% image_names_full[[i]])
+  # scale to integers. 
+  mask_sublist <- cytomapper::scaleImages(mask_sublist, 2^16-1)
+  mcols(mask_sublist)[["image_name"]] <- names(cytomapper::getImages(mask_sublist))
+  return(mask_sublist)
+})
+```
+
+```{r subset-masks}
+## Generate SUBSET using the same image-ids as for SCE-SUB.
+image_names_sub <- list("islet" = image_names_islet, "immune" = image_names_immune)
+
+mask_list_sub <- lapply(seq_along(mask_list_2), function(i) {
+  # i <- 2
+  mask_sublist <- mask_list_2[[i]]
+  mask_sublist <- cytomapper::getImages(mask_sublist, names(cytomapper::getImages(mask_sublist)) %in% image_names_sub[[i]])
+  mcols(mask_sublist)[["image_name"]] <- names(cytomapper::getImages(mask_sublist))
+  return(mask_sublist)
+})
+```
+
+## Save the CytoImageList objects as RDS files for upload to `ExperimentHub`.
+```{r save-masks}
+## Save the CytoImageList objects as RDS files
+panels <- c("islet", "immune")
+lapply(seq_along(mask_list), function(i) {
+    print(paste0("Saving masks_full_", panels[i], ".rds"))
+    print(file.path(getwd(), outdir, paste0("masks_full_", panels[i], ".rds")))
+    saveRDS(mask_list[[i]], file.path(outdir, paste0("masks_full_", panels[i], ".rds")))
+})
+
+## Save the subsetted CytoImageList objects as RDS files
+lapply(seq_along(mask_list_sub), function(i) {
+    print(paste0("Saving masks_", panels[i], ".rds"))
+    print(file.path(getwd(), outdir, paste0("masks_",panels[i], ".rds")))
+    saveRDS(mask_list_sub[[i]], file.path(outdir, paste0("masks_",panels[i], ".rds")))
+})
+```
+
+## Clean-up:
+```{r clean-up-masks}
+rm(mask_list, mask_list_2)
+```
+
+
+# Images:
+Processed images (.tiffs):
+
+Data is available in the following repositories:
+
+- Immune panel: https://zenodo.org/records/15971803
+- Islet panel: https://zenodo.org/records/15919088
+
+
+```{r download-images}
+exdir <- file.path(workdir, "Islet_img")
+dest_dir <- file.path(workdir, "Islet_img.zip")
+
+if (!dir.exists(dest_dir)) {
+  url_img <- "https://zenodo.org/records/15919088/files/Islet.zip"
+  download.file(url_img, destfile = dest_dir, mode = "wb")
+}
+if (!dir.exists(exdir)) {
+  unzip(dest_dir, exdir = exdir, overwrite = TRUE)
+}
+
+exdir <- file.path(workdir, "Immune_img")
+dest_dir <- file.path(workdir, "Immune_img.zip")
+
+if (!dir.exists(dest_dir)) {
+  url_img <- "https://zenodo.org/records/15971803/files/Immune.zip"
+  download.file(url_img, destfile = dest_dir, mode = "wb")
+}
+if (!dir.exists(exdir)) {
+  unzip(dest_dir, exdir = exdir, overwrite = TRUE)
+}
+```
+
+```{r read-in-image-subset}
+temp_dir <- tempdir()
+panels <- c("islet", "immune")
+image_names <- list("islet" = image_names_islet, "immune" = image_names_immune)
+
+# Create a CytoImageList object for each panel
+img_list <- purrr::map2(panels, image_names, function(panel, image_name) {
+  # List all files in the directory for the current panel
+  # panel <- "Islet"; image_name <- image_names_islet
+  panel_dir <- file.path(workdir, paste(panel, "_img", sep = ""), panel)
+  img_files <- list.files(panel_dir, full.names = TRUE)
+  
+  # add .tiff to end and add ROI after Case-ID and ROI tag (e.g. 1234_Islet -> 1234_Islet_ROI) to match the image_name in colData and in masks.
+  image_name_2 <- paste0(image_name, ".tiff")
+  image_name_2 <- gsub("_(Islet|Immune)", "_\\1_ROI", image_name_2)
+  # add full path to image_name_2 (panel_dir)
+  image_name_2 <- file.path(panel_dir, image_name_2)
+
+  img_files <- img_files[img_files %in% image_name_2]
+
+  # Create a CytoImageList object from the specified image files.
+  tt <- cytomapper::loadImages(img_files, on_disk = FALSE)
+
+  # remove _ROI_ from mask_list names. 
+  names(tt) <- gsub("_ROI_", "_", names(tt))
+  mcols(tt)[["image_name"]] <- names(cytomapper::getImages(tt))
+  tt
+})
+```
+
+Channel names of the images object (channelNames(images)) must map to rownames(sce) (marker short names).
+We will adjust `channelNames` of the `CytoImageList` image subset to match the `SingleCellExperiment` object.
+
+```{r channelnames}
+# Update channelNames, so they match the SCE object
+img_list <- purrr::map2(img_list, sce_list_sub, function(images_sub, sce_new_sub) {
+  cytomapper::channelNames(images_sub) <- rownames(sce_new_sub)
+  images_sub
+})
+
+img_list
+```
+
+## Save:
+
+```{r save-images}
+# Save the CytoImageList Image-Object as RDS files
+lapply(seq_along(img_list), function(i) {
+  print(paste0("Saving images_", panels[i], ".rds"))
+  print(file.path(getwd(), outdir, paste0("images_", panels[i], ".rds")))
+  saveRDS(img_list[[i]], file.path(outdir, paste0("images_", panels[i], ".rds")))
+})
+```

@@ -25,13 +25,14 @@ The [release version](https://www.bioconductor.org/packages/release/data/experim
 of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.23.  
 
 The current release of *Bioconductor* should be installed:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version = "3.23")
 ```
+
 Then, `imcdatasets` can be installed from *Bioconductor*:
-```{r}
+```r
 BiocManager::install("imcdatasets")
 ```
 
@@ -41,18 +42,18 @@ The [development version](https://www.bioconductor.org/packages/devel/data/exper
 of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.24.  
 
 The development version of *Bioconductor* should be installed:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version='devel')
 ```
 Then, `imcdatasets` can be installed from *Bioconductor*:
-```{r}
+```r
 BiocManager::install("imcdatasets")
 ```
 
 `imcdatasets` can also be installed from GitHub using `devtools`:
-```{r}
+```r
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
@@ -66,7 +67,7 @@ devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
 and [cytomapper](https://bioconductor.org/packages/cytomapper) packages.
 
 These packages can be installed as follows:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"))
@@ -75,7 +76,7 @@ BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"
 ## Usage
 
 To load `imcdatasets` in your R session, use:
-```{r}
+```r
 library(imcdatasets)
 ```
 
@@ -83,7 +84,7 @@ Detailed information on how to access the datasets is available in the
 [imcdatasets vignette](https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html).
 
 The vignette can also be viewed directly in R:
-```{r}
+```r
 vignette("imcdatasets")
 ```
 
@@ -125,7 +126,10 @@ respectively.
 ## Available datasets
 
 ### List of available datasets
-
+* __SteenbuckDamond_2026_T1D__: Pancreas sections from organ donors with type 1
+diabetes.    
+  - Documentation: [SteenbuckDamond_2026_T1D](https://bodenmillergroup.github.io/imcdatasets/reference/SteenbuckDamond_2026_T1D.html).  
+  - Publication: [Steenbuck, Damond et al. _Nat Metab_ (2026) 29(3):755-768.e5](https://doi.org/10.1038/s42255-026-01559-z).
 * __Damond_2019_Pancreas__: Pancreas sections from organ donors with type 1
 diabetes.    
   - Documentation: [Damond_2019_Pancreas](https://bodenmillergroup.github.io/imcdatasets/reference/Damond_2019_Pancreas.html).  
@@ -152,11 +156,12 @@ lines.
 ### Viewing available datasets in R
 
 In R, currently available datasets can be viewed with:
-```{r}
+```r
 imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
 imc
 ```
+
 Detailed information about each dataset is available in the help pages
 (e.g., `?JacksonFischer_2020_BreastCancer`).
 For more information, please refer to the
@@ -174,7 +179,7 @@ Guidelines about contributions and dataset formatting are provided in a
 ## Citation
 
 Damond N, Steenbuck N, Eling N, Fischer J, Hoch T, Meyer L (2026). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.21.2, https://github.com/BodenmillerGroup/imcdatasets.
+R package version 1.21.3, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 
