@@ -100,8 +100,8 @@ The package maintainers will do the following:
 * Make sure the data objects are well formatted and consistent with the other 
 datasets.
 * Check all the new package metadata and documentation.
-* Upload the data objects to `AWS S3` and announce the upload to Bioconductor 
-Hubs.
+* Upload the data objects to Zenodo by creating a dedicated repository. 
+* Announce the upload to Bioconductor Hubs.
 * Download the data objects from `ExperimentHub` and check the format again.
 * Update the `NEWS`, `DESCRIPTION` (add new contributor, version bump) and 
 `README.md` (if needed) files.

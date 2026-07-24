@@ -1,7 +1,21 @@
 # imcdatasets
 
+<!-- badges: start -->
+[![docs](https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/docs.yml/badge.svg?branch=devel)](https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/docs.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Bioc downloads rank](https://bioconductor.org/shields/downloads/release/imcdatasets.svg)](http://bioconductor.org/packages/stats/data-experiment/imcdatasets/)
+<!-- badges: end -->
+
 __Documentation is available at:
 https://bodenmillergroup.github.io/imcdatasets/index.html__
+
+## Check status
+
+| Bioc branch | Checks |
+|:-----------:|:------:|
+| Devel       |[![build-checks-devel](https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/build-checks-devel.yml/badge.svg?branch=devel)](https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/build-checks-devel.yml)|
+| BioC Devel | [![Bioc devel status](http://www.bioconductor.org/shields/build/devel/data-experiment/imcdatasets.svg)](https://bioconductor.org/checkResults/devel/data-experiment-LATEST/imcdatasets) |
+| BioC Release | [![Bioc release status](http://www.bioconductor.org/shields/build/release/data-experiment/imcdatasets.svg)](https://bioconductor.org/checkResults/release/data-experiment-LATEST/imcdatasets) |
 
 ## Introduction
 
@@ -25,13 +39,13 @@ The [release version](https://www.bioconductor.org/packages/release/data/experim
 of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.23.  
 
 The current release of *Bioconductor* should be installed:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version = "3.23")
 ```
 Then, `imcdatasets` can be installed from *Bioconductor*:
-```{r}
+```r
 BiocManager::install("imcdatasets")
 ```
 
@@ -41,18 +55,18 @@ The [development version](https://www.bioconductor.org/packages/devel/data/exper
 of `imcdatasets` requires *R* version >= 4.6 and *Bioconductor* version >= 3.24.  
 
 The development version of *Bioconductor* should be installed:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version='devel')
 ```
 Then, `imcdatasets` can be installed from *Bioconductor*:
-```{r}
+```r
 BiocManager::install("imcdatasets")
 ```
 
 `imcdatasets` can also be installed from GitHub using `devtools`:
-```{r}
+```r
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
@@ -66,7 +80,7 @@ devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
 and [cytomapper](https://bioconductor.org/packages/cytomapper) packages.
 
 These packages can be installed as follows:
-```{r}
+```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"))
@@ -75,7 +89,7 @@ BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"
 ## Usage
 
 To load `imcdatasets` in your R session, use:
-```{r}
+```r
 library(imcdatasets)
 ```
 
@@ -83,7 +97,7 @@ Detailed information on how to access the datasets is available in the
 [imcdatasets vignette](https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html).
 
 The vignette can also be viewed directly in R:
-```{r}
+```r
 vignette("imcdatasets")
 ```
 
@@ -152,7 +166,7 @@ lines.
 ### Viewing available datasets in R
 
 In R, currently available datasets can be viewed with:
-```{r}
+```r
 imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
 imc
