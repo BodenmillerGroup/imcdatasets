@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/BodenmillerGroup/imcdatasets/blob/add-github-actions/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/BodenmillerGroup/imcdatasets/blob/devel/DESCRIPTION)
 
 Damond N, Steenbuck N (2026). *imcdatasets: Collection of publicly
 available imaging mass cytometry (IMC) datasets*. R package version
