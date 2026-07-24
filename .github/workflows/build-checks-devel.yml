@@ -1,0 +1,71 @@
+name: build-checks-devel
+
+on:
+  push:
+    branches: [ devel, add-github-actions ]
+  pull_request:
+    branches:
+      - devel
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    container: bioconductor/bioconductor_docker:devel
+    timeout-minutes: 240
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            libharfbuzz-dev libfribidi-dev zlib1g-dev \
+            libxml2-dev libxt-dev curl libcairo2-dev \
+            libmagick++-dev libcurl4-gnutls-dev libhdf5-dev \
+            pandoc libnode-dev libgeos-dev libproj-dev libgdal-dev tk
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Cache ExperimentHub / AnnotationHub data
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/R/ExperimentHub
+            ~/.cache/R/AnnotationHub
+          key: ${{ runner.os }}-devel-experimenthub-${{ hashFiles('inst/extdata/metadata.csv') }}
+          restore-keys: |
+            ${{ runner.os }}-devel-experimenthub-
+
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "BiocManager", "rcmdcheck", "BiocCheck"))
+          remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories(), Ncpus = 4L)
+        shell: Rscript {0}
+
+      - name: Check
+        run: |
+          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
+
+      - name: BiocCheck
+        run: |
+          results <- BiocCheck::BiocCheck(".")
+          if (length(results$error) > 0) {
+            quit(status = 1, save = "no")
+          }
+        shell: Rscript {0}
+
+      - name: Session info
+        if: always()
+        run: |
+          options(width = 100)
+          pkgs <- installed.packages()[, "Package"]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}

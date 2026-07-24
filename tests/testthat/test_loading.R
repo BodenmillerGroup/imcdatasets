@@ -30,8 +30,11 @@ datasets <- list(
     "Meyer_2025_TripleNegativeBreastCancer"
 )
 
-testDatasetWorks <- function(x) {
+testDatasetWorks <- function(x, ci_test = FALSE) {
     test_that(paste(x, "works"), {
+        if (!ci_test) {
+            skip_on_ci()
+        }
         sce <- do.call(x, args = list(data_type = "sce"))
         images <- do.call(x, args = list(data_type = "images"))
         masks <- do.call(x, args = list(data_type = "masks"))
@@ -71,5 +74,5 @@ testDatasetWorks <- function(x) {
             on_disk = TRUE)))
     }
 )}
-
-lapply(datasets, testDatasetWorks)
+invisible(lapply(head(datasets, -1), testDatasetWorks))
+testDatasetWorks(tail(datasets, 1)[[1]], ci_test = TRUE)
