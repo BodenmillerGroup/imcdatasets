@@ -58,9 +58,13 @@ IMMUcan_2022_CancerExample(
 
 ## Value
 
-A SingleCellExperiment object with single cell data, a CytoImageList
-object containing multichannel images, or a CytoImageList object
-containing cell segmentation masks.
+A
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object with single cell data, a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing multichannel images, or a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing cell segmentation masks.
 
 ## Details
 
@@ -68,27 +72,36 @@ This is an Imaging Mass Cytometry (IMC) dataset used in the [IMC data
 analysis book](https://bodenmillergroup.github.io/IMCDataAnalysis/)
 
 - `images` contains 14 multichannel images, each containing 50 channels,
-  in the form of a CytoImageList class object.
+  in the form of a
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `masks` contains the cell segmentation masks associated with the
-  images, in the form of a CytoImageList class object.
+  images, in the form of a
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `sce` contains the single cell data extracted from the multichannel
   images using the cell segmentation masks, as well as the associated
-  metadata, in the form of a SingleCellExperiment object. Single cell
-  data can also be retrieved as a SpatialExperiment object. This
-  represents a total of 46,825 cells x 40 channels.
+  metadata, in the form of a
+  [SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+  object. Single cell data can also be retrieved as a
+  [SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+  object. This represents a total of 46,825 cells x 40 channels.
 
 All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables
-located in their metadata columns: `mcols()` for the CytoImageList
-objects and `ColData()` for the SingleCellExperiment object. Mapping at
-the image level can be performed with the `sample_id` or `image_name`
-variables. Mapping between cell segmentation masks and single cell data
-is performed with the `cell_number` variable, the values of which
-correspond to the intensity values of the `masks` object. For practical
-examples, please refer to the "Accessing IMC datasets" vignette.
+located in their metadata columns: `mcols()` for the
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+objects and `ColData()` for the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object. Mapping at the image level can be performed with the `sample_id`
+or `image_name` variables. Mapping between cell segmentation masks and
+single cell data is performed with the `cell_number` variable, the
+values of which correspond to the intensity values of the `masks`
+object. For practical examples, please refer to the "Accessing IMC
+datasets" vignette.
 
 This imaging mass cytometry dataset serves as an example to demonstrate
 downstream analysis tools including spatial data analysis. The data was
@@ -140,16 +153,21 @@ Relevant entries to the `colData` slot are as follows:
 - `cell_y` spatial y coordinate.
 
 The marker-associated metadata, including antibody information and metal
-tags are stored in the `rowData` of the SingleCellExperiment object.
+tags are stored in the `rowData` of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object.
 
-The `assay` slot of the SingleCellExperiment object contains two assays:
+The `assay` slot of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object contains two assays:
 
 - `counts`: mean ion counts per cell
 
 - `exprs`: arsinh-transformed counts per cell, with cofactor 1.
 
-The `colPair` slot of the SingleCellExperiment object contains the
-following spatial object graphs:
+The `colPair` slot of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object contains the following spatial object graphs:
 
 - `neighborhood` steinbock generated graph.
 

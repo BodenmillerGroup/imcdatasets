@@ -58,10 +58,15 @@ Zanotelli_2020_Spheroids(
 
 ## Value
 
-A SingleCellExperiment object with single cell data, a SpatialExperiment
-object with single cell data, a CytoImageList object containing
-multichannel images, or a CytoImageList object containing cell
-segmentation masks.
+A
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object with single cell data, a
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+object with single cell data, a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing multichannel images, or a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing cell segmentation masks.
 
 ## Details
 
@@ -69,46 +74,58 @@ This is an Imaging Mass Cytometry (IMC) dataset from Zanotelli et al.
 (2020), consisting of three data objects:
 
 - `images` contains 517 multichannel images, each containing 51
-  channels, in the form of a CytoImageList class object.
+  channels, in the form of a
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `masks` contains the cell segmentation masks associated with the
-  images, in the form of a CytoImageList class object.
+  images, in the form of a
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `sce` contains the single cell data extracted from the multichannel
   images using the cell segmentation masks, as well as the associated
-  metadata, in the form of a SingleCellExperiment. This represents a
-  total of 229,047 cells x 51 channels.
+  metadata, in the form of a
+  [SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html).
+  This represents a total of 229,047 cells x 51 channels.
 
-- `spe` same single cell data as for `sce`, but in the SpatialExperiment
+- `spe` same single cell data as for `sce`, but in the
+  [SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
   format.
 
 All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables
-located in their metadata columns: `mcols()` for the CytoImageList
-objects and `ColData()` for the SingleCellExperiment and
-SpatialExperiment objects. Mapping at the image level can be performed
-with the `image_name` or `image_number` variables. Mapping between cell
+located in their metadata columns: `mcols()` for the
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+objects and `ColData()` for the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects. Mapping at the image level can be performed with the
+`image_name` or `image_number` variables. Mapping between cell
 segmentation masks and single cell data is performed with the
 `cell_number` variable, the values of which correspond to the intensity
 values of the `masks` object. For practical examples, please refer to
 the "Accessing IMC datasets" vignette.
 
 This dataset was obtained as following (the names of the experimental
-variables, located in the `colData` of the SingleCellExperiment and
-SpatialExperiment objects, are indicated in parentheses): *i)* Cells
-from four different cell lines (`cell_line`) were seeded at three
-different densities (`treatment_concentration`, relative densities) and
-grown for either 72 or 96 hours (`treatment_time_point`, duration in
-hours). In the appropriate experimental conditions (see the paper for
-details), the cells aggregate into 3D spheroids. *ii)* Cells were
-harvested and pooled into 60-well barcoding plates. *iii)* A pellet of
-each spheroid pool was generated and cut into several 6 um-thick
-sections. *iv)* A subset of these sections (`site_id`) were stained with
-an IMC panel and acquired as one or more acquisitions (`acquisition_id`)
-containing multiple spheres each. *v)* Spheres in these acquisitions
-were identified by computer vision and cropped into individual images
-(`image_number`).
+variables, located in the `colData` of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects, are indicated in parentheses): *i)* Cells from four different
+cell lines (`cell_line`) were seeded at three different densities
+(`treatment_concentration`, relative densities) and grown for either 72
+or 96 hours (`treatment_time_point`, duration in hours). In the
+appropriate experimental conditions (see the paper for details), the
+cells aggregate into 3D spheroids. *ii)* Cells were harvested and pooled
+into 60-well barcoding plates. *iii)* A pellet of each spheroid pool was
+generated and cut into several 6 um-thick sections. *iv)* A subset of
+these sections (`site_id`) were stained with an IMC panel and acquired
+as one or more acquisitions (`acquisition_id`) containing multiple
+spheres each. *v)* Spheres in these acquisitions were identified by
+computer vision and cropped into individual images (`image_number`).
 
 Other relevant cell metadata include:
 
@@ -133,12 +150,18 @@ to the publication (https://doi.org/10.15252/msb.20209798) and to the
 original dataset repository (https://doi.org/10.5281/zenodo.4271910).
 
 The marker-associated metadata, including antibody information and metal
-tags are stored in the `rowData` of the SingleCellExperiment and
-SpatialExperiment objects. The channels with names starting with "BC\_"
-are the channels used for barcoding. Post-transcriptional modification
-of the protein targets are indicated in brackets.
+tags are stored in the `rowData` of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects. The channels with names starting with "BC\_" are the channels
+used for barcoding. Post-transcriptional modification of the protein
+targets are indicated in brackets.
 
-The `assay` slots of the SingleCellExperiment and SpatialExperiment
+The `assay` slots of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
 objects contain three assays:
 
 - `counts` contains raw mean ion counts per cell.
@@ -148,15 +171,20 @@ objects contain three assays:
 - `quant_norm` contains counts censored at the 99th percentile and
   scaled 0-1.
 
-In addition, the `altExp` slot of the SingleCellExperiment object
-contains another SingleCellExperiment object where the counts matrix
-represents raw mean ion counts for cells neighboring the current cell.
+In addition, the `altExp` slot of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object contains another
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object where the counts matrix represents raw mean ion counts for cells
+neighboring the current cell.
 
 Neighborhood information, defined here as cells that are localized next
 to each other, is stored as a `SelfHits` object in the `colPairs` slot
-of the `SingleCellExperiment` and SpatialExperiment objects. Cells in
-the `SelfHits` object are represented by unique integers that map to the
-`cell_number_absolute` column of `colData(sce)`.
+of the `SingleCellExperiment` and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects. Cells in the `SelfHits` object are represented by unique
+integers that map to the `cell_number_absolute` column of
+`colData(sce)`.
 
 Dataset versions: a `version` argument can be passed to the function to
 specify which dataset version should be retrieved.

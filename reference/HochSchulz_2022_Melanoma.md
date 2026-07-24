@@ -76,10 +76,15 @@ HochSchulz_2022_Melanoma(
 
 ## Value
 
-A SingleCellExperiment object with single cell data, a SpatialExperiment
-object with single cell data, a CytoImageList object containing
-multichannel images, or a CytoImageList object containing cell
-segmentation masks.
+A
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+object with single cell data, a
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+object with single cell data, a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing multichannel images, or a
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+object containing cell segmentation masks.
 
 ## Details
 
@@ -87,31 +92,44 @@ This is an Imaging Mass Cytometry (IMC) dataset from Hoch, Schulz et al.
 (2022):
 
 - `images` contains fifty 38-channel images in the form of a
-  CytoImageList class object.
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `masks` contains the cell segmentation masks associated with the
-  images, in the form of a CytoImageList class object.
+  images, in the form of a
+  [CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+  class object.
 
 - `sce` contains the single cell data extracted from the multichannel
   images using the cell segmentation masks, as well as the associated
-  metadata, in the form of a SingleCellExperiment object.
+  metadata, in the form of a
+  [SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+  object.
 
-- `spe` same single cell data as for `sce`, but in the SpatialExperiment
+- `spe` same single cell data as for `sce`, but in the
+  [SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
   format.
 
 All data are downloaded from ExperimentHub and cached for local re-use.
 
 Mapping between the three data objects is performed via variables
-located in their metadata columns: `mcols()` for the CytoImageList
-objects and `ColData()` for the SingleCellExperiment and
-SpatialExperiment objects. Mapping at the image level can be performed
-with the `image_name` or `image_number` variables. Mapping between cell
+located in their metadata columns: `mcols()` for the
+[CytoImageList](https://rdrr.io/pkg/cytomapper/man/CytoImageList.html)
+objects and `ColData()` for the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects. Mapping at the image level can be performed with the
+`image_name` or `image_number` variables. Mapping between cell
 segmentation masks and single cell data is performed with the
 `cell_number` variable, the values of which correspond to the intensity
 values of the `masks` object. For practical examples, please refer to
 the "Accessing IMC datasets" vignette.
 
-The `assay` slots of the SingleCellExperiment and SpatialExperiment
+The `assay` slots of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
 objects contain three assays:
 
 - `counts` contains raw mean ion counts per cell.
@@ -123,18 +141,26 @@ objects contain three assays:
 - `scaled_exprs` contains scaled asinh-transformed counts.
 
 The marker-associated metadata, including antibody information and metal
-tags are stored in the `rowData` of the SingleCellExperiment /
-SpatialExperiment objects.
+tags are stored in the `rowData` of the
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+/
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects.
 
 The cell-associated metadata are stored in the `colData` of the
-SingleCellExperiment and SpatialExperiment objects. These metadata
-include various information about cells, milieu, samples, and patients.
-For instance, cell types can be retrieved with `colData(sce)$cell_type`
-and cell clusters with `colData(sce)$cell_cluster`.
+[SingleCellExperiment](https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html)
+and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects. These metadata include various information about cells, milieu,
+samples, and patients. For instance, cell types can be retrieved with
+`colData(sce)$cell_type` and cell clusters with
+`colData(sce)$cell_cluster`.
 
 Neighborhood information, defined here as cells that are localized next
 to each other, is stored as a `SelfHits` object in the `colPairs` slot
-of the `SingleCellExperiment` and SpatialExperiment objects.
+of the `SingleCellExperiment` and
+[SpatialExperiment](https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment.html)
+objects.
 
 For more information, please refer to the Hoch, Schulz, et al.
 publication.

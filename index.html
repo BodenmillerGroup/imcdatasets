@@ -55,7 +55,37 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="imcdatasets">imcdatasets<a class="anchor" aria-label="anchor" href="#imcdatasets"></a>
 </h1></div>
+<!-- badges: start -->
+
 <p>__Documentation is available at: <a href="https://bodenmillergroup.github.io/imcdatasets/index.html__" class="uri">https://bodenmillergroup.github.io/imcdatasets/index.html__</a></p>
+<div class="section level2">
+<h2 id="check-status">Check status<a class="anchor" aria-label="anchor" href="#check-status"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="61%">
+<col width="38%">
+</colgroup>
+<thead><tr>
+<th align="center">Bioc branch</th>
+<th align="center">Checks</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="center">Devel</td>
+<td align="center"><a href="https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/build-checks-devel.yml" class="external-link"><img src="https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/build-checks-devel.yml/badge.svg?branch=devel" alt="build-checks-devel"></a></td>
+</tr>
+<tr>
+<td align="center">BioC Devel</td>
+<td align="center"><a href="https://bioconductor.org/checkResults/devel/data-experiment-LATEST/imcdatasets" class="external-link"><img src="http://www.bioconductor.org/shields/build/devel/data-experiment/imcdatasets.svg" alt="Bioc devel status"></a></td>
+</tr>
+<tr>
+<td align="center">BioC Release</td>
+<td align="center"><a href="https://bioconductor.org/checkResults/release/data-experiment-LATEST/imcdatasets" class="external-link"><img src="http://www.bioconductor.org/shields/build/release/data-experiment/imcdatasets.svg" alt="Bioc release status"></a></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -69,28 +99,54 @@
 <h3 id="release-version">Release version<a class="anchor" aria-label="anchor" href="#release-version"></a>
 </h3>
 <p>The <a href="https://www.bioconductor.org/packages/release/data/experiment/html/imcdatasets.html" class="external-link">release version</a> of <code>imcdatasets</code> requires <em>R</em> version &gt;= 4.6 and <em>Bioconductor</em> version &gt;= 3.23.</p>
-<p>The current release of <em>Bioconductor</em> should be installed: <code>{r} if (!requireNamespace("BiocManager", quietly = TRUE))     install.packages("BiocManager") BiocManager::install(version = "3.23")</code> Then, <code>imcdatasets</code> can be installed from <em>Bioconductor</em>: <code>{r} BiocManager::install("imcdatasets")</code></p>
+<p>The current release of <em>Bioconductor</em> should be installed:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span>version <span class="op">=</span> <span class="st">"3.23"</span><span class="op">)</span></span></code></pre></div>
+<p>Then, <code>imcdatasets</code> can be installed from <em>Bioconductor</em>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"imcdatasets"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="development-version">Development version<a class="anchor" aria-label="anchor" href="#development-version"></a>
 </h3>
 <p>The <a href="https://www.bioconductor.org/packages/devel/data/experiment/html/imcdatasets.html" class="external-link">development version</a> of <code>imcdatasets</code> requires <em>R</em> version &gt;= 4.6 and <em>Bioconductor</em> version &gt;= 3.24.</p>
-<p>The development version of <em>Bioconductor</em> should be installed: <code>{r} if (!requireNamespace("BiocManager", quietly = TRUE))     install.packages("BiocManager") BiocManager::install(version='devel')</code> Then, <code>imcdatasets</code> can be installed from <em>Bioconductor</em>: <code>{r} BiocManager::install("imcdatasets")</code></p>
-<p><code>imcdatasets</code> can also be installed from GitHub using <code>devtools</code>: <code>{r} if (!requireNamespace("devtools", quietly = TRUE))     install.packages("devtools") devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)</code></p>
+<p>The development version of <em>Bioconductor</em> should be installed:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span>version<span class="op">=</span><span class="st">'devel'</span><span class="op">)</span></span></code></pre></div>
+<p>Then, <code>imcdatasets</code> can be installed from <em>Bioconductor</em>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"imcdatasets"</span><span class="op">)</span></span></code></pre></div>
+<p><code>imcdatasets</code> can also be installed from GitHub using <code>devtools</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"devtools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"BodenmillerGroup/imcdatasets"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
 </h3>
 <p><code>imcdatasets</code> builds on data objects contained in the <a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a>, <a href="https://bioconductor.org/packages/SpatialExperiment" class="external-link">SpatialExperiment</a>, and <a href="https://bioconductor.org/packages/cytomapper" class="external-link">cytomapper</a> packages.</p>
-<p>These packages can be installed as follows: <code>{r} if (!requireNamespace("BiocManager", quietly = TRUE))     install.packages("BiocManager") BiocManager::install(c("SingleCellExperiment", "SpatialExperiment", "cytomapper"))</code></p>
+<p>These packages can be installed as follows:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SingleCellExperiment"</span>, <span class="st">"SpatialExperiment"</span>, <span class="st">"cytomapper"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>To load <code>imcdatasets</code> in your R session, use: <code>{r} library(imcdatasets)</code></p>
+<p>To load <code>imcdatasets</code> in your R session, use:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BodenmillerGroup/imcdatasets" class="external-link">imcdatasets</a></span><span class="op">)</span></span></code></pre></div>
 <p>Detailed information on how to access the datasets is available in the <a href="https://bodenmillergroup.github.io/imcdatasets/articles/imcdatasets.html">imcdatasets vignette</a>.</p>
-<p>The vignette can also be viewed directly in R: <code>{r} vignette("imcdatasets")</code></p>
+<p>The vignette can also be viewed directly in R:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"imcdatasets"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a>
@@ -162,7 +218,12 @@
 <div class="section level3">
 <h3 id="viewing-available-datasets-in-r">Viewing available datasets in R<a class="anchor" aria-label="anchor" href="#viewing-available-datasets-in-r"></a>
 </h3>
-<p>In R, currently available datasets can be viewed with: <code>{r} imc &lt;- imcdatasets::listDatasets() imc &lt;- as.data.frame(imc) imc</code> Detailed information about each dataset is available in the help pages (e.g., <code><a href="reference/JacksonFischer_2020_BreastCancer.html">?JacksonFischer_2020_BreastCancer</a></code>). For more information, please refer to the <a href="https://bioconductor.org/packages/release/bioc/vignettes/ExperimentHub/inst/doc/ExperimentHub.html" class="external-link">ExperimentHub vignette</a>.</p>
+<p>In R, currently available datasets can be viewed with:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">imc</span> <span class="op">&lt;-</span> <span class="fu">imcdatasets</span><span class="fu">::</span><span class="fu"><a href="reference/listDatasets.html">listDatasets</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">imc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">imc</span><span class="op">)</span></span>
+<span><span class="va">imc</span></span></code></pre></div>
+<p>Detailed information about each dataset is available in the help pages (e.g., <code><a href="reference/JacksonFischer_2020_BreastCancer.html">?JacksonFischer_2020_BreastCancer</a></code>). For more information, please refer to the <a href="https://bioconductor.org/packages/release/bioc/vignettes/ExperimentHub/inst/doc/ExperimentHub.html" class="external-link">ExperimentHub vignette</a>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -239,7 +300,14 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/docs.yml" class="external-link"><img src="https://github.com/BodenmillerGroup/imcdatasets/actions/workflows/docs.yml/badge.svg?branch=devel" alt="docs"></a></li>
+<li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
+<li><a href="http://bioconductor.org/packages/stats/data-experiment/imcdatasets/" class="external-link"><img src="https://bioconductor.org/shields/downloads/release/imcdatasets.svg" alt="Bioc downloads rank"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
