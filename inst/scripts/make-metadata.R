@@ -116,7 +116,7 @@ df_list <- list(
         LocationPrefix = rep(c("https://zenodo.org/"), 12),
         RDataPath = 
             file.path("records",
-            "21371432",
+            "21621291",
             "files",
             paste0(sprintf("%s%s_%s",
                 rep(c("sce", "images", "masks"), 4),

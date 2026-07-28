@@ -310,7 +310,7 @@ sce_list[[2]]$image_insulitic <- ifelse(sce_list[[2]]$image_id %in% insulitic_id
 Neighborhood information, such as a list of cells that are localized next to each other, can be stored as a SelfHits object in the colPair slot of the SingleCellExperiment object.
 -> Done.
 
-```{r}
+```{r colPairs-check}
 (colPairs(sce_list[[1]]))
 (colPairs(sce_list[[2]]))
 ```
@@ -335,7 +335,7 @@ For post-translationally modified proteins:
 - Prefix the `short_name` with an abbreviation of the modification type (e.g., p_, me_) 
 and do not indicate the modified aminoacids, unless there is a possible confusion with another target in the dataset.
 
-```{r}
+```{r rename-rowdata}
 rowData(sce_list[[1]])[, "channel"] <- 1:nrow(rowData(sce_list[[1]]))
 # Edit PTMs and other marker names in rowData of the SCE objects.
 rowData(sce_list[[1]])["ERN1", "short_name"] <- "p_IRE1a"
@@ -425,9 +425,9 @@ Common examples include:
     `exprs`: asinh-transformed counts. For IMC, a cofactor of 1 is typically used.
     `quant_norm`: counts censored (e.g., at the 99th percentile) and scaled from 0 to 1. Here, named as `scaled`.
 
-```{r}
-assayNames(sce_list[[1]])
-assayNames(sce_list[[2]])
+```{r assay-names}
+assayNames(sce_list[[1]]) <- c("raw", "exprs", "scaled")
+assayNames(sce_list[[2]]) <- c("raw", "exprs", "scaled")
 ```
 
 ## Subsample-Images.
@@ -468,7 +468,16 @@ tt <- tt |>
     stages %in% c("mAAb+_Insulitic_IDI", "RecentOnset_Insulitic_IDI") ~ "mAAb+/RecentOnset_Insulitic_IDI",
     stages %in% c("mAAb+_NonInsulitic_IDI", "RecentOnset_NonInsulitic_IDI") ~ "mAAb+/RecentOnset_NonInsulitic_IDI",
     TRUE ~ stages
-  ))
+  )) |> 
+  # factor:
+  dplyr::mutate(stages = factor(stages, levels = c("NoDiabetes_NonInsulitic_ICI", 
+                                                  "sAAb+_NonInsulitic_ICI", 
+                                                  "mAAb+_NonInsulitic_ICI", 
+                                                  "RecentOnset_NonInsulitic_ICI", 
+                                                  "mAAb+/RecentOnset_Insulitic_ICI", 
+                                                  "mAAb+/RecentOnset_Insulitic_IDI",
+                                                  "mAAb+/RecentOnset_NonInsulitic_IDI",
+                                                  "LongDuration_NonInsulitic_IDI")))
 tt |> dplyr::count(stages)
 ```
 
@@ -502,7 +511,7 @@ sce_list[[1]]$image_name |> unique() -> image_names_islet_full
 sce_list[[2]]$image_name |> unique() -> image_names_immune_full
 ```
 
-```{r}
+```{r coerce-sce}
 # Coerce to SingleCellExperiment
 sce_list[[1]] <- as(sce_list[[1]], "SingleCellExperiment")
 sce_list[[2]] <- as(sce_list[[2]], "SingleCellExperiment")
@@ -510,19 +519,29 @@ sce_list[[2]] <- as(sce_list[[2]], "SingleCellExperiment")
 
 ## Add NICHE-information.
 
-```{r add-niche-information}
-run <- TRUE
-if (run) {
-  fn  <- "/mnt/central_nas/projects/type1_diabetes/nathan/T1D_Vol/temp_analysis/analysis/16_Neighborhood_cells_Immune/CN_annot.rds"
-  tt <- readRDS(fn)
+This is only added to the Immune panel. As CNs were run on this panel.
 
-  cl_temp <- SummarizedExperiment::colData(sce_list[[2]]) |> 
+```{r add-niche-information}
+url_cns <- "https://zenodo.org/records/21487858/files/CN_annot.rds"
+dest_dir <- file.path(workdir, "CN_annot.rds")
+
+if (!file.exists(dest_dir)) {
+  download.file(url_cns, destfile = dest_dir, mode = "wb")
+}
+
+tt <- readRDS(dest_dir)
+cl_temp <- SummarizedExperiment::colData(sce_list[[2]]) |> 
     tibble::as_tibble() |> 
     dplyr::left_join(tt, by = "cell_id") |> 
     S4Vectors::DataFrame()
-  
-  SummarizedExperiment::colData(sce_list[[2]]) <- cl_temp
-}
+
+SummarizedExperiment::colData(sce_list[[2]]) <- cl_temp
+```
+
+Check that rownames(rowData(sce_list[[i]])) is identical to rownames(colData(sce_list[[i]])).
+```{r}
+stopifnot(rownames(rowData(sce_list[[1]])) == rownames(colData(sce_list[[1]])))
+stopifnot(rownames(rowData(sce_list[[2]])) == rownames(colData(sce_list[[2]])))
 ```
 
 ## Save.
@@ -642,14 +661,24 @@ mask_list_sub <- lapply(seq_along(mask_list_2), function(i) {
 })
 ```
 
+Check that the image_name column of mcols(mask_list_sub) matches the image_name column of colData(sce_list_sub).
+```{r}
+if (!all(sort(mcols(mask_list_sub[[1]])[["image_name"]]) == sort(unique(colData(sce_list_sub[[1]])[["image_name"]])))) {
+  stop("Image names in mcols(mask_list_sub[[1]]) do not match colData(sce_list_sub[[1]])")
+}
+if (!all(sort(mcols(mask_list_sub[[2]])[["image_name"]]) == sort(unique(colData(sce_list_sub[[2]])[["image_name"]])))) {
+  stop("Image names in mcols(mask_list_sub[[2]]) do not match colData(sce_list_sub[[2]])")
+}
+```
+
 ## Save the CytoImageList objects as RDS files for upload to `ExperimentHub`.
 ```{r save-masks}
 ## Save the CytoImageList objects as RDS files
 panels <- c("islet", "immune")
-lapply(seq_along(mask_list), function(i) {
+lapply(seq_along(mask_list_2), function(i) {
     print(paste0("Saving masks_full_", panels[i], ".rds"))
     print(file.path(getwd(), outdir, paste0("masks_full_", panels[i], ".rds")))
-    saveRDS(mask_list[[i]], file.path(outdir, paste0("masks_full_", panels[i], ".rds")))
+    saveRDS(mask_list_2[[i]], file.path(outdir, paste0("masks_full_", panels[i], ".rds")))
 })
 
 ## Save the subsetted CytoImageList objects as RDS files
@@ -679,7 +708,7 @@ Data is available in the following repositories:
 exdir <- file.path(workdir, "Islet_img")
 dest_dir <- file.path(workdir, "Islet_img.zip")
 
-if (!dir.exists(dest_dir)) {
+if (!file.exists(dest_dir)) {
   url_img <- "https://zenodo.org/records/15919088/files/Islet.zip"
   download.file(url_img, destfile = dest_dir, mode = "wb")
 }
@@ -690,7 +719,7 @@ if (!dir.exists(exdir)) {
 exdir <- file.path(workdir, "Immune_img")
 dest_dir <- file.path(workdir, "Immune_img.zip")
 
-if (!dir.exists(dest_dir)) {
+if (!file.exists(dest_dir)) {
   url_img <- "https://zenodo.org/records/15971803/files/Immune.zip"
   download.file(url_img, destfile = dest_dir, mode = "wb")
 }

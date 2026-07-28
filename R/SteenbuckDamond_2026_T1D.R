@@ -71,7 +71,7 @@
 #' The \code{assay} slots of the \linkS4class{SingleCellExperiment} and 
 #' \linkS4class{SpatialExperiment} objects contain three assays:
 #' \itemize{
-#'     \item \code{counts} contains raw mean ion counts per cell.
+#'     \item \code{raw} contains raw mean ion counts per cell.
 #'     \item \code{exprs} contains arsinh-transformed counts, with cofactor 1.
 #'     \item \code{scaled} contains scaled asinh-transformed raw counts.
 #' }
