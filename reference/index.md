@@ -12,6 +12,8 @@
   : Obtain the JacksonFischer_2020_BreastCancer dataset
 - [`Meyer_2025_TripleNegativeBreastCancer()`](https://bodenmillergroup.github.io/imcdatasets/reference/Meyer_2025_TripleNegativeBreastCancer.md)
   : Obtain the Meyer_2025_TripleNegativeBreastCancer dataset
+- [`SteenbuckDamond_2026_T1D()`](https://bodenmillergroup.github.io/imcdatasets/reference/SteenbuckDamond_2026_T1D.md)
+  : Obtain the SteenbuckDamond_2026_T1D dataset
 - [`Zanotelli_2020_Spheroids()`](https://bodenmillergroup.github.io/imcdatasets/reference/Zanotelli_2020_Spheroids.md)
   : Obtain the Zanotelli_2020_Spheroids dataset
 - [`listDatasets()`](https://bodenmillergroup.github.io/imcdatasets/reference/listDatasets.md)

@@ -38,7 +38,7 @@ segmentation masks.
 
 ``` r
 listDatasets()
-#> DataFrame with 6 rows and 7 columns
+#> DataFrame with 7 rows and 7 columns
 #>             FunctionCall     Species                Tissue NumberOfCells
 #>              <character> <character>           <character>     <integer>
 #> 1 Damond_2019_Pancreas()       Human              Pancreas        252059
@@ -47,6 +47,7 @@ listDatasets()
 #> 4 Zanotelli_2020_Spher..       Human   Cell line spheroids        229047
 #> 5 IMMUcan_2022_CancerE..       Human         Primary tumor         46825
 #> 6 Meyer_2025_TripleNeg..       Human  Primary breast tumor        257680
+#> 7 SteenbuckDamond_2026..       Human              Pancreas      17609072
 #>   NumberOfImages NumberOfChannels              Reference
 #>        <integer>        <integer>            <character>
 #> 1            100               38  @Damond-2019-Pancreas
@@ -55,4 +56,5 @@ listDatasets()
 #> 4            517               51 @Zanotelli-2020-Sphe..
 #> 5             14               40                   None
 #> 6            125               39 @Meyer-2025-TripleNe..
+#> 7            120               79 @SteenbuckDamond-202..
 ```

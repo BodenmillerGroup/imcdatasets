@@ -19,12 +19,12 @@ Source:
 
 Damond N, Steenbuck N (2026). *imcdatasets: Collection of publicly
 available imaging mass cytometry (IMC) datasets*. R package version
-1.21.2, <https://github.com/BodenmillerGroup/imcdatasets>.
+1.21.3, <https://github.com/BodenmillerGroup/imcdatasets>.
 
     @Manual{,
       title = {imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets},
       author = {Nicolas Damond and Nathan Steenbuck},
       year = {2026},
-      note = {R package version 1.21.2},
+      note = {R package version 1.21.3},
       url = {https://github.com/BodenmillerGroup/imcdatasets},
     }

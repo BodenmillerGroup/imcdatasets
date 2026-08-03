@@ -47,7 +47,8 @@ knitr::kable(datasets)
 | [`JacksonFischer_2020_BreastCancer()`](https://bodenmillergroup.github.io/imcdatasets/reference/JacksonFischer_2020_BreastCancer.md) | Human | Primary breast tumour | 285851 | 100 | 42 | Jackson et al. (2020) |
 | [`Zanotelli_2020_Spheroids()`](https://bodenmillergroup.github.io/imcdatasets/reference/Zanotelli_2020_Spheroids.md) | Human | Cell line spheroids | 229047 | 517 | 51 | Zanotelli et al. (2020) |
 | [`IMMUcan_2022_CancerExample()`](https://bodenmillergroup.github.io/imcdatasets/reference/IMMUcan_2022_CancerExample.md) | Human | Primary tumor | 46825 | 14 | 40 | None |
-| `Meyer_2025_TripleNegativeBreastCancer` | Human | Primary breast tumor | 257680 | 125 | 39 | Meyer et al. (2025) |
+| [`Meyer_2025_TripleNegativeBreastCancer()`](https://bodenmillergroup.github.io/imcdatasets/reference/Meyer_2025_TripleNegativeBreastCancer.md) | Human | Primary breast tumor | 257680 | 125 | 39 | Meyer et al. (2025) |
+| [`SteenbuckDamond_2026_T1D()`](https://bodenmillergroup.github.io/imcdatasets/reference/SteenbuckDamond_2026_T1D.md) | Human | Pancreas | 17609072 | 120 | 79 | Steenbuck et al. (2026) |
 
 ## Retrieving data
 
@@ -255,7 +256,7 @@ plotPixels(
     ## [8] base     
     ## 
     ## other attached packages:
-    ##  [1] imcdatasets_1.21.2          SpatialExperiment_1.22.0   
+    ##  [1] imcdatasets_1.21.3          SpatialExperiment_1.22.0   
     ##  [3] cytomapper_1.24.0           EBImage_4.54.0             
     ##  [5] SingleCellExperiment_1.34.0 SummarizedExperiment_1.42.0
     ##  [7] Biobase_2.72.0              GenomicRanges_1.64.0       
@@ -265,7 +266,7 @@ plotPixels(
     ## [15] matrixStats_1.5.0           BiocStyle_2.40.0           
     ## 
     ## loaded via a namespace (and not attached):
-    ##   [1] DBI_1.3.0            bitops_1.0-9         httr2_1.3.0         
+    ##   [1] DBI_1.3.0            bitops_1.1-0         httr2_1.3.0         
     ##   [4] gridExtra_2.3.1      rlang_1.3.0          magrittr_2.0.5      
     ##   [7] svgPanZoom_0.3.4     shinydashboard_0.7.3 otel_0.2.0          
     ##  [10] RSQLite_3.53.3       compiler_4.6.1       png_0.1-9           
@@ -275,7 +276,7 @@ plotPixels(
     ##  [22] promises_1.5.0       rmarkdown_2.31       ggbeeswarm_0.7.3    
     ##  [25] ragg_1.5.2           purrr_1.2.2          bit_4.6.0           
     ##  [28] xfun_0.60            cachem_1.1.0         jsonlite_2.0.0      
-    ##  [31] blob_1.3.0           later_1.4.8          rhdf5filters_1.24.0 
+    ##  [31] blob_1.3.0           later_1.4.8          rhdf5filters_1.24.1 
     ##  [34] DelayedArray_0.38.2  Rhdf5lib_2.0.0       BiocParallel_1.46.0 
     ##  [37] jpeg_0.1-11          tiff_0.1-12          terra_1.9-34        
     ##  [40] parallel_4.6.1       R6_2.6.1             bslib_0.11.0        
@@ -325,6 +326,11 @@ Single-Cell Pathology Landscape of Breast Cancer.” *Nature* 578 (7796):
 Meyer, Lasse, Hartland W Jackson, Nils Eling, et al. 2025. “A
 Stratification System for Breast Cancer Based on Basoluminal Tumor Cells
 and Spatial Tumor Architecture.” *Cancer Cell* 43 (9): 1637–1655.e9.
+
+Steenbuck, Nathan, Nicolas Damond, Stefanie Engler, et al. 2026.
+“Imaging Mass Cytometry Reveals Functional and Immunological Changes
+During Type 1 Diabetes Progression in Human Pancreata.” *Nature
+Metabolism* 8 (7): 1603–20.
 
 Zanotelli, V. R. T., M. Leutenegger, X. K. Lun, F. Georgi, N. de Souza,
 and B. Bodenmiller. 2020. “A Quantitative Analysis of the Interplay of

@@ -160,6 +160,12 @@ respectively.
 
 ### List of available datasets
 
+- **SteenbuckDamond_2026_T1D**: Pancreas sections from organ donors with
+  type 1 diabetes.
+  - Documentation:
+    [SteenbuckDamond_2026_T1D](https://bodenmillergroup.github.io/imcdatasets/reference/SteenbuckDamond_2026_T1D.html).  
+  - Publication: [Steenbuck, Damond et al. *Nat Metab* (2026)
+    8(7):1603–1620](https://doi.org/10.1038/s42255-026-01559-z).
 - **Damond_2019_Pancreas**: Pancreas sections from organ donors with
   type 1 diabetes.
   - Documentation:
@@ -226,7 +232,7 @@ vignette](https://bodenmillergroup.github.io/imcdatasets/articles/Guidelines_Con
 
 Damond N, Steenbuck N, Eling N, Fischer J, Hoch T, Meyer L (2026).
 *imcdatasets: Collection of publicly available imaging mass cytometry
-(IMC) datasets.* R package version 1.21.2,
+(IMC) datasets.* R package version 1.21.3,
 <https://github.com/BodenmillerGroup/imcdatasets>.
 
 ## Authors
