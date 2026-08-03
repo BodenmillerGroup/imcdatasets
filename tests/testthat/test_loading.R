@@ -27,7 +27,8 @@ datasets <- list(
     "JacksonFischer_2020_BreastCancer",
     "Zanotelli_2020_Spheroids",
     "IMMUcan_2022_CancerExample",
-    "Meyer_2025_TripleNegativeBreastCancer"
+    "Meyer_2025_TripleNegativeBreastCancer",
+    "SteenbuckDamond_2026_T1D"
 )
 
 testDatasetWorks <- function(x, ci_test = FALSE) {

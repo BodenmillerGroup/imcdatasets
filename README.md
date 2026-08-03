@@ -44,6 +44,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version = "3.23")
 ```
+
 Then, `imcdatasets` can be installed from *Bioconductor*:
 ```r
 BiocManager::install("imcdatasets")
@@ -139,7 +140,10 @@ respectively.
 ## Available datasets
 
 ### List of available datasets
-
+* __SteenbuckDamond_2026_T1D__: Pancreas sections from organ donors with type 1
+diabetes.    
+  - Documentation: [SteenbuckDamond_2026_T1D](https://bodenmillergroup.github.io/imcdatasets/reference/SteenbuckDamond_2026_T1D.html).  
+  - Publication: [Steenbuck, Damond et al. _Nat Metab_ (2026) 8(7):1603–1620](https://doi.org/10.1038/s42255-026-01559-z).
 * __Damond_2019_Pancreas__: Pancreas sections from organ donors with type 1
 diabetes.    
   - Documentation: [Damond_2019_Pancreas](https://bodenmillergroup.github.io/imcdatasets/reference/Damond_2019_Pancreas.html).  
@@ -171,6 +175,7 @@ imc <- imcdatasets::listDatasets()
 imc <- as.data.frame(imc)
 imc
 ```
+
 Detailed information about each dataset is available in the help pages
 (e.g., `?JacksonFischer_2020_BreastCancer`).
 For more information, please refer to the
@@ -188,7 +193,7 @@ Guidelines about contributions and dataset formatting are provided in a
 ## Citation
 
 Damond N, Steenbuck N, Eling N, Fischer J, Hoch T, Meyer L (2026). _imcdatasets: Collection of publicly available imaging mass cytometry (IMC) datasets._
-R package version 1.21.2, https://github.com/BodenmillerGroup/imcdatasets.
+R package version 1.21.3, https://github.com/BodenmillerGroup/imcdatasets.
 
 ## Authors
 

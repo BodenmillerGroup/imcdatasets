@@ -88,7 +88,45 @@ df_list <- list(
         DatasetType = rep(c("matched subset", "full dataset"), 2, each = 3),
         Notes = c("")
     ),
-    
+
+    # SteenbuckDamond_2026_Pancreas
+    data.frame(
+        Title = sprintf(
+            "SteenbuckDamond_2026_T1D - %s - %s - %s%s",
+            rep(c("islet", "immune"), each = 6),
+            rep(c("sce", "images", "masks"), 4),
+            rep(c(rep("v1", 3)), each = 4),
+            rep(c("", " - full"), 2, each = 3)),
+        FunctionCall = sprintf(
+            "SteenbuckDamond_2026_T1D(data_type = '%s', panel = '%s'%s)",
+            rep(c("sce", "images", "masks"), 4),
+            rep(c("islet", "immune"), each = 6),
+            rep(c("", ", full_dataset = TRUE"), 2, each = 3)),
+        Description = sprintf(
+            "%s (%s panel, %s) for the SteenbuckDamond_2026_T1D IMC dataset",
+            c("Single cell data", "Multichannel images", "Cell masks"),
+            rep(c("Islet", "Immune"), each = 6),
+            rep(c("subset", "full dataset"), 2, each = 3)),
+        BiocVersion = "3.24",
+        DatasetVersion = "v1",
+        SourceUrl = "https://doi.org/10.5281/zenodo.14968075",
+        SourceVersion = "Mar 05 2025",
+        RDataClass = rep(c("SingleCellExperiment",
+            rep("CytoImageList", 2)), 4),
+        LocationPrefix = rep(c("https://zenodo.org/"), 12),
+        RDataPath = 
+            file.path("records",
+            "21621291",
+            "files",
+            paste0(sprintf("%s%s_%s",
+                rep(c("sce", "images", "masks"), 4),
+                rep(c("", "_full"), 2, each = 3),
+                rep(c("islet", "immune"), each = 6)), ".rds")),
+        DataType = rep(c("sce", "images", "masks"), 4),
+        DatasetType = rep(c("matched subset", "full dataset"), 2, each = 3),
+        Notes = c("")
+    ),
+
     # IMMUcan_2022_CancerExample
     data.frame(
         Title = sprintf(
@@ -134,7 +172,7 @@ df_list <- list(
         "%s (%s) for the Meyer_2025_TripleNegativeBreastCancer IMC dataset",
         c("Single cell data", "Multichannel images", "Cell masks"),
         rep(c("subset", "full dataset"), 1, each = 3)),
-      BiocVersion = rep(c("3.23"), each=6),
+      BiocVersion = rep(c("3.24"), each=6),
       DatasetVersion = rep(c("v1"), each=3),
       SourceUrl = "https://zenodo.org/records/15304181",
       SourceVersion = "Jan 09 2026",

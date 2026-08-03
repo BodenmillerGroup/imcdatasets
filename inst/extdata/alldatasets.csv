@@ -4,4 +4,5 @@ HochSchulz_2022_Melanoma(),Human,Metastatic melanoma,325881,50,41,@HochSchulz-20
 JacksonFischer_2020_BreastCancer(),Human,Primary breast tumour,285851,100,42,@JacksonFischer-2020-BreastCancer
 Zanotelli_2020_Spheroids(),Human,Cell line spheroids,229047,517,51,@Zanotelli-2020-Spheroids
 IMMUcan_2022_CancerExample(),Human,Primary tumor,46825,14,40,None
-Meyer_2025_TripleNegativeBreastCancer, Human, Primary breast tumor,257680,125,39,@Meyer-2025-TripleNegativeBreastCancer
+Meyer_2025_TripleNegativeBreastCancer(),Human,Primary breast tumor,257680,125,39,@Meyer-2025-TripleNegativeBreastCancer
+SteenbuckDamond_2026_T1D(),Human,Pancreas,17609072,120,79,@SteenbuckDamond-2026-T1D
