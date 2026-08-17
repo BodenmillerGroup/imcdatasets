@@ -73,13 +73,13 @@ Then, `imcdatasets` can be installed from *Bioconductor*:
 BiocManager::install("imcdatasets")
 ```
 
-`imcdatasets` can also be installed from GitHub using `devtools`:
+`imcdatasets` can also be installed from GitHub using `pak`:
 
 ``` r
 
-if (!requireNamespace("devtools", quietly = TRUE))
-    install.packages("devtools")
-devtools::install_github("BodenmillerGroup/imcdatasets", build_vignettes = TRUE)
+if (!requireNamespace("pak", quietly = TRUE))
+    install.packages("pak")
+pak::pkg_install("BodenmillerGroup/imcdatasets")
 ```
 
 ### Dependencies

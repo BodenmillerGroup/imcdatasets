@@ -279,7 +279,7 @@ plotPixels(
     ##  [31] blob_1.3.0           later_1.4.8          rhdf5filters_1.24.1 
     ##  [34] DelayedArray_0.38.2  Rhdf5lib_2.0.0       BiocParallel_1.46.0 
     ##  [37] jpeg_0.1-11          tiff_0.1-12          terra_1.9-34        
-    ##  [40] parallel_4.6.1       R6_2.6.1             bslib_0.11.0        
+    ##  [40] parallel_4.6.1       R6_2.6.1             bslib_0.12.0        
     ##  [43] RColorBrewer_1.1-3   jquerylib_0.1.4      Rcpp_1.1.2          
     ##  [46] bookdown_0.47        knitr_1.51           httpuv_1.6.17       
     ##  [49] Matrix_1.7-5         nnls_1.6             tidyselect_1.2.1    
