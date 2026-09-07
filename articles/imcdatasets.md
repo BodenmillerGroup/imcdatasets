@@ -261,7 +261,7 @@ plotPixels(
     ##  [5] SingleCellExperiment_1.34.0 SummarizedExperiment_1.42.0
     ##  [7] Biobase_2.72.0              GenomicRanges_1.64.0       
     ##  [9] Seqinfo_1.2.0               IRanges_2.46.0             
-    ## [11] S4Vectors_0.50.1            BiocGenerics_0.58.1        
+    ## [11] S4Vectors_0.50.2            BiocGenerics_0.58.1        
     ## [13] generics_0.1.4              MatrixGenerics_1.24.0      
     ## [15] matrixStats_1.5.0           BiocStyle_2.40.0           
     ## 
@@ -273,23 +273,23 @@ plotPixels(
     ##  [13] systemfonts_1.3.2    fftwtools_0.9-11     vctrs_0.7.3         
     ##  [16] crayon_1.5.3         pkgconfig_2.0.3      fastmap_1.2.0       
     ##  [19] dbplyr_2.6.0         magick_2.9.1         XVector_0.52.0      
-    ##  [22] promises_1.5.0       rmarkdown_2.31       ggbeeswarm_0.7.3    
+    ##  [22] promises_1.5.0       rmarkdown_2.32       ggbeeswarm_0.7.3    
     ##  [25] ragg_1.5.2           purrr_1.2.2          bit_4.6.0           
     ##  [28] xfun_0.60            cachem_1.1.0         jsonlite_2.0.0      
     ##  [31] blob_1.3.0           later_1.4.8          rhdf5filters_1.24.1 
     ##  [34] DelayedArray_0.38.2  Rhdf5lib_2.0.0       BiocParallel_1.46.0 
-    ##  [37] jpeg_0.1-11          tiff_0.1-12          terra_1.9-34        
+    ##  [37] jpeg_0.1-11          tiff_0.1-12          terra_1.9-46        
     ##  [40] parallel_4.6.1       R6_2.6.1             bslib_0.12.0        
     ##  [43] RColorBrewer_1.1-3   jquerylib_0.1.4      Rcpp_1.1.2          
-    ##  [46] bookdown_0.47        knitr_1.51           httpuv_1.6.17       
+    ##  [46] bookdown_0.48        knitr_1.52           httpuv_1.6.17       
     ##  [49] Matrix_1.7-5         nnls_1.6             tidyselect_1.2.1    
     ##  [52] abind_1.4-8          yaml_2.3.12          viridis_0.6.5       
-    ##  [55] codetools_0.2-20     curl_7.1.0           lattice_0.22-9      
+    ##  [55] codetools_0.2-20     curl_8.0.0           lattice_0.22-9      
     ##  [58] tibble_3.3.1         withr_3.0.3          KEGGREST_1.52.2     
     ##  [61] shiny_1.14.0         S7_0.2.2             evaluate_1.0.5      
-    ##  [64] desc_1.4.3           BiocFileCache_3.2.0  Biostrings_2.80.1   
-    ##  [67] ExperimentHub_3.2.0  filelock_1.0.3       pillar_1.11.1       
-    ##  [70] BiocManager_1.30.27  sp_2.2-3             RCurl_1.98-1.19     
+    ##  [64] desc_1.4.3           BiocFileCache_3.2.0  Biostrings_2.80.2   
+    ##  [67] ExperimentHub_3.2.2  filelock_1.0.3       pillar_1.11.1       
+    ##  [70] BiocManager_1.30.27  sp_2.2-3             RCurl_1.98-1.20     
     ##  [73] BiocVersion_3.23.1   ggplot2_4.0.3        scales_1.4.0        
     ##  [76] xtable_1.8-8         glue_1.8.1           tools_4.6.1         
     ##  [79] AnnotationHub_4.2.2  locfit_1.5-9.12      fs_2.1.0            
@@ -301,8 +301,8 @@ plotPixels(
     ##  [97] sass_0.4.10          digest_0.6.39        SparseArray_1.12.2  
     ## [100] rjson_0.2.23         htmlwidgets_1.6.4    farver_2.1.2        
     ## [103] memoise_2.0.1        htmltools_0.5.9      pkgdown_2.2.1       
-    ## [106] lifecycle_1.0.5      httr_1.4.8           h5mread_1.4.0       
-    ## [109] mime_0.13            bit64_4.8.2
+    ## [106] lifecycle_1.0.5      httr_1.4.9           h5mread_1.4.1       
+    ## [109] mime_0.13            bit64_4.8.6
 
 ## References
 
